@@ -5,7 +5,8 @@ void main(){
   List<int> oddList=numList.where((i)=>i%2!=0).toList();
   List<int> Multipleof2=numList.map((i)=>i*2).toList();
   numList.forEach((i)=>sum+=i);
-  print("Sum of all numbers in the list is: $sum");
+  print("Sum of all numbers in the list is: $sum")
+  ;
   print(evenList);
   print(oddList);
   print(Multipleof2);

@@ -6,7 +6,7 @@ class Student{
 
   const Student.guest():
     id=0,
-    name="Guest";         //initializer list
+    name="Guest";         //initializer list is used to initialize final variables in a const constructor
 }
 void main(){
   const s1=Student(1,"Balaji");

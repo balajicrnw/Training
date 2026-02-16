@@ -24,7 +24,7 @@ class BankAccount{
   }
 
   void withdraw(double amount){
-    if(amount==0){
+    if(amount>0){
       if(amount>_balance!){
         print("Insufficient balance");
       }
@@ -38,13 +38,16 @@ class BankAccount{
     }
     
 }
+}
 
 void main(){
-  BankAccount b1=new BankAccount("123456789","Balaji","1234",500.0);
-  b1.getBalance("Balaji","1234");
-  b1.setBalance(1000.0);
-  b1.getBalance("Balaji","1234");
-  b1.deposit(500.0);
-  b1.getBalance("Balaji","1234");
-
+  BankAccount user1=new BankAccount("123456789","Balaji","1234",500.0);
+  user1.getBalance("Balaji","1234");
+  user1.setBalance(1000.0);
+  user1.getBalance("Balaji","1234");
+  user1.deposit(500.0);
+  user1.getBalance("Balaji","1234");
+  user1.withdraw(1000.0);
+  user1.getBalance("Balaji","1234");
+  user1.withdraw(2032893225345);
 }

@@ -34,10 +34,7 @@ class Student{
 
   void main(){
     List<String> subjects=[];
-    subjects.add("Maths");
-    subjects.add("Physics");
-    subjects.add("Chemistry");
-    subjects.add("Biology");
+    subjects.addAll(["Maths","Physics","Chemistry","Biology"]);
     Student s1=new Student(1,"Balaji",21,5.8,subjects);
     s1.printDetails();
     subjects.remove( "Biology");

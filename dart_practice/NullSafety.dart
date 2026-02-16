@@ -7,7 +7,7 @@ void main(){
   int? age=21;
   late String? name;
   String? city;
-  //printDetails(name, age); i give late which means i need to assign value before usinf it
+  //printDetails(name, age); i give late which means i need to assign value before using it
   name="Balaji";
   printDetails(name, age,city);
 }

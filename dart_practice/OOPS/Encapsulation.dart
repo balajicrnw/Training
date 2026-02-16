@@ -22,6 +22,21 @@ class BankAccount{
     _balance=(_balance??0)+amount;
     
   }
+
+  void withdraw(double amount){
+    if(amount==0){
+      if(amount>_balance!){
+        print("Insufficient balance");
+      }
+      else{
+        _balance=_balance!-amount;
+        print("Withdrawal successful. Current balance: $_balance");
+      }
+    }
+    else{
+      print("Enter valid amount");
+    }
+    
 }
 
 void main(){

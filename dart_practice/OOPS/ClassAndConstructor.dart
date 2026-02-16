@@ -6,7 +6,7 @@ class Student{
 
   const Student.guest():
     id=0,
-    name="Guest";
+    name="Guest";         //initializer list
 }
 void main(){
   const s1=Student(1,"Balaji");

@@ -14,6 +14,7 @@ class Restaurent{
         menuList.add(MenuModel(2, "Chicken Fried Rice", 150.0));
         await Future.delayed(Duration(seconds: 2));
         menuList.add(MenuModel(3, "Pasta", 100.0));
+        
         return menuList;
     }
     

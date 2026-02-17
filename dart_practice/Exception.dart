@@ -1,13 +1,9 @@
 class toomanybondaException implements Exception {
-  String toString() {
-    return "Too many bonda";
-  }
+  
 }
 
 class InvalidbondaException implements Exception {
-  String toString() {
-    return "Invalid bonda amount";
-  }
+  
 }
 
 class Bondashop{
@@ -24,10 +20,30 @@ class Bondashop{
     
     print("Ordered $quantity bonda.");
   }
+
+  void orderBonda(int quantity) {
+    try{
+      Bondashop shop = Bondashop(quantity);
+      
+    }
+  on InvalidbondaException catch(e){
+      print("you didnt order any bonda");
+  }
+  on toomanybondaException catch(e){
+      print("you ordered too many bondas");
+  }
+  catch(e){
+      print("Error: $e");
+  }
+  finally{
+    print("come to Bondashop daily");
+  }
+  }
 }
 
 void main(){
-  Bondashop shop = Bondashop(2);
-  Bondashop shop2 = Bondashop(0);
-  Bondashop shop3 = Bondashop(60);
+  Bondashop shop = Bondashop(3);
+  shop.orderBonda(0);
+  shop.orderBonda(6);
+  shop.orderBonda(3);
 }

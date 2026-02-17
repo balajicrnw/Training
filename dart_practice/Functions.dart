@@ -16,8 +16,7 @@ void main(){
   numList.forEach((i)=>
     sum+=i
   );
+
   print("The sum of the list is: $sum");
   subtraction(10,5);
-
-  
 }

@@ -5,6 +5,10 @@ enum EnemyHealth{
 
   final int health;
   const EnemyHealth(this.health);
+
+  void display(){
+    print("Difficulty: ${this.name}");
+  }
 }
 
 void main(){
@@ -12,5 +16,6 @@ void main(){
   print(enemy);
   print(enemy.health);
   print(EnemyHealth.hard.health);
+  EnemyHealth.easy.display();
 
 }

@@ -5,6 +5,5 @@ void main(){
     String star="*";
     stdout.write(star*i);
     stdout.write(" ");
-  
 }
 }

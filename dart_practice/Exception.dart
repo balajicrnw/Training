@@ -23,7 +23,7 @@ class Bondashop{
 
   void orderBonda(int quantity) {
     try{
-      Bondashop shop = Bondashop(quantity);
+      Bondashop(quantity);
       
     }
   on InvalidbondaException catch(e){

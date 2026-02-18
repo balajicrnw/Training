@@ -19,7 +19,6 @@ class Gamestore{
     if(age>=18){
       numberOfUsers++;
       return Gamestore.newUser(userId, age);
-      
     }
     
     print("Account creation denied to user: $userId. Age must be 18 or above.");

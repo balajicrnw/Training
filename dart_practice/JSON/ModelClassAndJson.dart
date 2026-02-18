@@ -68,6 +68,4 @@ void main(){
   personList.forEach((person) => person.display(person));
 
   print(PersonModel.jsonData);
-
-
 }

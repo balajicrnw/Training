@@ -14,10 +14,10 @@ void primeCheck(int n){
     }
   }
   if(isPrime){
-    print("$n is a prime number");
+    print("Prime");
   }
   else{
-    print("$n is not a prime number");
+    print("not Prime");
   }
 
 }

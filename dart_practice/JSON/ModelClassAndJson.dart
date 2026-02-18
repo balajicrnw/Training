@@ -42,6 +42,7 @@ class PersonModel{
       'gender':gender
     };
   }
+  
 
   void display(PersonModel person){
     print("Name: ${person.name}");

@@ -6,6 +6,8 @@ void addition(var a,{var b,var c=0}){
   else
   print("The sum of $a and $b and $c is: $sum");
 }
+
+  
 void subtraction(a,b)=>print("Difference of $a and $b is: ${a-b}");
  
 void main(){
@@ -19,4 +21,5 @@ void main(){
 
   print("The sum of the list is: $sum");
   subtraction(10,5);
+  (()=>print("This is an anonymous function"))();
 }

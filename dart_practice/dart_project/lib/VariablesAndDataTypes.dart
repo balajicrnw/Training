@@ -1,9 +1,9 @@
 class Student{
-  int? id;
-  String? name;
-  int? age;
-  double? heightinft;
-  List<String>? subjects;
+  int id;
+  String name;
+  int age;
+  double heightinft;
+  List<String> subjects;
   Map<String,dynamic>? StudentDetails;
   int updateCount=0;
 

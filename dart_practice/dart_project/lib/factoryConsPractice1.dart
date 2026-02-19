@@ -1,24 +1,41 @@
-class VehicaleFuel{
-  static double fuelCapcity=50;
-  double curretFuel;
-  double Fuelneeded;
-
-  VehicaleFuel.fillFuel(this.Fuelneeded,this.curretFuel);
-
-  factory VehicaleFuel(double fuelNeeded, double curretFuel){
-    if((fuelNeeded+curretFuel)>50){
-      print("Fuel fulled $fuelCapcity liters. Cannot add more fuel. remaining fuel: ${fuelNeeded+curretFuel-fuelCapcity} liters");
-      return VehicaleFuel.fillFuel(0,50);
-    } else {
-      print("Fuel fulled $fuelNeeded liters. Total fuel: ${fuelNeeded+curretFuel} liters");
-      return VehicaleFuel.fillFuel(fuelNeeded,curretFuel);
+abstract class Shape{
+  void draw();
+  factory Shape(String shape){
+    switch(shape){
+      case "circle":
+        return circle();
+      case "square":
+        return square();
+      case "triangle":
+        return triangle();
+      default:
+        throw ArgumentError("Invalid shape: $shape");
     }
+  }
+}
+class circle implements Shape{
+  void draw(){
+    print("Drawing a circle");
+  } 
+}
+class square implements Shape{
+  void draw(){
+    print("Drawing a square");
+  }
+}
+class triangle implements Shape{
+  void draw(){
+    print("Drawing a triangle");
   }
 }
 
 void main(){
-  VehicaleFuel v1=VehicaleFuel(30, 10);
-  VehicaleFuel v2=VehicaleFuel(25, 20);
-  VehicaleFuel v3=VehicaleFuel(15, 5);
-  VehicaleFuel v4=VehicaleFuel(100, 40);
+  Shape circle=Shape("circle");
+  circle.draw();
+  Shape square=Shape("square");
+  square.draw();
+  Shape triangle=Shape("triangle");
+  triangle.draw();
+  Shape invalid=Shape("aefkjseg");
+  
 }

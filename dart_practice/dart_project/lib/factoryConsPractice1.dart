@@ -37,5 +37,7 @@ void main(){
   Shape triangle=Shape("triangle");
   triangle.draw();
   Shape invalid=Shape("aefkjseg");
+  invalid.draw();
+
   
 }

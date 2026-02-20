@@ -52,5 +52,4 @@ extension StudentExtension on Student{
     s2.printDetails();
     print("Update count for s1: ${s1.updateCount}");
     print("Update count for s2: ${s2.updateCount}");
-
 }

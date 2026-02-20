@@ -74,13 +74,13 @@ class _LoginPageState extends State<LoginPage> {
                   if (_formKey.currentState!.validate()) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => HomePage()),
+                      MaterialPageRoute(builder: (context) => HomePage()),
                     )
                     ;
                   }
-                  else{
-                    _formKey.currentState!.reset();
-                  }
+                  // else{
+                  //   _formKey.currentState!.reset();
+                  // }
                 },
                 child: Text("Login"),
               ),
@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => RegisterPage()),
+                    MaterialPageRoute(builder: (context) => RegisterPage()),
                   );
                 },
                 child: Text("Don't have account? Sign Up"),

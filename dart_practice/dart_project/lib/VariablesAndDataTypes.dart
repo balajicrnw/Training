@@ -17,6 +17,16 @@ class Student{
     };
   }
 
+  
+
+  updateDetails(String key,dynamic value){
+    this.StudentDetails![key]=value;
+    updateCount++;
+  }
+
+}
+
+extension StudentExtension on Student{
   printDetails(){
     print("id: ${StudentDetails!['id']}");
     print("name: ${StudentDetails!['name']}");
@@ -24,12 +34,6 @@ class Student{
     print("heightinft: ${StudentDetails!['heightinft']}");
     print("subjects: ${StudentDetails!['subjects']}");
   }
-
-  updateDetails(String key,dynamic value){
-    this.StudentDetails![key]=value;
-    updateCount++;
-  }
-
 }
 
   void main(){

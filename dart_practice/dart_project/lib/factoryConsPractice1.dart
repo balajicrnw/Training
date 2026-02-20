@@ -29,6 +29,7 @@ class triangle implements Shape{
   }
 }
 
+
 void main(){
   Shape circle=Shape("circle");
   circle.draw();

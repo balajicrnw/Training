@@ -14,8 +14,8 @@ Future<void> main() async{
     print(number);
   });
 
-  // Stream<int> stream2=ns.CountDown(5);
-  // await for(int number in stream2){
-  //   print(number);
-  // }
+  Stream<int> stream2=ns.CountDown(5);
+  await for(int number in stream2){
+    print(number);
+  }
 }

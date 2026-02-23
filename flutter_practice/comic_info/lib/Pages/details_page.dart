@@ -45,7 +45,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  context.pushNamed(RouterNames.characters);
+                  context.goNamed(RouterNames.characters);
                 },
                 child: const Text("Go Back"))
           ],

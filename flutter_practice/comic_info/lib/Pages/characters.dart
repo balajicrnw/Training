@@ -45,7 +45,12 @@ class _CharactersState extends State<CharactersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Characters')),
+      appBar: AppBar(title: const Text('Characters'),leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        context.goNamed(RouterNames.home);
+      },),),
+      
       body: _buildBody(),
     );
   }

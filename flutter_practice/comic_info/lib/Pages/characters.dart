@@ -78,19 +78,28 @@ class _CharactersState extends State<CharactersPage> {
 
         return InkWell(
           onTap: () {
-            // Pass the whole hero object to detail page
-            context.goNamed(RouterNames.detail, extra: hero);
+            context.goNamed(RouterNames.detail, extra: hero,pathParameters: {
+    'name': hero.name,  
+  },);
           },
           child: Card(
             child: Column(
               children: [
                 Expanded(
-                  child: Image.network(
-                    hero.image,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image, size: 50),
+                  child: Hero(
+                    tag: hero.name,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child:Tooltip(
+                      message: hero.name,
+                      child: Image.network(
+                        hero.image,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, size: 50),
+                      ),),
+                    ),
                   ),
                 ),
                 Padding(

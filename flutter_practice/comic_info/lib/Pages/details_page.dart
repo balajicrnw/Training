@@ -5,7 +5,8 @@ import 'package:comic_info/Router/router_names.dart';
 
 class DetailPage extends StatefulWidget {
   final Comicmodel hero;
-  const DetailPage({super.key, required this.hero});
+  final String charName;
+  const DetailPage({super.key, required this.hero,required this.charName});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -21,7 +22,21 @@ class _DetailPageState extends State<DetailPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.network(widget.hero.image),
+            Hero(
+              tag: widget.hero.name,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    widget.hero.image,
+                    height: 300,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             Text(
               'Name: ${widget.hero.name}',

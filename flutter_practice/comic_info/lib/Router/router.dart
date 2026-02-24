@@ -26,13 +26,15 @@ class AppRouter {
         }),
     GoRoute(
         name: RouterNames.detail,
-        path: "/detail",
+        path: "/detail/:name",
         pageBuilder: (context, state) {
           final hero = state.extra as Comicmodel;
+          final charName=state.pathParameters['name'];
           return MaterialPage(
-            child: DetailPage(hero: hero),
+            child: DetailPage(hero: hero,charName: charName??" "),
           );
         })
+  
   ],
       );
 }

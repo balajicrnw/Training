@@ -1,5 +1,6 @@
 import 'package:comic_info/Router/router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +15,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _router = AppRouter().router;
+  // final GoRouter _router = AppRouter().router;
 
   @override
   Widget build(BuildContext context) {

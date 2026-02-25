@@ -19,7 +19,6 @@ Future<void> main() async{
       List bookList=data["data"].map((e)=>serializers.deserializeWith(Books.serializer, e)).toList(); 
       print(bookList.runtimeType);
       printDetails(bookList);
-
     }
   }
   catch(ex){

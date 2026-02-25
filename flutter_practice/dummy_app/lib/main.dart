@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../provider/count_provider.dart';
 import 'dart:math';
+import '../Pages/new_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,10 +14,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider( 
+      providers: [ChangeNotifierProvider(create: (context)=>CountProvider())],
+      child:MaterialApp(
+      
       title: 'Flutter Demo',
       
       home: const MyHomePage(),
+    )
     );
   }
 }
@@ -54,7 +61,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Get Information about Comic characters here"),
+            
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>NewPage())), child:Text("Next page")),
             const SizedBox(height: 20),
             AnimatedBuilder(
               animation: _controller,
@@ -62,13 +71,21 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                 return Transform.rotate(
                   angle: _controller.value * 2 * pi,
                   child: Container(
-                    width: 100,
-                    height: 100,
+                    width: context.watch<CountProvider>().count*10,
+                    height:context.watch<CountProvider>().count *10,
                     color: Colors.blue,
                   ),
                 );
               },
             ),
+            Text(context.watch<CountProvider>().name.toString()),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                context.read<CountProvider>().increment();
+              },
+              child:  Text(context.watch<CountProvider>().count.toString())),
+            
           ],
         ),
       ),

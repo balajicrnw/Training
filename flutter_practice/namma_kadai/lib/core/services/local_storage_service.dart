@@ -1,12 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../model/product.dart';
 import '../../model/cart_item.dart';
 import '../../model/order.dart';
 import '../../services/local_storage_service_impl.dart';
-
-final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
-  return LocalStorageServiceImpl();
-});
 
 abstract class LocalStorageService {
   Future<void> init();

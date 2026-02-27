@@ -29,9 +29,9 @@ class AppRouter {
         path: "/detail/:name",
         pageBuilder: (context, state) {
           final hero = state.extra as Comicmodel;
-          final charName=state.pathParameters['name'];
+          final charName = state.pathParameters['name'];
           return MaterialPage(
-            child: DetailPage(hero: hero,charName: charName??" "),
+            child: DetailPage(hero: hero, charName: charName ?? " "),
           );
         })
   

@@ -87,7 +87,7 @@ class _CharactersState extends State<CharactersPage> {
               children: [
                 Expanded(
                   child: Hero(
-                    tag: hero.name,
+                    tag: hero.image,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child:Tooltip(

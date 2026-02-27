@@ -5,7 +5,6 @@ import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
 import '../repository/app_repository.dart';
-import '../core/services/local_storage_service.dart';
 import '../services/local_storage_service_impl.dart';
 
 final localStorageServiceProvider = LocalStorageServiceImpl();

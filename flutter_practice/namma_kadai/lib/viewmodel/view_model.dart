@@ -4,40 +4,21 @@ import '../model/app_state.dart';
 import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
-import '../repository/product_repository.dart';
-import '../repository/cart_repository.dart';
-import '../repository/order_repository.dart';
+import '../repository/app_repository.dart';
 import '../core/services/local_storage_service.dart';
 import '../services/local_storage_service_impl.dart';
 
-final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
-  return LocalStorageServiceImpl();
-});
+final localStorageServiceProvider = LocalStorageServiceImpl();
 
-final productRepositoryProvider = Provider<ProductRepository>((ref) {
-  final storageService = ref.watch(localStorageServiceProvider);
-  return ProductRepository(storageService);
-});
-
-final cartRepositoryProvider = Provider<CartRepository>((ref) {
-  final storageService = ref.watch(localStorageServiceProvider);
-  return CartRepository(storageService);
-});
-
-final orderRepositoryProvider = Provider<OrderRepository>((ref) {
-  final storageService = ref.watch(localStorageServiceProvider);
-  return OrderRepository(storageService);
+final appRepositoryProvider = Provider<AppRepository>((ref) {
+  return AppRepository(localStorageServiceProvider);
 });
 
 class AppNotifier extends StateNotifier<AppState> {
-  final ProductRepository productRepository;
-  final CartRepository cartRepository;
-  final OrderRepository orderRepository;
+  final AppRepository repository;
 
   AppNotifier({
-    required this.productRepository,
-    required this.cartRepository,
-    required this.orderRepository,
+    required this.repository,
   }) : super(AppState.initial());
 
   Future<void> init() async {
@@ -48,7 +29,7 @@ class AppNotifier extends StateNotifier<AppState> {
 
   Future<void> loadProducts() async {
     try {
-      final products = await productRepository.storageService.getProducts();
+      final products = await repository.storageService.getProducts();
       state = state.rebuild((b) => b..products = ListBuilder<Product>(products));
     } catch (e) {
       print('loadProducts error: $e');
@@ -57,7 +38,7 @@ class AppNotifier extends StateNotifier<AppState> {
 
   Future<void> loadCart() async {
     try {
-      final items = await cartRepository.storageService.getCartItems();
+      final items = await repository.storageService.getCartItems();
       state = state.rebuild((b) => b..cartItems = ListBuilder<CartItem>(items));
     } catch (e) {
       print('loadCart error: $e');
@@ -66,7 +47,7 @@ class AppNotifier extends StateNotifier<AppState> {
 
   Future<void> loadOrders() async {
     try {
-      final orders = await orderRepository.storageService.getOrders();
+      final orders = await repository.storageService.getOrders();
       state = state.rebuild((b) => b..orders = ListBuilder<Order>(orders));
     } catch (e) {
       print('loadOrders error: $e');
@@ -80,17 +61,17 @@ class AppNotifier extends StateNotifier<AppState> {
       ..price = product.price
       ..imageUrl = product.imageUrl
       ..quantity = 1);
-    await cartRepository.storageService.addToCart(item);
+    await repository.storageService.addToCart(item);
     await loadCart();
   }
 
   Future<void> updateQuantity(int productId, int quantity) async {
-    await cartRepository.storageService.updateCartQuantity(productId, quantity);
+    await repository.storageService.updateCartQuantity(productId, quantity);
     await loadCart();
   }
 
   Future<void> removeFromCart(int productId) async {
-    await cartRepository.storageService.removeFromCart(productId);
+    await repository.storageService.removeFromCart(productId);
     await loadCart();
   }
 
@@ -108,7 +89,7 @@ class AppNotifier extends StateNotifier<AppState> {
       ..dateTime = DateTime.now().toUtc());
 
     try {
-      await orderRepository.storageService.placeOrder(order);
+      await repository.storageService.placeOrder(order);
       await loadOrders();
       await loadCart();
     } catch (e) {
@@ -119,13 +100,9 @@ class AppNotifier extends StateNotifier<AppState> {
 
 final appViewModelProvider =
     StateNotifierProvider<AppNotifier, AppState>((ref) {
-  final productRepository = ref.watch(productRepositoryProvider);
-  final cartRepository = ref.watch(cartRepositoryProvider);
-  final orderRepository = ref.watch(orderRepositoryProvider);
+  final repository = ref.watch(appRepositoryProvider);
 
   return AppNotifier(
-    productRepository: productRepository,
-    cartRepository: cartRepository,
-    orderRepository: orderRepository,
+    repository: repository,
   )..init();
 });

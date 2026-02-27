@@ -1,25 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:namma_kadai/viewmodel/view_model.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'services/local_storage_service_impl.dart';
 import 'core/services/local_storage_service.dart';
 import 'view/product_list_screen.dart';
+import '../viewmodel/view_model.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  
-  // Initialize LocalStorageService
-  final storageService = LocalStorageServiceImpl();
-  await storageService.init();
+  await localStorageServiceProvider.init();
   
   runApp(
-    ProviderScope(
-      overrides: [
-        localStorageServiceProvider.overrideWithValue(storageService),
-      ],
-      child: const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }

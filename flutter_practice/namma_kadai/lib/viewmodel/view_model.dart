@@ -10,10 +10,6 @@ import '../services/local_storage_service_impl.dart';
 
 final localStorageServiceProvider = LocalStorageServiceImpl();
 
-final appRepositoryProvider = Provider<AppRepository>((ref) {
-  return AppRepository(localStorageServiceProvider);
-});
-
 class AppNotifier extends StateNotifier<AppState> {
   final AppRepository repository;
 
@@ -100,9 +96,7 @@ class AppNotifier extends StateNotifier<AppState> {
 
 final appViewModelProvider =
     StateNotifierProvider<AppNotifier, AppState>((ref) {
-  final repository = ref.watch(appRepositoryProvider);
-
   return AppNotifier(
-    repository: repository,
+    repository: AppRepository(localStorageServiceProvider),
   )..init();
 });

@@ -10,26 +10,11 @@ class ProductListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final products = ref.watch(productViewModelProvider);
-    final cartItems = ref.watch(cartViewModelProvider);
-    final productNotifier = ref.read(productViewModelProvider.notifier);
+    final appState = ref.watch(appViewModelProvider);
+    final products = appState.products;
+    final cartItems = appState.cartItems;
 
 
-    if (productNotifier.isLoading && products.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Namma Kadai')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (productNotifier.error != null && products.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Namma Kadai')),
-        body: Center(
-          child: Text('Error: ${productNotifier.error}'),
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(

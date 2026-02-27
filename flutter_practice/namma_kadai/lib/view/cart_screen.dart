@@ -7,8 +7,9 @@ class CartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(cartViewModelProvider);
-    final cartNotifier = ref.read(cartViewModelProvider.notifier);
+    final appState = ref.watch(appViewModelProvider);
+    final items = appState.cartItems;
+    final appNotifier = ref.read(appViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,14 +45,14 @@ class CartScreen extends ConsumerWidget {
                               IconButton(
                                 icon: const Icon(
                                     Icons.remove_circle_outline),
-                                onPressed: () => cartNotifier
+                                onPressed: () => appNotifier
                                     .updateQuantity(item.productId,
                                         item.quantity - 1),
                               ),
                               Text('${item.quantity}'),
                               IconButton(
                                 icon: const Icon(Icons.add_circle_outline),
-                                onPressed: () => cartNotifier
+                                onPressed: () => appNotifier
                                     .updateQuantity(item.productId,
                                         item.quantity + 1),
                               ),
@@ -74,7 +75,7 @@ class CartScreen extends ConsumerWidget {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           Text(
-                            '₹${cartNotifier.totalAmount.toString()}',
+                            '₹${appNotifier.totalAmount.toString()}',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -91,9 +92,7 @@ class CartScreen extends ConsumerWidget {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () async {
-                          await ref
-                              .read(orderViewModelProvider.notifier)
-                              .placeOrder();
+                          await appNotifier.placeOrder();
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

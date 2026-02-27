@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'services/local_storage_service_impl.dart';
-import 'core/providers.dart';
+import 'core/services/local_storage_service.dart';
 import 'view/product_list_screen.dart';
 
 void main() async {

@@ -70,7 +70,7 @@ class ProductDetailScreen extends ConsumerWidget {
             foregroundColor: Colors.white,
           ),
           onPressed: () {
-            ref.read(cartViewModelProvider.notifier).addToCart(product);
+            ref.read(appViewModelProvider.notifier).addToCart(product);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('${product.title} added to cart!')),
             );

@@ -1,11 +1,13 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/services/local_storage_service.dart';
-import '../model/order.dart';
+
+final orderRepositoryProvider = Provider<OrderRepository>((ref) {
+  final storageService = ref.watch(localStorageServiceProvider);
+  return OrderRepository(storageService);
+});
 
 class OrderRepository {
-  final LocalStorageService _storageService;
+  final LocalStorageService storageService;
 
-  OrderRepository(this._storageService);
-
-  Future<List<Order>> getOrders() => _storageService.getOrders();
-  Future<void> placeOrder(Order order) => _storageService.placeOrder(order);
+  OrderRepository(this.storageService);
 }

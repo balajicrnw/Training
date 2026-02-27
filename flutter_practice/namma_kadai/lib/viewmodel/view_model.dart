@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:built_collection/built_collection.dart';
+import '../model/app_state.dart';
 import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
@@ -7,45 +8,22 @@ import '../repository/product_repository.dart';
 import '../repository/cart_repository.dart';
 import '../repository/order_repository.dart';
 
-class AppState {
-  final List<Product> products;
-  final List<CartItem> cartItems;
-  final List<Order> orders;
-
-  AppState({
-    this.products = const [],
-    this.cartItems = const [],
-    this.orders = const [],
-  });
-
-  AppState copyWith({
-    List<Product>? products,
-    List<CartItem>? cartItems,
-    List<Order>? orders,
-  }) {
-    return AppState(
-      products: products ?? this.products,
-      cartItems: cartItems ?? this.cartItems,
-      orders: orders ?? this.orders,
-    );
-  }
-}
-
-
 class AppNotifier extends StateNotifier<AppState> {
   final Ref ref;
 
-  AppNotifier(this.ref) : super(AppState()) {
-    loadProducts();
-    loadCart();
-    loadOrders();
+  AppNotifier(this.ref) : super(AppState.initial());
+
+  Future<void> init() async {
+    await loadProducts();
+    await loadCart();
+    await loadOrders();
   }
 
   Future<void> loadProducts() async {
     try {
       final products =
           await ref.read(productRepositoryProvider).storageService.getProducts();
-      state = state.copyWith(products: products);
+      state = state.rebuild((b) => b..products = ListBuilder<Product>(products));
     } catch (e) {
       print('loadProducts error: $e');
     }
@@ -55,7 +33,7 @@ class AppNotifier extends StateNotifier<AppState> {
     try {
       final items =
           await ref.read(cartRepositoryProvider).storageService.getCartItems();
-      state = state.copyWith(cartItems: items);
+      state = state.rebuild((b) => b..cartItems = ListBuilder<CartItem>(items));
     } catch (e) {
       print('loadCart error: $e');
     }
@@ -65,7 +43,7 @@ class AppNotifier extends StateNotifier<AppState> {
     try {
       final orders =
           await ref.read(orderRepositoryProvider).storageService.getOrders();
-      state = state.copyWith(orders: orders);
+      state = state.rebuild((b) => b..orders = ListBuilder<Order>(orders));
     } catch (e) {
       print('loadOrders error: $e');
     }
@@ -100,7 +78,7 @@ class AppNotifier extends StateNotifier<AppState> {
   }
 
   Future<void> placeOrder() async {
-    final items = state.cartItems;
+    final items = state.cartItems.toList();
     if (items.isEmpty) return;
 
     final order = Order((b) => b
@@ -120,5 +98,5 @@ class AppNotifier extends StateNotifier<AppState> {
 
 final appViewModelProvider =
     StateNotifierProvider<AppNotifier, AppState>((ref) {
-  return AppNotifier(ref);
+  return AppNotifier(ref)..init();
 });

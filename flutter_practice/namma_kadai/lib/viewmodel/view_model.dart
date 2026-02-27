@@ -34,7 +34,7 @@ final productViewModelProvider =
   return ProductNotifier(ref);
 });
 
-// Simple Cart ViewModel
+
 class CartNotifier extends StateNotifier<List<CartItem>> {
   final Ref ref;
   bool isLoading = false;

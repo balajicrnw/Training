@@ -2,25 +2,23 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'services/local_storage_service_impl.dart';
 import 'core/providers.dart';
 import 'view/product_list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  if (Platform.isWindows || Platform.isLinux) {
-    // Initialize FFI
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
   
   // Initialize LocalStorageService
-  final container = ProviderContainer();
-  await container.read(localStorageServiceProvider).init();
+  final storageService = LocalStorageServiceImpl();
+  await storageService.init();
   
   runApp(
-    UncontrolledProviderScope(
-      container: container,
+    ProviderScope(
+      overrides: [
+        localStorageServiceProvider.overrideWithValue(storageService),
+      ],
       child: const MyApp(),
     ),
   );

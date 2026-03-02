@@ -86,14 +86,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
   }
 
   Future<void> _seedData(Database db) async {
-    final productData = [
-      {
-        'title': 'Namma Filter Coffee',
-        'description': 'Authentic South Indian filter coffee powder.',
-        'price': 250.0,
-        'imageUrl': 'https://example.com/coffee.jpg',
-      },
-    ];
+    final productData = [ { 'title': 'Namma Filter Coffee', 'description': 'Authentic South Indian filter coffee powder.', 'price': 250.0, 'imageUrl': 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=2070&auto=format&fit=crop', }, { 'title': 'Traditional Silk Saree', 'description': 'Handwoven Kanchipuram silk saree with zari border.', 'price': 5500.0, 'imageUrl': 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1974&auto=format&fit=crop', }, { 'title': 'Brass Pooja Lamp', 'description': 'Elegant brass lamp for your daily prayers.', 'price': 850.0, 'imageUrl': 'https://m.media-amazon.com/images/I/61ko3sPvQaL._SX679_.jpg', }, { 'title': 'Organic Palm Jaggery', 'description': 'Healthy and natural palm jaggery from local farms.', 'price': 180.0, 'imageUrl': 'https://m.media-amazon.com/images/I/31kEZjWsdfS.jpg', }, { 'title': 'Sony PlayStation 4 (PS4)', 'description': 'Popular gaming console with immersive graphics and exclusive games.', 'price': 29999.0, 'imageUrl': 'https://i.dr.com.tr/cache/500x400-0/originals/0001793012001-1.jpg', }, { 'title': 'Nike Running Shoes', 'description': 'Lightweight and comfortable running shoes for daily workouts.', 'price': 4599.0, 'imageUrl': 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS_uHQa0Z4Y-md9zJjoloxnqHC_28PTyzgYyyYkZ5-4aZX6aFGYusIrsUqwK89qH7RZTMRv8nCGnRoVSy2Ge5IjupZuemCz', }, { 'title': 'Stainless Steel Water Bottle', 'description': 'Insulated bottle that keeps drinks hot or cold for hours.', 'price': 799.0, 'imageUrl': 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQJB3TVFB-nO7kANOi_vWSTydoUIhIXX6gCO203lBwuRP9xiQseo1jEzod0YAxjjF0usmukai5v2fGKyvepHNKTThv3elBwTOBRzXMt44dfLdyUMBiqOrtkC_w', }, { 'title': 'Samsung 32-inch Smart TV', 'description': 'HD smart TV with streaming apps and vibrant display.', 'price': 18999.0, 'imageUrl': 'https://m.media-amazon.com/images/I/71XA+N8Xj1L._SL1500_.jpg', }, { 'title': 'Cooking Non-Stick Pan', 'description': 'Durable non-stick frying pan suitable for everyday cooking.', 'price': 999.0, 'imageUrl': 'https://m.media-amazon.com/images/I/41VSFd1bIXL._SY300_SX300_QL70_FMwebp_.jpg', }, { 'title': 'Casual Backpack', 'description': 'Spacious backpack ideal for travel, college, and office use.', 'price': 1299.0, 'imageUrl': 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQK0EhDtlgzv8oBCQjGRiOJKverqFrhzwZpUflE1oPLTL3-lL2uN95yVU_10C_ZoDneV-zjQNMHFOXYVKRAxY040vrbwB3t1kif-Xv7eblpxqumeFAdHg2dCl40ZzgRu1d301T3vA&usqp=CAc', }, ];
 
     for (var data in productData) {
       final product =

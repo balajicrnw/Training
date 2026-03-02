@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
 import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import 'checkout_screen.dart';
+import 'login_screen.dart';
 
 class ProductListScreen extends ConsumerStatefulWidget {
   const ProductListScreen({super.key});
@@ -23,16 +25,21 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    
     ref.listen(appViewModelProvider, (_, __) {
       if (_isLoading && mounted) setState(() => _isLoading = false);
     });
 
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Namma Kadai'),
+        
+        title: ref.watch(authStateProvider).when(
+              data: (user) => Text(user != null ? 'Hi ${user.email}' : 'Welcome'),
+              loading: () => const Text('Welcome'),
+              error: (err, stack) => const Text('Welcome'),
+            ),
         actions: [
+          
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () => Navigator.push(
@@ -40,6 +47,8 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               MaterialPageRoute(builder: (_) => const CheckoutScreen()),
             ),
           ),
+
+          
           Stack(
             children: [
               IconButton(
@@ -76,82 +85,107 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                     ),
             ],
           ),
+
+          // Login / Logout button
+          ref.watch(authStateProvider).when(
+                data: (user) => IconButton(
+                  icon: Icon(user != null ? Icons.logout : Icons.login),
+                  onPressed: () {
+                    if (user != null) {
+                      // Logout
+                      FirebaseAuth.instance.signOut();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Logged out successfully!')),
+                      );
+                    } else {
+                      // Navigate to login
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      );
+                    }
+                  },
+                ),
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(strokeWidth: 2.0),
+                ),
+                error: (err, stack) => const Icon(Icons.error),
+              ),
         ],
       ),
+
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: ref.products.length,
-          itemBuilder: (context, index) {
-            final product = ref.products[index];
-            return GestureDetector(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ProductDetailScreen(product: product),
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
-              ),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12)),
-                        child: Image.network(
-                          product.imageUrl,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Center(
-                                  child: Icon(Icons.image_not_supported)),
-                        ),
+                itemCount: ref.products.length,
+                itemBuilder: (context, index) {
+                  final product = ref.products[index];
+                  return GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductDetailScreen(product: product),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            product.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius:
+                                  const BorderRadius.vertical(top: Radius.circular(12)),
+                              child: Image.network(
+                                product.imageUrl,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Center(child: Icon(Icons.image_not_supported)),
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '₹${product.price.toString()}',
-                            style: TextStyle(
-                              color:
-                                  Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '₹${product.price.toString()}',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }

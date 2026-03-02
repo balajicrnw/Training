@@ -9,7 +9,8 @@ class CheckoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orders = ref.watch(appViewModelProvider).orders;
+    final appState = ref.watch(appViewModelProvider);
+    final orders = appState.orders;
 
     return Scaffold(
       appBar: AppBar(

@@ -18,7 +18,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   factory AppState.initial() => AppState((b) => b
     ..products = ListBuilder<Product>([])
     ..cartItems = ListBuilder<CartItem>([])
-    ..orders = ListBuilder<Order>([]));
+    ..orders = ListBuilder<Order>([]));  
 
   static Serializer<AppState> get serializer => _$appStateSerializer;
 }

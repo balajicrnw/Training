@@ -5,11 +5,26 @@ import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import 'checkout_screen.dart';
 
-class ProductListScreen extends ConsumerWidget {
+class ProductListScreen extends ConsumerStatefulWidget {
   const ProductListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductListScreen> createState() => _ProductListScreenState();
+}
+
+class _ProductListScreenState extends ConsumerState<ProductListScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(appViewModelProvider.notifier).init().then((_) {
+      if (mounted) setState(() => _isLoading = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final appState = ref.watch(appViewModelProvider);
     final products = appState.products;
     final cartItems = appState.cartItems;
@@ -65,7 +80,9 @@ class ProductListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

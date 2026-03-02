@@ -5,11 +5,10 @@ import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
 import '../repository/app_repository.dart';
-import '../services/local_storage_service_impl.dart';
+import '../core/mixins/exception_handler_mixin.dart';
 
-final localStorageServiceProvider = LocalStorageServiceImpl();
-
-class AppNotifier extends StateNotifier<AppState> {
+class AppNotifier extends StateNotifier<AppState>
+    with ExceptionHandlerMixin {
   final AppRepository repository;
 
   AppNotifier({
@@ -17,36 +16,42 @@ class AppNotifier extends StateNotifier<AppState> {
   }) : super(AppState.initial());
 
   Future<void> init() async {
+    await repository.init();
     await loadProducts();
     await loadCart();
     await loadOrders();
   }
 
+
+
   Future<void> loadProducts() async {
-    try {
-      final products = await repository.storageService.getProducts();
-      state = state.rebuild((b) => b..products = ListBuilder<Product>(products));
-    } catch (e) {
-      print('loadProducts error: $e');
-    }
+    await handleAsync(
+      () async {
+        final products =
+            await repository.storageService.getProducts();
+
+        state = state.rebuild(
+          (b) => b..products = ListBuilder<Product>(products),
+        );
+      },
+      errorMessage: 'loadProducts error',
+    );
   }
+
+ 
 
   Future<void> loadCart() async {
-    try {
-      final items = await repository.storageService.getCartItems();
-      state = state.rebuild((b) => b..cartItems = ListBuilder<CartItem>(items));
-    } catch (e) {
-      print('loadCart error: $e');
-    }
-  }
+    await handleAsync(
+      () async {
+        final items =
+            await repository.storageService.getCartItems();
 
-  Future<void> loadOrders() async {
-    try {
-      final orders = await repository.storageService.getOrders();
-      state = state.rebuild((b) => b..orders = ListBuilder<Order>(orders));
-    } catch (e) {
-      print('loadOrders error: $e');
-    }
+        state = state.rebuild(
+          (b) => b..cartItems = ListBuilder<CartItem>(items),
+        );
+      },
+      errorMessage: 'loadCart error',
+    );
   }
 
   Future<void> addToCart(Product product) async {
@@ -56,12 +61,15 @@ class AppNotifier extends StateNotifier<AppState> {
       ..price = product.price
       ..imageUrl = product.imageUrl
       ..quantity = 1);
+
     await repository.storageService.addToCart(item);
     await loadCart();
   }
 
   Future<void> updateQuantity(int productId, int quantity) async {
-    await repository.storageService.updateCartQuantity(productId, quantity);
+    await repository.storageService
+        .updateCartQuantity(productId, quantity);
+
     await loadCart();
   }
 
@@ -71,7 +79,24 @@ class AppNotifier extends StateNotifier<AppState> {
   }
 
   double get totalAmount {
-    return state.cartItems.fold<double>(0.0, (sum, item) => sum + item.total);
+    return state.cartItems
+        .fold<double>(0.0, (sum, item) => sum + item.total);
+  }
+
+ 
+
+  Future<void> loadOrders() async {
+    await handleAsync(
+      () async {
+        final orders =
+            await repository.storageService.getOrders();
+
+        state = state.rebuild(
+          (b) => b..orders = ListBuilder<Order>(orders),
+        );
+      },
+      errorMessage: 'loadOrders error',
+    );
   }
 
   Future<void> placeOrder() async {
@@ -80,22 +105,25 @@ class AppNotifier extends StateNotifier<AppState> {
 
     final order = Order((b) => b
       ..items = ListBuilder<CartItem>(items)
-      ..totalAmount = items.fold<double>(0.0, (sum, item) => sum + item.total)
+      ..totalAmount =
+          items.fold<double>(0.0, (sum, item) => sum + item.total)
       ..dateTime = DateTime.now().toUtc());
 
-    try {
-      await repository.storageService.placeOrder(order);
-      await loadOrders();
-      await loadCart();
-    } catch (e) {
-      print('placeOrder error: $e');
-    }
+    await handleAsync(
+      () async {
+        await repository.storageService.placeOrder(order);
+        await loadOrders();
+        await loadCart();
+      },
+      errorMessage: 'placeOrder error',
+    );
   }
 }
+
 
 final appViewModelProvider =
     StateNotifierProvider<AppNotifier, AppState>((ref) {
   return AppNotifier(
-    repository: AppRepository(localStorageServiceProvider),
+    repository: AppRepository(),
   )..init();
 });

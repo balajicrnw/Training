@@ -3,25 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../model/cart_item.dart';
 import '../viewmodel/view_model.dart';
+import '../core/extensions/widget_ref_extension.dart';
 
 class CheckoutScreen extends ConsumerWidget {
   const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appViewModelProvider);
-    final orders = appState.orders;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Order History'),
       ),
-      body: orders.isEmpty
+      body: ref.orders.isEmpty
           ? const Center(child: Text('No orders placed yet.'))
           : ListView.builder(
-              itemCount: orders.length,
+              itemCount: ref.orders.length,
               itemBuilder: (context, index) {
-                final order = orders[index];
+                final order = ref.orders[index];
                 return Card(
                   margin: const EdgeInsets.all(16),
                   child: ExpansionTile(

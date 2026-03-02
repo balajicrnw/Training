@@ -1,9 +1,8 @@
-
 import '../core/services/local_storage_service.dart';
+import '../services/local_storage_service_impl.dart';
 
 class AppRepository {
-  final LocalStorageService storageService;
+  final LocalStorageService storageService = LocalStorageServiceImpl();
 
-  AppRepository(this.storageService);
-
+  Future<void> init() => storageService.init();
 }

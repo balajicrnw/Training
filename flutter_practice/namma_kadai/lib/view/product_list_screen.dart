@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../viewmodel/view_model.dart';
+import '../core/extensions/widget_ref_extension.dart';
 import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import 'checkout_screen.dart';
@@ -18,17 +19,14 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(appViewModelProvider.notifier).init().then((_) {
-      if (mounted) setState(() => _isLoading = false);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final appState = ref.watch(appViewModelProvider);
-    final products = appState.products;
-    final cartItems = appState.cartItems;
 
+    ref.listen(appViewModelProvider, (_, __) {
+      if (_isLoading && mounted) setState(() => _isLoading = false);
+    });
 
 
     return Scaffold(
@@ -51,7 +49,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                   MaterialPageRoute(builder: (_) => const CartScreen()),
                 ),
               ),
-              cartItems.isEmpty
+              ref.cartItems.isEmpty
                   ? const SizedBox.shrink()
                   : Positioned(
                       right: 8,
@@ -67,7 +65,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                           minHeight: 16,
                         ),
                         child: Text(
-                          '${cartItems.length}',
+                          '${ref.cartItems.length}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -91,9 +89,9 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
-          itemCount: products.length,
+          itemCount: ref.products.length,
           itemBuilder: (context, index) {
-            final product = products[index];
+            final product = ref.products[index];
             return GestureDetector(
               onTap: () => Navigator.push(
                 context,

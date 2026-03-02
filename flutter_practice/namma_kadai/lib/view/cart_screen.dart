@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../viewmodel/view_model.dart';
+import '../core/extensions/widget_ref_extension.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appViewModelProvider);
-    final items = appState.cartItems;
-    final appNotifier = ref.read(appViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Cart'),
       ),
-      body: items.isEmpty
+      body: ref.cartItems.isEmpty
           ? const Center(child: Text('Your cart is empty.'))
           : Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: items.length,
+                    itemCount: ref.cartItems.length,
                     itemBuilder: (context, index) {
-                      final item = items[index];
+                      final item = ref.cartItems[index];
                       return Card(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
@@ -45,14 +43,14 @@ class CartScreen extends ConsumerWidget {
                               IconButton(
                                 icon: const Icon(
                                     Icons.remove_circle_outline),
-                                onPressed: () => appNotifier
+                                onPressed: () => ref.notifier
                                     .updateQuantity(item.productId,
                                         item.quantity - 1),
                               ),
                               Text('${item.quantity}'),
                               IconButton(
                                 icon: const Icon(Icons.add_circle_outline),
-                                onPressed: () => appNotifier
+                                onPressed: () => ref.notifier
                                     .updateQuantity(item.productId,
                                         item.quantity + 1),
                               ),
@@ -75,7 +73,7 @@ class CartScreen extends ConsumerWidget {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           Text(
-                            '₹${appNotifier.totalAmount.toString()}',
+                            '₹${ref.notifier.totalAmount.toString()}',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -92,7 +90,7 @@ class CartScreen extends ConsumerWidget {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () async {
-                          await appNotifier.placeOrder();
+                          await ref.notifier.placeOrder();
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

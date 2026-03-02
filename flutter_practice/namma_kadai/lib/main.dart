@@ -7,11 +7,7 @@ import 'view/product_list_screen.dart';
 
 
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  await localStorageServiceProvider.init();
-  
+void main() {
   runApp(
     const ProviderScope(
       child: MyApp(),

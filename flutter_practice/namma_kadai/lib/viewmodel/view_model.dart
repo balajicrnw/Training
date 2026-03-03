@@ -9,10 +9,9 @@ import '../model/order.dart';
 import '../repository/app_repository.dart';
 import '../core/mixins/exception_handler_mixin.dart';
 import '../core/services/local_storage_service.dart';
-
 final authStateProvider = StreamProvider<User?>((ref) {
-  final localStorageService = ref.watch(localStorageServiceProvider);
-  return localStorageService.authStateChanges();
+  final appRepository = ref.watch(appRepositoryProvider);
+  return appRepository.authService.authStateChanges();
 });
 
 class AppNotifier extends StateNotifier<AppState>
@@ -107,7 +106,7 @@ class AppNotifier extends StateNotifier<AppState>
 
   // Authentication methods
   Future<User?> login(String email, String password) async {
-    final user = await repository.storageService.signIn(email, password);
+    final user = await repository.authService.signIn(email, password);
     if (user == null) {
       state = state.rebuild((b) => b..errorMessage = 'Invalid email or password');
     }
@@ -115,7 +114,7 @@ class AppNotifier extends StateNotifier<AppState>
   }
 
   Future<User?> register(String email, String password) async {
-    final user = await repository.storageService.signUp(email, password);
+    final user = await repository.authService.signUp(email, password);
     if (user == null) {
       state = state.rebuild((b) => b..errorMessage = 'Registration failed');
     }
@@ -123,12 +122,15 @@ class AppNotifier extends StateNotifier<AppState>
   }
 
   Future<void> logout() async {
-    await repository.storageService.signOut();
+    await repository.authService.signOut();
   }
 }
 
+final appRepositoryProvider = Provider<AppRepository>((ref) => AppRepository());
+
 final appViewModelProvider = StateNotifierProvider<AppNotifier, AppState>((ref) {
-  return AppNotifier(repository: AppRepository())..init();
+  final repository = ref.watch(appRepositoryProvider);
+  return AppNotifier(repository: repository)..init();
 });
 
 final localStorageServiceProvider = Provider<LocalStorageService>((ref) {

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../model/cart_item.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
+import '../core/routing/route_names.dart';
 
 class CheckoutScreen extends ConsumerWidget {
   const CheckoutScreen({super.key});

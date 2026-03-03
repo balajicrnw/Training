@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_kadai/services/route_names.dart';
+import 'package:namma_kadai/core/routing/route_names.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
-
+import '../core/routing/route_names.dart';
 class ProductListScreen extends ConsumerStatefulWidget {
   const ProductListScreen({super.key});
 

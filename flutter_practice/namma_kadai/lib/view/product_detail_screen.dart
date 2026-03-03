@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/product.dart';
 import '../viewmodel/view_model.dart';
-
+import '../core/routing/route_names.dart';
 class ProductDetailScreen extends ConsumerWidget {
   final Product product;
 

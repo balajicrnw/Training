@@ -1,8 +1,6 @@
 import '../../model/product.dart';
 import '../../model/cart_item.dart';
 import '../../model/order.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 
 abstract class LocalStorageService {
   Future<void> init();
@@ -22,9 +20,4 @@ abstract class LocalStorageService {
   // Orders
   Future<List<Order>> getOrders();
   Future<void> placeOrder(Order order);
-
-  Future<User?> signIn(String email, String password);
-  Future<User?> signUp(String email, String password);
-  Future<void> signOut();
-  Stream<User?> authStateChanges();
 }

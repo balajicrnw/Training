@@ -11,7 +11,7 @@ import 'package:namma_kadai/view/product_list_screen.dart';
 import 'package:namma_kadai/view/register_screen.dart';
 import 'package:namma_kadai/viewmodel/view_model.dart';
 
-import 'route_names.dart';
+import '../core/routing/route_names.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);

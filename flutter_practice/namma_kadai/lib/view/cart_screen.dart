@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
+import '../core/routing/route_names.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../viewmodel/view_model.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -27,7 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account created successfully!')),
         );
-        Navigator.pop(context);
+        context.pop();
       } else {
         final errorMessage = ref.read(appViewModelProvider).errorMessage;
         ScaffoldMessenger.of(context).showSnackBar(

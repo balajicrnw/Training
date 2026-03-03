@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_kadai/services/route_names.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
-import 'product_detail_screen.dart';
-import 'cart_screen.dart';
-import 'checkout_screen.dart';
-import 'login_screen.dart';
 
 class ProductListScreen extends ConsumerStatefulWidget {
   const ProductListScreen({super.key});
@@ -40,20 +37,14 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           
           IconButton(
             icon: const Icon(Icons.history),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CheckoutScreen()),
-            ),
+            onPressed: () => context.pushNamed(RouteNames.checkout),
           ),
 
           Stack(
             children: [
               IconButton(
                 icon: const Icon(Icons.shopping_cart),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CartScreen()),
-                ),
+                onPressed: () => context.pushNamed(RouteNames.cart),
               ),
               ref.cartItems.isEmpty
                   ? const SizedBox.shrink()
@@ -96,10 +87,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                       );
                     } else {
                       // Navigate to login
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      );
+                      context.pushNamed(RouteNames.login);
                     }
                   },
                 ),
@@ -127,11 +115,10 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                 itemBuilder: (context, index) {
                   final product = ref.products[index];
                   return GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ProductDetailScreen(product: product),
-                      ),
+                    onTap: () => context.pushNamed(
+                      RouteNames.productDetail,
+                      pathParameters: {'id': product.id.toString()},
+                      extra: product,
                     ),
                     child: Card(
                       elevation: 4,

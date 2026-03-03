@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
 
@@ -97,7 +98,7 @@ class CartScreen extends ConsumerWidget {
                                   content: Text(
                                       'Order placed successfully!')),
                             );
-                            Navigator.pop(context);
+                            context.pop();
                           }
                         },
                         child: const Text('Checkout',

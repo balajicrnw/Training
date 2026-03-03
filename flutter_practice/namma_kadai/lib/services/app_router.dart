@@ -23,18 +23,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final bool loggedIn = authState.asData?.value != null;
       final bool onLoginPage = state.matchedLocation == RouteNames.login;
       final bool onRegisterPage = state.matchedLocation == RouteNames.register;
+      final bool onHomePage = state.matchedLocation == RouteNames.home;
+      final bool onProductDetailPage = state.matchedLocation.startsWith('/product/');
 
-      // If not logged in and not on a public page, redirect to login.
-      if (!loggedIn && !onLoginPage && !onRegisterPage) {
+      if (!loggedIn && !onLoginPage && !onRegisterPage && !onHomePage && !onProductDetailPage) {
         return RouteNames.login;
       }
 
-      // If logged in and on login/register page, redirect to home.
+     
       if (loggedIn && (onLoginPage || onRegisterPage)) {
         return RouteNames.home;
       }
 
-      return null; // No redirect needed
+      return null; 
     },
     routes: [
       GoRoute(
@@ -46,7 +47,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/product/:id',
         name: RouteNames.productDetail,
         builder: (context, state) {
-          // The product object is passed as an extra to avoid re-fetching.
+          
           final product = state.extra as Product;
           return ProductDetailScreen(product: product);
         },
@@ -80,7 +81,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-// Helper class to notify GoRouter of auth state changes
+
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
   GoRouterRefreshStream(Stream<dynamic> stream) {

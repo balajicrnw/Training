@@ -9,6 +9,7 @@ import '../model/order.dart';
 import '../repository/app_repository.dart';
 import '../core/mixins/exception_handler_mixin.dart';
 import '../core/services/local_storage_service.dart';
+
 final authStateProvider = StreamProvider<User?>((ref) {
   final appRepository = ref.watch(appRepositoryProvider);
   return appRepository.authService.authStateChanges();

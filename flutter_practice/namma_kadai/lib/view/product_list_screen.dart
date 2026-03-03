@@ -1,30 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_kadai/core/routing/route_names.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
 import '../core/routing/route_names.dart';
-class ProductListScreen extends ConsumerStatefulWidget {
+
+class ProductListScreen extends ConsumerWidget {
   const ProductListScreen({super.key});
 
   @override
-  ConsumerState<ProductListScreen> createState() => _ProductListScreenState();
-}
-
-class _ProductListScreenState extends ConsumerState<ProductListScreen> {
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ref.listen(appViewModelProvider, (_, __) {
-      if (_isLoading && mounted) setState(() => _isLoading = false);
-    });
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Determine loading state directly from the data.
+    // This is safe because the app has seed data, so an empty list means it's loading.
+    final isLoading = ref.products.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,12 +22,10 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               error: (err, stack) => const Text('Welcome'),
             ),
         actions: [
-          
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () => context.pushNamed(RouteNames.checkout),
           ),
-
           Stack(
             children: [
               IconButton(
@@ -99,8 +85,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               ),
         ],
       ),
-
-      body: _isLoading
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(8.0),

@@ -1,16 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:namma_kadai/services/local_storage_service_impl.dart';
 import '../model/app_state.dart';
 import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
 import '../repository/app_repository.dart';
 import '../core/mixins/exception_handler_mixin.dart';
-
+import '../core/services/local_storage_service.dart';
 
 final authStateProvider = StreamProvider<User?>((ref) {
-  return FirebaseAuth.instance.authStateChanges();
+  final localStorageService = ref.watch(localStorageServiceProvider);
+  return localStorageService.authStateChanges();
 });
 
 class AppNotifier extends StateNotifier<AppState>
@@ -18,7 +20,7 @@ class AppNotifier extends StateNotifier<AppState>
   final AppRepository repository;
 
   AppNotifier({
-    required this.repository,
+    required this.repository, 
   }) : super(AppState.initial());
 
   Future<void> init() async {
@@ -102,8 +104,33 @@ class AppNotifier extends StateNotifier<AppState>
       errorMessage: 'placeOrder error',
     );
   }
+
+  // Authentication methods
+  Future<User?> login(String email, String password) async {
+    final user = await repository.storageService.signIn(email, password);
+    if (user == null) {
+      state = state.rebuild((b) => b..errorMessage = 'Invalid email or password');
+    }
+    return user;
+  }
+
+  Future<User?> register(String email, String password) async {
+    final user = await repository.storageService.signUp(email, password);
+    if (user == null) {
+      state = state.rebuild((b) => b..errorMessage = 'Registration failed');
+    }
+    return user;
+  }
+
+  Future<void> logout() async {
+    await repository.storageService.signOut();
+  }
 }
 
 final appViewModelProvider = StateNotifierProvider<AppNotifier, AppState>((ref) {
   return AppNotifier(repository: AppRepository())..init();
+});
+
+final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
+  return LocalStorageServiceImpl();
 });

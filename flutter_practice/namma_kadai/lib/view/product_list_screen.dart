@@ -25,14 +25,12 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     ref.listen(appViewModelProvider, (_, __) {
       if (_isLoading && mounted) setState(() => _isLoading = false);
     });
 
     return Scaffold(
       appBar: AppBar(
-        
         title: ref.watch(authStateProvider).when(
               data: (user) => Text(user != null ? 'Hi ${user.email}' : 'Welcome'),
               loading: () => const Text('Welcome'),
@@ -48,7 +46,6 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
             ),
           ),
 
-          
           Stack(
             children: [
               IconButton(
@@ -93,7 +90,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                   onPressed: () {
                     if (user != null) {
                       // Logout
-                      FirebaseAuth.instance.signOut();
+                      ref.read(appViewModelProvider.notifier).logout();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Logged out successfully!')),
                       );

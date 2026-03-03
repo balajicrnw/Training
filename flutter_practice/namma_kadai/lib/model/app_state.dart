@@ -11,6 +11,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   BuiltList<Product> get products;
   BuiltList<CartItem> get cartItems;
   BuiltList<Order> get orders;
+  String? get errorMessage;
 
   AppState._();
   factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
@@ -18,7 +19,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   factory AppState.initial() => AppState((b) => b
     ..products = ListBuilder<Product>([])
     ..cartItems = ListBuilder<CartItem>([])
-    ..orders = ListBuilder<Order>([]));  
+    ..orders = ListBuilder<Order>([])
+    ..errorMessage = null);
 
   static Serializer<AppState> get serializer => _$appStateSerializer;
 }

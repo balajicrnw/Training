@@ -41,6 +41,14 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
         specifiedType: const FullType(BuiltList, const [const FullType(Order)]),
       ),
     ];
+    Object? value;
+    value = object.errorMessage;
+    if (value != null) {
+      result
+        ..add('errorMessage')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(String)));
+    }
 
     return result;
   }
@@ -92,6 +100,10 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
                 as BuiltList<Object?>,
           );
           break;
+        case 'errorMessage':
+          result.errorMessage = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
       }
     }
 
@@ -106,6 +118,8 @@ class _$AppState extends AppState {
   final BuiltList<CartItem> cartItems;
   @override
   final BuiltList<Order> orders;
+  @override
+  final String? errorMessage;
 
   factory _$AppState([void Function(AppStateBuilder)? updates]) =>
       (AppStateBuilder()..update(updates))._build();
@@ -114,6 +128,7 @@ class _$AppState extends AppState {
     required this.products,
     required this.cartItems,
     required this.orders,
+    this.errorMessage,
   }) : super._();
   @override
   AppState rebuild(void Function(AppStateBuilder) updates) =>
@@ -128,7 +143,8 @@ class _$AppState extends AppState {
     return other is AppState &&
         products == other.products &&
         cartItems == other.cartItems &&
-        orders == other.orders;
+        orders == other.orders &&
+        errorMessage == other.errorMessage;
   }
 
   @override
@@ -137,6 +153,7 @@ class _$AppState extends AppState {
     _$hash = $jc(_$hash, products.hashCode);
     _$hash = $jc(_$hash, cartItems.hashCode);
     _$hash = $jc(_$hash, orders.hashCode);
+    _$hash = $jc(_$hash, errorMessage.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -146,7 +163,8 @@ class _$AppState extends AppState {
     return (newBuiltValueToStringHelper(r'AppState')
           ..add('products', products)
           ..add('cartItems', cartItems)
-          ..add('orders', orders))
+          ..add('orders', orders)
+          ..add('errorMessage', errorMessage))
         .toString();
   }
 }
@@ -169,6 +187,11 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   ListBuilder<Order> get orders => _$this._orders ??= ListBuilder<Order>();
   set orders(ListBuilder<Order>? orders) => _$this._orders = orders;
 
+  String? _errorMessage;
+  String? get errorMessage => _$this._errorMessage;
+  set errorMessage(String? errorMessage) =>
+      _$this._errorMessage = errorMessage;
+
   AppStateBuilder();
 
   AppStateBuilder get _$this {
@@ -177,6 +200,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _products = $v.products.toBuilder();
       _cartItems = $v.cartItems.toBuilder();
       _orders = $v.orders.toBuilder();
+      _errorMessage = $v.errorMessage;
       _$v = null;
     }
     return this;
@@ -204,6 +228,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
             products: products.build(),
             cartItems: cartItems.build(),
             orders: orders.build(),
+            errorMessage: errorMessage,
           );
     } catch (_) {
       late String _$failedField;

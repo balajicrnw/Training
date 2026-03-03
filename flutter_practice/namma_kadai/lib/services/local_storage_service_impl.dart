@@ -5,6 +5,7 @@ import '../core/services/local_storage_service.dart';
 import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../model/serializers.dart';
 
 class LocalStorageServiceImpl implements LocalStorageService {
@@ -36,6 +37,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 4) {
+          await db.execute('DROP TABLE IF EXISTS users');
           await db.execute('DROP TABLE IF EXISTS products');
           await db.execute('DROP TABLE IF EXISTS cart');
           await db.execute('DROP TABLE IF EXISTS orders');
@@ -202,4 +204,40 @@ class LocalStorageServiceImpl implements LocalStorageService {
     await db.insert('orders', mutable);
     await clearCart();
   }
+
+  @override
+  Future<User?> signIn(String email, String password) async {
+    try {
+      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print("Firebase Sign In Error: ${e.code} - ${e.message}");
+      return null;
+    }
+  }
+
+  @override
+  Future<User?> signUp(String email, String password) async {
+    try {
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print("Firebase Sign Up Error: ${e.code} - ${e.message}");
+      return null;
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+  
+  @override
+  Stream<User?> authStateChanges() => FirebaseAuth.instance.authStateChanges();
 }

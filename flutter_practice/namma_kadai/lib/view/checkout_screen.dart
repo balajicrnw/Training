@@ -14,7 +14,20 @@ class CheckoutScreen extends ConsumerWidget {
 
     if (ordersState.errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Order History')),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.indigo, Colors.deepPurple],
+              ),
+            ),
+          ),
+          title: const Text('Order History', style: TextStyle(color: Colors.white)),
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -38,13 +51,33 @@ class CheckoutScreen extends ConsumerWidget {
 
     if (orders.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Order History')),
-        body: RefreshIndicator(
-          onRefresh: () => ref.read(appViewModelProvider.notifier).loadOrders(),
-          child: Stack(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.indigo, Colors.deepPurple],
+              ),
+            ),
+          ),
+          title: const Text('Order History', style: TextStyle(color: Colors.white)),
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ListView(),
-              const Center(child: Text('No orders placed yet.')),
+              Icon(Icons.receipt_long_outlined,
+                  size: 80, color: Colors.grey[300]),
+              const SizedBox(height: 16),
+              Text(
+                'No orders yet',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.grey,
+                    ),
+              ),
             ],
           ),
         ),
@@ -52,43 +85,95 @@ class CheckoutScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Order History')),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.indigo, Colors.deepPurple],
+            ),
+          ),
+        ),
+        title: const Text('Order History', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () =>
+                ref.read(appViewModelProvider.notifier).loadOrders(),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(appViewModelProvider.notifier).loadOrders(),
         child: ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           itemCount: orders.length,
           itemBuilder: (context, index) {
             final order = orders[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: ExpansionTile(
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(color: Colors.white),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                title: Text(  
-                  'Order #${index + 1}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  'Total: ₹${order.totalAmount.toStringAsFixed(2)}\n${DateFormat('dd MMM yyyy, hh:mm a').format(order.dateTime.toLocal())}',
-                ),
-                children: order.items.map((CartItem item) {
-                  return ListTile(
-                    dense: true,
-                    title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.w500)),
-                    subtitle: Text('₹${item.price.toStringAsFixed(2)} x ${item.quantity}'),
-                    trailing: Text(
-                      '₹${item.total.toStringAsFixed(2)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                ],
+              ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  tilePadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  leading: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      shape: BoxShape.circle,
                     ),
-                  );
-                }).toList(),
+                    child: Icon(
+                      Icons.shopping_bag_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  title: Text(
+                    'Order #${index + 1}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Text(
+                    DateFormat('dd MMM yyyy').format(order.dateTime),
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  trailing: Text(
+                    '₹${order.totalAmount}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  children: [
+                    const Divider(indent: 20, endIndent: 20),
+                    ...order.items.map((item) => ListTile(
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 24),
+                          title: Text(item.title),
+                          subtitle: Text('Qty: ${item.quantity}'),
+                          trailing: Text('₹${item.price * item.quantity}'),
+                        )),
+                    const SizedBox(height: 12),
+                  ],
+                ),
               ),
             );
           },

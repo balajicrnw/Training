@@ -80,11 +80,16 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<bool> addToCart(Product product) async {
-    final exists = state.cartItems.any((item) => item.productId == product.id);
-    if (exists) {
-      return false;
+    final existingItems = state.cartItems.where((item) => item.productId == product.id).toList();
+    
+    if (existingItems.isNotEmpty) {
+      final existingItem = existingItems.first;
+      if (kDebugMode) print('addToCart: Incrementing quantity for ${product.title}');
+      await updateQuantity(product.id!, existingItem.quantity + 1);
+      return true;
     }
 
+    if (kDebugMode) print('addToCart: Adding new product ${product.title}');
     final item = CartItem((b) => b
       ..productId = product.id!
       ..title = product.title
@@ -98,6 +103,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<void> updateQuantity(int productId, int quantity) async {
+    if (kDebugMode) print('updateQuantity: ID $productId, New Qty $quantity');
     if (quantity <= 0) {
       await removeFromCart(productId);
     } else {

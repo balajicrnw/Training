@@ -28,4 +28,21 @@ extension AppProviderShortcuts on WidgetRef {
 
   BuiltMap<String, dynamic>? get userData =>
       watch(appViewModelProvider).userData;
+
+  String get selectedCategory => watch(appViewModelProvider).selectedCategory;
+  String get searchQuery => watch(appViewModelProvider).searchQuery;
+
+  List<Product> get filteredProducts {
+    final allProducts = products;
+    final category = selectedCategory;
+    final query = searchQuery.toLowerCase();
+
+    return allProducts.where((p) {
+      final matchesCategory = category == 'All' || p.category == category;
+      final matchesSearch = query.isEmpty || 
+                            p.title.toLowerCase().contains(query) ||
+                            p.description.toLowerCase().contains(query);
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
 }

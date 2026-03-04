@@ -13,6 +13,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   BuiltList<Order> get orders;
   BuiltMap<String, dynamic>? get userData;
   String? get errorMessage;
+  String get selectedCategory;
+  String get searchQuery;
 
   AppState._();
   factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
@@ -21,7 +23,9 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
     ..products = ListBuilder<Product>([])
     ..cartItems = ListBuilder<CartItem>([])
     ..orders = ListBuilder<Order>([])
-    ..errorMessage = null);
+    ..errorMessage = null
+    ..selectedCategory = 'All'
+    ..searchQuery = '');
 
   static Serializer<AppState> get serializer => _$appStateSerializer;
 }

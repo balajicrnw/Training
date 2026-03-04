@@ -34,12 +34,22 @@ class ProductDetailScreen extends ConsumerWidget {
                     tag: 'product_${product.id}',
                     child: Container(
                       color: Colors.grey[50],
-                      padding: const EdgeInsets.all(32),
                       child: Image.network(
                         product.imageUrl,
-                        fit: BoxFit.contain,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.image_not_supported, size: 100),
+                            const Icon(Icons.broken_image_outlined, size: 100, color: Colors.grey),
                       ),
                     ),
                   ),

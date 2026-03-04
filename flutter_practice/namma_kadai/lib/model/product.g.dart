@@ -49,6 +49,14 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
         ..add('id')
         ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
+    value = object.category;
+    if (value != null) {
+      result
+        ..add('category')
+        ..add(
+          serializers.serialize(value, specifiedType: const FullType(String)),
+        );
+    }
     return result;
   }
 
@@ -103,6 +111,14 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
                   )!
                   as String;
           break;
+        case 'category':
+          result.category =
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )
+                  as String?;
+          break;
       }
     }
 
@@ -121,6 +137,8 @@ class _$Product extends Product {
   final double price;
   @override
   final String imageUrl;
+  @override
+  final String? category;
 
   factory _$Product([void Function(ProductBuilder)? updates]) =>
       (ProductBuilder()..update(updates))._build();
@@ -131,6 +149,7 @@ class _$Product extends Product {
     required this.description,
     required this.price,
     required this.imageUrl,
+    this.category,
   }) : super._();
   @override
   Product rebuild(void Function(ProductBuilder) updates) =>
@@ -147,7 +166,8 @@ class _$Product extends Product {
         title == other.title &&
         description == other.description &&
         price == other.price &&
-        imageUrl == other.imageUrl;
+        imageUrl == other.imageUrl &&
+        category == other.category;
   }
 
   @override
@@ -158,6 +178,7 @@ class _$Product extends Product {
     _$hash = $jc(_$hash, description.hashCode);
     _$hash = $jc(_$hash, price.hashCode);
     _$hash = $jc(_$hash, imageUrl.hashCode);
+    _$hash = $jc(_$hash, category.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -169,7 +190,8 @@ class _$Product extends Product {
           ..add('title', title)
           ..add('description', description)
           ..add('price', price)
-          ..add('imageUrl', imageUrl))
+          ..add('imageUrl', imageUrl)
+          ..add('category', category))
         .toString();
   }
 }
@@ -197,6 +219,10 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   String? get imageUrl => _$this._imageUrl;
   set imageUrl(String? imageUrl) => _$this._imageUrl = imageUrl;
 
+  String? _category;
+  String? get category => _$this._category;
+  set category(String? category) => _$this._category = category;
+
   ProductBuilder();
 
   ProductBuilder get _$this {
@@ -207,6 +233,7 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _description = $v.description;
       _price = $v.price;
       _imageUrl = $v.imageUrl;
+      _category = $v.category;
       _$v = null;
     }
     return this;
@@ -250,6 +277,7 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
             r'Product',
             'imageUrl',
           ),
+          category: category,
         );
     replace(_$result);
     return _$result;

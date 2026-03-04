@@ -40,6 +40,16 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
         object.orders,
         specifiedType: const FullType(BuiltList, const [const FullType(Order)]),
       ),
+      'selectedCategory',
+      serializers.serialize(
+        object.selectedCategory,
+        specifiedType: const FullType(String),
+      ),
+      'searchQuery',
+      serializers.serialize(
+        object.searchQuery,
+        specifiedType: const FullType(String),
+      ),
     ];
     Object? value;
     value = object.userData;
@@ -133,6 +143,22 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
                   )
                   as String?;
           break;
+        case 'selectedCategory':
+          result.selectedCategory =
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )!
+                  as String;
+          break;
+        case 'searchQuery':
+          result.searchQuery =
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )!
+                  as String;
+          break;
       }
     }
 
@@ -151,6 +177,10 @@ class _$AppState extends AppState {
   final BuiltMap<String, dynamic>? userData;
   @override
   final String? errorMessage;
+  @override
+  final String selectedCategory;
+  @override
+  final String searchQuery;
 
   factory _$AppState([void Function(AppStateBuilder)? updates]) =>
       (AppStateBuilder()..update(updates))._build();
@@ -161,6 +191,8 @@ class _$AppState extends AppState {
     required this.orders,
     this.userData,
     this.errorMessage,
+    required this.selectedCategory,
+    required this.searchQuery,
   }) : super._();
   @override
   AppState rebuild(void Function(AppStateBuilder) updates) =>
@@ -177,7 +209,9 @@ class _$AppState extends AppState {
         cartItems == other.cartItems &&
         orders == other.orders &&
         userData == other.userData &&
-        errorMessage == other.errorMessage;
+        errorMessage == other.errorMessage &&
+        selectedCategory == other.selectedCategory &&
+        searchQuery == other.searchQuery;
   }
 
   @override
@@ -188,6 +222,8 @@ class _$AppState extends AppState {
     _$hash = $jc(_$hash, orders.hashCode);
     _$hash = $jc(_$hash, userData.hashCode);
     _$hash = $jc(_$hash, errorMessage.hashCode);
+    _$hash = $jc(_$hash, selectedCategory.hashCode);
+    _$hash = $jc(_$hash, searchQuery.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -199,7 +235,9 @@ class _$AppState extends AppState {
           ..add('cartItems', cartItems)
           ..add('orders', orders)
           ..add('userData', userData)
-          ..add('errorMessage', errorMessage))
+          ..add('errorMessage', errorMessage)
+          ..add('selectedCategory', selectedCategory)
+          ..add('searchQuery', searchQuery))
         .toString();
   }
 }
@@ -232,6 +270,15 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   String? get errorMessage => _$this._errorMessage;
   set errorMessage(String? errorMessage) => _$this._errorMessage = errorMessage;
 
+  String? _selectedCategory;
+  String? get selectedCategory => _$this._selectedCategory;
+  set selectedCategory(String? selectedCategory) =>
+      _$this._selectedCategory = selectedCategory;
+
+  String? _searchQuery;
+  String? get searchQuery => _$this._searchQuery;
+  set searchQuery(String? searchQuery) => _$this._searchQuery = searchQuery;
+
   AppStateBuilder();
 
   AppStateBuilder get _$this {
@@ -242,6 +289,8 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _orders = $v.orders.toBuilder();
       _userData = $v.userData?.toBuilder();
       _errorMessage = $v.errorMessage;
+      _selectedCategory = $v.selectedCategory;
+      _searchQuery = $v.searchQuery;
       _$v = null;
     }
     return this;
@@ -271,6 +320,16 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
             orders: orders.build(),
             userData: _userData?.build(),
             errorMessage: errorMessage,
+            selectedCategory: BuiltValueNullFieldError.checkNotNull(
+              selectedCategory,
+              r'AppState',
+              'selectedCategory',
+            ),
+            searchQuery: BuiltValueNullFieldError.checkNotNull(
+              searchQuery,
+              r'AppState',
+              'searchQuery',
+            ),
           );
     } catch (_) {
       late String _$failedField;

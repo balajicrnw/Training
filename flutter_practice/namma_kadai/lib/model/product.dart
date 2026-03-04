@@ -9,6 +9,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
   String get description;
   double get price;
   String get imageUrl;
+  String? get category;
 
   Product._();
   factory Product([void Function(ProductBuilder) updates]) = _$Product;

@@ -260,6 +260,14 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
 
   Future<void> logout() async => repository.authService.signOut();
 
+  void updateCategory(String category) {
+    state = state.rebuild((b) => b..selectedCategory = category);
+  }
+
+  void updateSearchQuery(String query) {
+    state = state.rebuild((b) => b..searchQuery = query);
+  }
+
   void clearError() {
     if (state.errorMessage != null) {
       state = state.rebuild((b) => b..errorMessage = null);

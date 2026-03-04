@@ -22,7 +22,7 @@ class FirebaseFirestoreServiceImpl implements FirebaseFirestoreService {
     try {
       final userData = <String, dynamic>{
         'email': user.email,
-        'name': name ?? user.displayName,
+        'name': name,
         'username': username,
         'gender': gender,
         'createdAt': FieldValue.serverTimestamp(),

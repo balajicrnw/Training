@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:built_collection/built_collection.dart';
 import '../../model/app_state.dart';
 import '../../model/order.dart';
 import '../../model/product.dart';
@@ -24,4 +25,7 @@ extension AppProviderShortcuts on WidgetRef {
 
   double get totalAmount =>
       watch(appViewModelProvider.notifier).totalAmount;
+
+  BuiltMap<String, dynamic>? get userData =>
+      watch(appViewModelProvider).userData;
 }

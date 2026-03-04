@@ -10,14 +10,16 @@ class ProductListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Determine loading state directly from the data.
-    // This is safe because the app has seed data, so an empty list means it's loading.
     final isLoading = ref.products.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
         title: ref.watch(authStateProvider).when(
-              data: (user) => Text(user != null ? 'Hi ${user.email}' : 'Welcome'),
+              data: (user) {
+                if (user == null) return const Text('Welcome');
+                final name = ref.userData?['name'];
+                return Text(name != null ? 'Hi $name' : 'Hi User');
+              },
               loading: () => const Text('Welcome'),
               error: (err, stack) => const Text('Welcome'),
             ),
@@ -60,7 +62,7 @@ class ProductListScreen extends ConsumerWidget {
             ],
           ),
 
-          // Login / Logout button
+          
           ref.watch(authStateProvider).when(
                 data: (user) => IconButton(
                   icon: Icon(user != null ? Icons.logout : Icons.login),

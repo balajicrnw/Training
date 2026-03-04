@@ -11,8 +11,7 @@ class AppRepository {
  
   final LocalStorageService storageService = LocalStorageServiceImpl();
   final AuthService authService = AuthServiceImpl(FirebaseAuth.instance);
-  final FirebaseFirestoreService firestoreService =
-      FirebaseFirestoreServiceImpl();
+  final FirebaseFirestoreService firestoreService = FirebaseFirestoreServiceImpl();
 
   
   Future<void> init() => storageService.init();

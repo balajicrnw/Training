@@ -22,6 +22,8 @@ final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authStateProvider).asData?.value;
 });
 
+
+
 class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   final AppRepository repository;
   final Ref _ref;
@@ -146,7 +148,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
           }
         }).toList();
 
-        // Sort client-side
+      
         orders.sort((a, b) => b.dateTime.compareTo(a.dateTime));
         
         state = state.rebuild((b) => b..orders = ListBuilder<Order>(orders));

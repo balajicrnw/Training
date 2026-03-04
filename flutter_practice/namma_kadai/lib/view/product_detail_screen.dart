@@ -69,11 +69,17 @@ class ProductDetailScreen extends ConsumerWidget {
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
           ),
-          onPressed: () {
-            ref.read(appViewModelProvider.notifier).addToCart(product);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${product.title} added to cart!')),
-            );
+          onPressed: () async {
+            final added = await ref.read(appViewModelProvider.notifier).addToCart(product);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(added
+                      ? '${product.title} added to cart!'
+                      : '${product.title} is already in cart'),
+                ),
+              );
+            }
           },
           child: const Text('Add to Cart', style: TextStyle(fontSize: 18)),
         ),

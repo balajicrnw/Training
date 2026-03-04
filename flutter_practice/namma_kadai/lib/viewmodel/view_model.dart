@@ -77,7 +77,12 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     );
   }
 
-  Future<void> addToCart(Product product) async {
+  Future<bool> addToCart(Product product) async {
+    final exists = state.cartItems.any((item) => item.productId == product.id);
+    if (exists) {
+      return false;
+    }
+
     final item = CartItem((b) => b
       ..productId = product.id!
       ..title = product.title
@@ -87,6 +92,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
 
     await repository.storageService.addToCart(item);
     await loadCart();
+    return true;
   }
 
   Future<void> updateQuantity(int productId, int quantity) async {

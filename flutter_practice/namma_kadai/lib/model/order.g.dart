@@ -44,7 +44,17 @@ class _$OrderSerializer implements StructuredSerializer<Order> {
     if (value != null) {
       result
         ..add('id')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+        ..add(
+          serializers.serialize(value, specifiedType: const FullType(String)),
+        );
+    }
+    value = object.uid;
+    if (value != null) {
+      result
+        ..add('uid')
+        ..add(
+          serializers.serialize(value, specifiedType: const FullType(String)),
+        );
     }
     return result;
   }
@@ -65,8 +75,19 @@ class _$OrderSerializer implements StructuredSerializer<Order> {
       switch (key) {
         case 'id':
           result.id =
-              serializers.deserialize(value, specifiedType: const FullType(int))
-                  as int?;
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )
+                  as String?;
+          break;
+        case 'uid':
+          result.uid =
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )
+                  as String?;
           break;
         case 'items':
           result.items.replace(
@@ -104,7 +125,9 @@ class _$OrderSerializer implements StructuredSerializer<Order> {
 
 class _$Order extends Order {
   @override
-  final int? id;
+  final String? id;
+  @override
+  final String? uid;
   @override
   final BuiltList<CartItem> items;
   @override
@@ -117,6 +140,7 @@ class _$Order extends Order {
 
   _$Order._({
     this.id,
+    this.uid,
     required this.items,
     required this.totalAmount,
     required this.dateTime,
@@ -133,6 +157,7 @@ class _$Order extends Order {
     if (identical(other, this)) return true;
     return other is Order &&
         id == other.id &&
+        uid == other.uid &&
         items == other.items &&
         totalAmount == other.totalAmount &&
         dateTime == other.dateTime;
@@ -142,6 +167,7 @@ class _$Order extends Order {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, uid.hashCode);
     _$hash = $jc(_$hash, items.hashCode);
     _$hash = $jc(_$hash, totalAmount.hashCode);
     _$hash = $jc(_$hash, dateTime.hashCode);
@@ -153,6 +179,7 @@ class _$Order extends Order {
   String toString() {
     return (newBuiltValueToStringHelper(r'Order')
           ..add('id', id)
+          ..add('uid', uid)
           ..add('items', items)
           ..add('totalAmount', totalAmount)
           ..add('dateTime', dateTime))
@@ -163,9 +190,13 @@ class _$Order extends Order {
 class OrderBuilder implements Builder<Order, OrderBuilder> {
   _$Order? _$v;
 
-  int? _id;
-  int? get id => _$this._id;
-  set id(int? id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _uid;
+  String? get uid => _$this._uid;
+  set uid(String? uid) => _$this._uid = uid;
 
   ListBuilder<CartItem>? _items;
   ListBuilder<CartItem> get items => _$this._items ??= ListBuilder<CartItem>();
@@ -185,6 +216,7 @@ class OrderBuilder implements Builder<Order, OrderBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
+      _uid = $v.uid;
       _items = $v.items.toBuilder();
       _totalAmount = $v.totalAmount;
       _dateTime = $v.dateTime;
@@ -213,6 +245,7 @@ class OrderBuilder implements Builder<Order, OrderBuilder> {
           _$v ??
           _$Order._(
             id: id,
+            uid: uid,
             items: items.build(),
             totalAmount: BuiltValueNullFieldError.checkNotNull(
               totalAmount,

@@ -99,7 +99,7 @@ class CartScreen extends ConsumerWidget {
                                   content: Text(
                                       'Order placed successfully!')),
                             );
-                            context.pop();
+                            context.pushReplacementNamed(RouteNames.checkout);
                           }
                         },
                         child: const Text('Checkout',

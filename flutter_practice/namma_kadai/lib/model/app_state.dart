@@ -11,6 +11,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   BuiltList<Product> get products;
   BuiltList<CartItem> get cartItems;
   BuiltList<Order> get orders;
+  BuiltMap<String, dynamic>? get userData;
   String? get errorMessage;
 
   AppState._();

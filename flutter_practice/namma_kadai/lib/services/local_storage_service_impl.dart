@@ -29,7 +29,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
 
     _database = await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: (db, version) async {
         await _createTables(db);
         await _seedData(db);
@@ -42,6 +42,9 @@ class LocalStorageServiceImpl implements LocalStorageService {
           await db.execute('DROP TABLE IF EXISTS orders');
           await _createTables(db);
           await _seedData(db);
+        } else if (oldVersion == 4) {
+          // Add uid column to orders table for version 5
+          await db.execute('ALTER TABLE orders ADD COLUMN uid TEXT');
         }
       },
     );
@@ -79,6 +82,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
     await db.execute('''
       CREATE TABLE orders(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
         items TEXT,
         totalAmount REAL,
         dateTime INTEGER
@@ -187,6 +191,9 @@ class LocalStorageServiceImpl implements LocalStorageService {
 
     return maps.map((map) {
       final mutable = Map<String, dynamic>.from(map);
+      if (mutable['id'] != null) {
+        mutable['id'] = mutable['id'].toString();
+      }
       mutable['items'] = jsonDecode(mutable['items']);
       return serializers.deserializeWith(Order.serializer, mutable) as Order;
     }).toList();
@@ -202,5 +209,19 @@ class LocalStorageServiceImpl implements LocalStorageService {
 
     await db.insert('orders', mutable);
     await clearCart();
+  }
+
+  @override
+  Map<String, dynamic> serializeOrder(Order order) {
+    return serializers.serializeWith(Order.serializer, order) as Map<String, dynamic>;
+  }
+
+  @override
+  Order deserializeOrder(Map<String, dynamic> map) {
+    final mutable = Map<String, dynamic>.from(map);
+    if (mutable['id'] != null) {
+      mutable['id'] = mutable['id'].toString();
+    }
+    return serializers.deserializeWith(Order.serializer, mutable) as Order;
   }
 }

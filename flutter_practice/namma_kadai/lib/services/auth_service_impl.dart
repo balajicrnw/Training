@@ -38,7 +38,7 @@ class AuthServiceImpl implements AuthService {
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       print("Firebase Sign Up Error: ${e.code} - ${e.message}");
-      return null;
+      rethrow;
     }
   }
 }

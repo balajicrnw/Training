@@ -20,4 +20,7 @@ abstract class LocalStorageService {
   // Orders
   Future<List<Order>> getOrders();
   Future<void> placeOrder(Order order);
+
+    Map<String, dynamic> serializeOrder(Order order);
+  Order deserializeOrder(Map<String, dynamic> map);
 }

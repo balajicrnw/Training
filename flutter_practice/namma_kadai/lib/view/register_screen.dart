@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_kadai/core/routing/route_names.dart';
 import '../viewmodel/view_model.dart';
-import '../core/routing/route_names.dart';
-import '../core/widgets/app_text_form_field.dart';
+
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -12,80 +12,174 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _loading = false;
+  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  String? _gender;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
 
-    setState(() => _loading = true);
-    final user = await ref.read(appViewModelProvider.notifier).register(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
+      final notifier = ref.read(appViewModelProvider.notifier);
+      final user = await notifier.register(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        username: _usernameController.text.trim(),
+        gender: _gender!,
+      );
 
-    if (mounted) {
-      setState(() => _loading = false);
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account created successfully!')),
+          const SnackBar(content: Text('Registration successful!')),
         );
-        context.pop();
-      } else {
-        final errorMessage = ref.read(appViewModelProvider).errorMessage;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage ?? 'Registration failed')),
-        );
+        // The go_router redirect will handle navigation to home.
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<String?>(
+      appViewModelProvider.select((state) => state.errorMessage),
+      (previous, next) {
+        if (next != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(next),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+          ref.read(appViewModelProvider.notifier).clearError();
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text('Register')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppTextFormField(
-                controller: _emailController,
-                labelText: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.email_outlined),
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: 'Username'),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a username';
                   }
-                  final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-                  if (!emailRegex.hasMatch(value)) {
-                    return 'Please enter a valid email';
+                  if (value.trim().length < 3) {
+                    return 'Username must be at least 3 characters long';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
-              AppTextFormField(
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter an email';
+                  }
+                  final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                  if (!emailRegex.hasMatch(value)) {
+                    return 'Please enter a valid email address';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _gender,
+                hint: const Text('Select Gender'),
+                items: ['Male', 'Female', 'Other']
+                    .map((gender) => DropdownMenuItem(
+                          value: gender,
+                          child: Text(gender),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _gender = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select a gender';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
                 controller: _passwordController,
-                labelText: 'Password',
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                prefixIcon: const Icon(Icons.lock_outline),
-                validator: (value) => (value == null || value.length < 6)
-                    ? 'Password must be at least 6 characters'
-                    : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters long';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _confirmPasswordController,
+                decoration: const InputDecoration(labelText: 'Confirm Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please confirm your password';
+                  }
+                  if (value != _passwordController.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 24),
-              _loading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _register,
-                      child: const Text('Register'),
-                    ),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _register,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Register'),
+              ),
+              TextButton(
+                onPressed: () => context.goNamed(RouteNames.login),
+                child: const Text('Already have an account? Login'),
+              ),
             ],
           ),
         ),

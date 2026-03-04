@@ -42,14 +42,28 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
       ),
     ];
     Object? value;
+    value = object.userData;
+    if (value != null) {
+      result
+        ..add('userData')
+        ..add(
+          serializers.serialize(
+            value,
+            specifiedType: const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(dynamic),
+            ]),
+          ),
+        );
+    }
     value = object.errorMessage;
     if (value != null) {
       result
         ..add('errorMessage')
         ..add(
-            serializers.serialize(value, specifiedType: const FullType(String)));
+          serializers.serialize(value, specifiedType: const FullType(String)),
+        );
     }
-
     return result;
   }
 
@@ -100,9 +114,24 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
                 as BuiltList<Object?>,
           );
           break;
+        case 'userData':
+          result.userData.replace(
+            serializers.deserialize(
+              value,
+              specifiedType: const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(dynamic),
+              ]),
+            )!,
+          );
+          break;
         case 'errorMessage':
-          result.errorMessage = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
+          result.errorMessage =
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )
+                  as String?;
           break;
       }
     }
@@ -119,6 +148,8 @@ class _$AppState extends AppState {
   @override
   final BuiltList<Order> orders;
   @override
+  final BuiltMap<String, dynamic>? userData;
+  @override
   final String? errorMessage;
 
   factory _$AppState([void Function(AppStateBuilder)? updates]) =>
@@ -128,6 +159,7 @@ class _$AppState extends AppState {
     required this.products,
     required this.cartItems,
     required this.orders,
+    this.userData,
     this.errorMessage,
   }) : super._();
   @override
@@ -144,6 +176,7 @@ class _$AppState extends AppState {
         products == other.products &&
         cartItems == other.cartItems &&
         orders == other.orders &&
+        userData == other.userData &&
         errorMessage == other.errorMessage;
   }
 
@@ -153,6 +186,7 @@ class _$AppState extends AppState {
     _$hash = $jc(_$hash, products.hashCode);
     _$hash = $jc(_$hash, cartItems.hashCode);
     _$hash = $jc(_$hash, orders.hashCode);
+    _$hash = $jc(_$hash, userData.hashCode);
     _$hash = $jc(_$hash, errorMessage.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -164,6 +198,7 @@ class _$AppState extends AppState {
           ..add('products', products)
           ..add('cartItems', cartItems)
           ..add('orders', orders)
+          ..add('userData', userData)
           ..add('errorMessage', errorMessage))
         .toString();
   }
@@ -187,10 +222,15 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   ListBuilder<Order> get orders => _$this._orders ??= ListBuilder<Order>();
   set orders(ListBuilder<Order>? orders) => _$this._orders = orders;
 
+  MapBuilder<String, dynamic>? _userData;
+  MapBuilder<String, dynamic> get userData =>
+      _$this._userData ??= MapBuilder<String, dynamic>();
+  set userData(MapBuilder<String, dynamic>? userData) =>
+      _$this._userData = userData;
+
   String? _errorMessage;
   String? get errorMessage => _$this._errorMessage;
-  set errorMessage(String? errorMessage) =>
-      _$this._errorMessage = errorMessage;
+  set errorMessage(String? errorMessage) => _$this._errorMessage = errorMessage;
 
   AppStateBuilder();
 
@@ -200,6 +240,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _products = $v.products.toBuilder();
       _cartItems = $v.cartItems.toBuilder();
       _orders = $v.orders.toBuilder();
+      _userData = $v.userData?.toBuilder();
       _errorMessage = $v.errorMessage;
       _$v = null;
     }
@@ -228,6 +269,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
             products: products.build(),
             cartItems: cartItems.build(),
             orders: orders.build(),
+            userData: _userData?.build(),
             errorMessage: errorMessage,
           );
     } catch (_) {
@@ -239,6 +281,8 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
         cartItems.build();
         _$failedField = 'orders';
         orders.build();
+        _$failedField = 'userData';
+        _userData?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'AppState',

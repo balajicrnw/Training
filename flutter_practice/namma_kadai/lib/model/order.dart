@@ -6,7 +6,8 @@ import 'cart_item.dart';
 part 'order.g.dart';
 
 abstract class Order implements Built<Order, OrderBuilder> {
-  int? get id;
+  String? get id;
+  String? get uid;
   BuiltList<CartItem> get items;
   double get totalAmount;
   DateTime get dateTime;

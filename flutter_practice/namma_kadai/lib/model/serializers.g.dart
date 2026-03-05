@@ -11,6 +11,7 @@ Serializers _$serializers =
           ..add(CartItem.serializer)
           ..add(Order.serializer)
           ..add(Product.serializer)
+          ..add(UserModel.serializer)
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(CartItem)]),
             () => ListBuilder<CartItem>(),

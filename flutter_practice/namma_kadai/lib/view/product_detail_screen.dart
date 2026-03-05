@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/product.dart';
 import '../viewmodel/view_model.dart';
-import '../core/routing/route_names.dart';
+
 class ProductDetailScreen extends ConsumerWidget {
   final Product product;
 
@@ -22,7 +22,7 @@ class ProductDetailScreen extends ConsumerWidget {
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.9),
+                backgroundColor: Colors.white.withValues(alpha: 0.9),
                 child: const BackButton(color: Colors.black87),
               ),
             ),
@@ -59,7 +59,7 @@ class ProductDetailScreen extends ConsumerWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.indigo.withOpacity(0.4),
+                          Colors.indigo.withValues(alpha: 0.4),
                           Colors.transparent,
                         ],
                       ),
@@ -132,7 +132,7 @@ class ProductDetailScreen extends ConsumerWidget {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -146,7 +146,7 @@ class ProductDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 18),
             ),
             onPressed: () async {
-              final added = await ref
+              await ref
                   .read(appViewModelProvider.notifier)
                   .addToCart(product);
               if (context.mounted) {

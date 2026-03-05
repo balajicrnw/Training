@@ -59,10 +59,7 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
         ..add(
           serializers.serialize(
             value,
-            specifiedType: const FullType(BuiltMap, const [
-              const FullType(String),
-              const FullType(dynamic),
-            ]),
+            specifiedType: const FullType(UserModel),
           ),
         );
     }
@@ -127,12 +124,10 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
         case 'userData':
           result.userData.replace(
             serializers.deserialize(
-              value,
-              specifiedType: const FullType(BuiltMap, const [
-                const FullType(String),
-                const FullType(dynamic),
-              ]),
-            )!,
+                  value,
+                  specifiedType: const FullType(UserModel),
+                )!
+                as UserModel,
           );
           break;
         case 'errorMessage':
@@ -174,7 +169,7 @@ class _$AppState extends AppState {
   @override
   final BuiltList<Order> orders;
   @override
-  final BuiltMap<String, dynamic>? userData;
+  final UserModel? userData;
   @override
   final String? errorMessage;
   @override
@@ -260,11 +255,9 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   ListBuilder<Order> get orders => _$this._orders ??= ListBuilder<Order>();
   set orders(ListBuilder<Order>? orders) => _$this._orders = orders;
 
-  MapBuilder<String, dynamic>? _userData;
-  MapBuilder<String, dynamic> get userData =>
-      _$this._userData ??= MapBuilder<String, dynamic>();
-  set userData(MapBuilder<String, dynamic>? userData) =>
-      _$this._userData = userData;
+  UserModelBuilder? _userData;
+  UserModelBuilder get userData => _$this._userData ??= UserModelBuilder();
+  set userData(UserModelBuilder? userData) => _$this._userData = userData;
 
   String? _errorMessage;
   String? get errorMessage => _$this._errorMessage;

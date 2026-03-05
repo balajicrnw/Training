@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../model/user_model.dart';
+import '../../model/order.dart';
 
 abstract class FirebaseFirestoreService {
   /// Save user data in Firestore
@@ -10,11 +12,11 @@ abstract class FirebaseFirestoreService {
   });
 
   /// Fetch user data from Firestore
-  Future<Map<String, dynamic>?> getUserData(String userId);
+  Stream<UserModel?> getUserData(String userId);
 
   /// Save an order for a specific user
   Future<void> saveOrder(String userId, Map<String, dynamic> orderData);
 
   /// Fetch order history for a specific user
-  Future<List<Map<String, dynamic>>> getOrderHistory(String userId);
+  Stream<List<Order>> getOrderHistory(String userId);
 }

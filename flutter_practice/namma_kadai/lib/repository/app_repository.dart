@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:namma_kadai/core/services/auth_service.dart';
 import 'package:namma_kadai/services/auth_service_impl.dart';
 import '../core/services/local_storage_service.dart';

@@ -4,6 +4,7 @@ import 'package:built_value/serializer.dart';
 import 'product.dart';
 import 'cart_item.dart';
 import 'order.dart';
+import 'user_model.dart';
 
 part 'app_state.g.dart';
 
@@ -11,7 +12,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   BuiltList<Product> get products;
   BuiltList<CartItem> get cartItems;
   BuiltList<Order> get orders;
-  BuiltMap<String, dynamic>? get userData;
+  UserModel? get userData;
   String? get errorMessage;
   String get selectedCategory;
   String get searchQuery;

@@ -40,7 +40,7 @@ class ProductListScreen extends ConsumerWidget {
                         children: [
                           userState.when(
                             data: (user) {
-                              final name = ref.userData?['name'];
+                              final name = ref.userData?.name;
                               return Text(
                                 name != null ? 'Hello, $name' : 'Welcome back',
                                 style: const TextStyle(
@@ -51,7 +51,7 @@ class ProductListScreen extends ConsumerWidget {
                               );
                             },
                             loading: () => const Text('Welcome', style: TextStyle(color: Colors.white, fontSize: 24)),
-                            error: (_, __) => const Text('Hi there', style: TextStyle(color: Colors.white, fontSize: 24)),
+                            error: (error, stackTrace) => const Text('Hi there', style: TextStyle(color: Colors.white, fontSize: 24)),
                           ),
                           const Text(
                             "What would you like to buy today?",
@@ -108,7 +108,7 @@ class ProductListScreen extends ConsumerWidget {
                   },
                 ),
                 loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (error, stackTrace) => const SizedBox.shrink(),
               ),
               const SizedBox(width: 8),
             ],
@@ -124,7 +124,7 @@ class ProductListScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -191,53 +191,6 @@ class ProductListScreen extends ConsumerWidget {
   }
 }
 
-class _FeaturedCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Color color;
-  final String image;
-
-  const _FeaturedCard({
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.image,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: color,
-        image: DecorationImage(
-          image: NetworkImage(image),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              subtitle,
-              style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _CategoryChip extends StatelessWidget {
   final String label;
@@ -264,7 +217,7 @@ class _CategoryChip extends StatelessWidget {
           color: isSelected ? Colors.white : Colors.indigo,
           fontWeight: FontWeight.bold,
         ),
-        side: BorderSide(color: isSelected ? Colors.transparent : Colors.indigo.withOpacity(0.2)),
+        side: BorderSide(color: isSelected ? Colors.transparent : Colors.indigo.withValues(alpha: 0.2)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         showCheckmark: false,
       ),
@@ -291,7 +244,7 @@ class _ProductCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.indigo.withOpacity(0.08),
+              color: Colors.indigo.withValues(alpha: 0.08),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),

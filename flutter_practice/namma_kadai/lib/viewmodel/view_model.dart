@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:built_collection/built_collection.dart';
@@ -8,8 +9,6 @@ import '../model/cart_item.dart';
 import '../model/order.dart';
 import '../repository/app_repository.dart';
 import '../core/mixins/exception_handler_mixin.dart';
-import '../core/services/local_storage_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 
 final appRepositoryProvider = Provider<AppRepository>((ref) => AppRepository());
 
@@ -27,6 +26,8 @@ final currentUserProvider = Provider<User?>((ref) {
 class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   final AppRepository repository;
   final Ref _ref;
+  StreamSubscription? _userDataSubscription;
+  StreamSubscription? _ordersSubscription;
 
   User? get _currentUser => _ref.read(currentUserProvider);
 
@@ -37,9 +38,9 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
         super(AppState.initial()) {
     _ref.listen<User?>(currentUserProvider, (previous, next) {
       if (next != null) {
-        loadOrders();
-        loadUserData();
+        startUserSubscriptions();
       } else {
+        cancelUserSubscriptions();
         state = state.rebuild((b) => b
           ..orders = ListBuilder<Order>([])
           ..userData = null);
@@ -47,13 +48,30 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     });
   }
 
+  void startUserSubscriptions() {
+    loadOrders();
+    loadUserData();
+  }
+
+  void cancelUserSubscriptions() {
+    _userDataSubscription?.cancel();
+    _ordersSubscription?.cancel();
+    _userDataSubscription = null;
+    _ordersSubscription = null;
+  }
+
+  @override
+  void dispose() {
+    cancelUserSubscriptions();
+    super.dispose();
+  }
+
   Future<void> init() async {
     await repository.init();
     await loadProducts();
     await loadCart();
     if (_currentUser != null) {
-      await loadOrders();
-      await loadUserData();
+      startUserSubscriptions();
     }
   }
 
@@ -118,50 +136,22 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   double get totalAmount =>
-      state.cartItems.fold(0.0, (sum, item) => sum + item.total);
+      state.cartItems.fold(0.0, (acc, item) => acc + item.total);
 
   Future<void> loadOrders() async {
     final uid = _currentUser?.uid;
-    if (uid == null) {
-      if (kDebugMode) print('loadOrders: No user logged in');
-      return;
-    }
+    if (uid == null) return;
 
-    if (kDebugMode) print('loadOrders: Fetching for UID $uid');
-
-    await handleAsync(
-      () async {
-        final orderMaps = await repository.firestoreService.getOrderHistory(uid);
-        if (kDebugMode) print('loadOrders: Fetched ${orderMaps.length} orders');
-
-        final orders = orderMaps.map((map) {
-          final mutableMap = Map<String, dynamic>.from(map);
-          mutableMap['uid'] = uid; 
-          
-          if (mutableMap['orderDate'] is Timestamp) {
-            mutableMap['dateTime'] = (mutableMap['orderDate'] as Timestamp).microsecondsSinceEpoch;
-          } else if (mutableMap['dateTime'] == null) {
-            mutableMap['dateTime'] = DateTime.now().microsecondsSinceEpoch;
-          }
-
-          mutableMap.remove('orderDate');
-          
-          try {
-            return repository.storageService.deserializeOrder(mutableMap);
-          } catch (e) {
-            if (kDebugMode) print('loadOrders: Deserialization error for order ${mutableMap['id']}: $e');
-            rethrow;
-          }
-        }).toList();
-
-      
-        orders.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    _ordersSubscription?.cancel();
+    _ordersSubscription = repository.firestoreService.getOrderHistory(uid).listen(
+      (orders) {
+        final sortedOrders = orders.toList()
+          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
         
-        state = state.rebuild((b) => b..orders = ListBuilder<Order>(orders));
+        state = state.rebuild((b) => b..orders = ListBuilder<Order>(sortedOrders));
       },
-      errorMessage: 'loadOrders error',
       onError: (error) {
-        if (kDebugMode) print('loadOrders: Error fetching or processing: $error');
+        if (kDebugMode) print('loadOrders: Error: $error');
         state = state.rebuild((b) => b..errorMessage = 'Failed to load orders: $error');
       },
     );
@@ -171,19 +161,13 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     final uid = _currentUser?.uid;
     if (uid == null) return;
 
-    if (kDebugMode) print('loadUserData: Fetching for UID $uid');
-
-    await handleAsync(
-      () async {
-        final data = await repository.firestoreService.getUserData(uid);
-        if (data != null) {
-          if (kDebugMode) print('loadUserData: Success');
-          state = state.rebuild((b) => b..userData = BuiltMap<String, dynamic>(data).toBuilder());
-        } else {
-          if (kDebugMode) print('loadUserData: No data found');
+    _userDataSubscription?.cancel();
+    _userDataSubscription = repository.firestoreService.getUserData(uid).listen(
+      (userData) {
+        if (userData != null) {
+          state = state.rebuild((b) => b..userData = userData.toBuilder());
         }
       },
-      errorMessage: 'loadUserData error',
       onError: (error) {
         if (kDebugMode) print('loadUserData: Error: $error');
         state = state.rebuild((b) => b..errorMessage = 'Failed to load user data: $error');
@@ -209,7 +193,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
         } else {
           await repository.storageService.placeOrder(order);
         }
-        await loadOrders();
+        loadOrders();
         await loadCart();
       },
       errorMessage: 'placeOrder error',

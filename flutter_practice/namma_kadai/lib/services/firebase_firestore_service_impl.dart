@@ -1,6 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/services/firebase_firestore_service.dart';
+import '../model/order.dart';
+import '../model/user_model.dart';
+import '../model/serializers.dart';
 
 class FirebaseFirestoreServiceImpl implements FirebaseFirestoreService {
   final FirebaseFirestore _firestore;
@@ -41,15 +44,24 @@ class FirebaseFirestoreServiceImpl implements FirebaseFirestoreService {
   }
 
   @override
-  Future<Map<String, dynamic>?> getUserData(String userId) async {
-    try {
-      final doc =
-          await _firestore.collection(_usersCollection).doc(userId).get();
-      return doc.data();
-    } catch (e) {
-      print('Error fetching user data: $e');
-      rethrow;
-    }
+  Stream<UserModel?> getUserData(String userId) {
+    return _firestore
+        .collection(_usersCollection)
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+          if (!doc.exists || doc.data() == null) return null;
+          
+          final data = Map<String, dynamic>.from(doc.data()!);
+          data['id'] = doc.id;
+          
+
+          if (data['createdAt'] is Timestamp) {
+            data['createdAt'] = (data['createdAt'] as Timestamp).toDate().microsecondsSinceEpoch;
+          }
+
+          return serializers.deserializeWith(UserModel.serializer, data);
+        });
   }
 
   @override
@@ -67,18 +79,22 @@ class FirebaseFirestoreServiceImpl implements FirebaseFirestoreService {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getOrderHistory(String userId) async {
-    try {
-      final querySnapshot = await _firestore
-          .collection(_ordersCollection)
-          .where('uid', isEqualTo: userId)
-          .get();
-      return querySnapshot.docs
-          .map((doc) => {'id': doc.id, ...doc.data()})
-          .toList();
-    } catch (e) {
-      print('Error fetching order history: $e');
-      rethrow;
-    }
+  Stream<List<Order>> getOrderHistory(String userId) {
+    return _firestore
+        .collection(_ordersCollection)
+        .where('uid', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = Map<String, dynamic>.from(doc.data());
+            data['id'] = doc.id;
+            
+            if (data['orderDate'] is Timestamp) {
+              data['dateTime'] = (data['orderDate'] as Timestamp).toDate().microsecondsSinceEpoch;
+            }
+
+            return serializers.deserializeWith(Order.serializer, data)!;
+          }).toList();
+        });
   }
 }

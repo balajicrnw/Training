@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../model/cart_item.dart';
 import '../viewmodel/view_model.dart'; // Import your AppNotifier / providers
 
 class CheckoutScreen extends ConsumerWidget {
@@ -107,7 +106,9 @@ class CheckoutScreen extends ConsumerWidget {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref.read(appViewModelProvider.notifier).loadOrders(),
+        onRefresh: () async {
+          await Future.microtask(() => ref.read(appViewModelProvider.notifier).loadOrders());
+        },
         child: ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           itemCount: orders.length,
@@ -120,7 +121,7 @@ class CheckoutScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -151,7 +152,7 @@ class CheckoutScreen extends ConsumerWidget {
                     ),
                   ),
                   subtitle: Text(
-                    DateFormat('dd MMM yyyy').format(order.dateTime),
+                    DateFormat('dd MMM yyyy, hh:mm a').format(order.dateTime.toLocal()),
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   trailing: Text(

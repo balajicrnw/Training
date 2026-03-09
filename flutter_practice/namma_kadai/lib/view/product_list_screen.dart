@@ -143,7 +143,7 @@ class ProductListScreen extends ConsumerWidget {
             ),
           ),
 
-          // Categories List
+          
           SliverToBoxAdapter(
             child: Container(
               height: 60,

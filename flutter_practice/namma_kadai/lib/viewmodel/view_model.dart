@@ -80,7 +80,14 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   Future<void> loadProducts() async {
     await handleAsync(
       () async {
-        final products = await repository.firestoreService.getProducts();
+        List<Product> products = [];
+        try {
+          products = await repository.firestoreService.getProducts();
+        }
+        catch(e){
+          products = await repository.storageService.getProducts();
+        }
+
         state = state.rebuild((b) => b..products = ListBuilder<Product>(products));
       },
       errorMessage: 'loadProducts error',

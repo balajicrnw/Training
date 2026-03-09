@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../core/services/local_storage_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../core/services/storage_service.dart';
 import '../model/product.dart';
 import '../model/cart_item.dart';
 import '../model/order.dart';
+import '../model/user_model.dart';
 import '../model/serializers.dart';
 
-class LocalStorageServiceImpl implements LocalStorageService {
+class LocalStorageServiceImpl implements StorageService {
   
   static final LocalStorageServiceImpl _instance =
       LocalStorageServiceImpl._internal();
@@ -29,52 +31,18 @@ class LocalStorageServiceImpl implements LocalStorageService {
 
     _database = await openDatabase(
       path,
-      version: 11,
+      version: 12,
       onCreate: (db, version) async {
         await _createTables(db);
         await _seedData(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 4) {
+        if (oldVersion < 12) {
           await db.execute('DROP TABLE IF EXISTS users');
           await db.execute('DROP TABLE IF EXISTS products');
           await db.execute('DROP TABLE IF EXISTS cart');
           await db.execute('DROP TABLE IF EXISTS orders');
           await _createTables(db);
-          await _seedData(db);
-        } else if (oldVersion == 4) {
-          await db.execute('ALTER TABLE orders ADD COLUMN uid TEXT');
-        }
-        
-        // Upgrade to v6/v7: Refresh products
-        if (oldVersion < 7) {
-          await db.execute('DROP TABLE IF EXISTS products');
-          await db.execute('''
-            CREATE TABLE products(
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              title TEXT,
-              description TEXT,
-              price REAL,
-              imageUrl TEXT,
-              category TEXT
-            )
-          ''');
-          await _seedData(db);
-        }
-
-        // Upgrade to v8/v9/v10/v11: Refresh URLs and apply manual updates
-        if (oldVersion < 11) {
-          await db.execute('DROP TABLE IF EXISTS products');
-          await db.execute('''
-            CREATE TABLE products(
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              title TEXT,
-              description TEXT,
-              price REAL,
-              imageUrl TEXT,
-              category TEXT
-            )
-          ''');
           await _seedData(db);
         }
       },
@@ -91,7 +59,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
   Future<void> _createTables(Database db) async {
     await db.execute('''
       CREATE TABLE products(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         title TEXT,
         description TEXT,
         price REAL,
@@ -102,8 +70,8 @@ class LocalStorageServiceImpl implements LocalStorageService {
 
     await db.execute('''
       CREATE TABLE cart(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        productId INTEGER,
+        id TEXT PRIMARY KEY,
+        productId TEXT,
         title TEXT,
         price REAL,
         imageUrl TEXT,
@@ -113,11 +81,22 @@ class LocalStorageServiceImpl implements LocalStorageService {
 
     await db.execute('''
       CREATE TABLE orders(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         uid TEXT,
         items TEXT,
         totalAmount REAL,
         dateTime INTEGER
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE users(
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        username TEXT,
+        email TEXT,
+        gender TEXT,
+        createdAt INTEGER
       )
     ''');
   }
@@ -125,6 +104,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
   Future<void> _seedData(Database db) async {
     final productData = [
       {
+        'id': '1',
         'title': 'Namma Filter Coffee',
         'description': 'Pure roasted South Indian coffee blend for the perfect morning.',
         'price': 299.0,
@@ -132,6 +112,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Coffee',
       },
       {
+        'id': '2',
         'title': 'Royal Silk Saree',
         'description': 'Exquisite Kanchipuram silk with handcrafted gold zari work.',
         'price': 8500.0,
@@ -139,6 +120,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Fashion',
       },
       {
+        'id': '3',
         'title': 'Premium Leather Boots',
         'description': 'Hand-stitched genuine leather boots for everlasting style.',
         'price': 4200.0,
@@ -146,6 +128,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Fashion',
       },
       {
+        'id': '4',
         'title': 'Sony PlayStation 5',
         'description': 'Experience lightning-fast loading and immersive 4K gaming.',
         'price': 54999.0,
@@ -153,6 +136,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Electronics',
       },
       {
+        'id': '5',
         'title': 'AirPod Max Silver',
         'description': 'A perfect balance of exhilarating high-fidelity audio.',
         'price': 59900.0,
@@ -160,6 +144,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Electronics',
       },
       {
+        'id': '6',
         'title': 'Classic Chronograph',
         'description': 'Timeless design meets modern precision engineering.',
         'price': 12500.0,
@@ -167,6 +152,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Electronics',
       },
       {
+        'id': '7',
         'title': 'Eames Lounge Chair',
         'description': 'The ultimate icon of mid-century modern luxury.',
         'price': 24000.0,
@@ -174,6 +160,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Home',
       },
       {
+        'id': '8',
         'title': 'Professional Drone',
         'description': 'Capture breathtaking 4K footage from the skies.',
         'price': 89000.0,
@@ -181,6 +168,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Electronics',
       },
       {
+        'id': '9',
         'title': 'Organic Honey Blend',
         'description': 'Pure, unadulterated honey sourced from hill tribes.',
         'price': 450.0,
@@ -188,6 +176,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Coffee',
       },
       {
+        'id': '10',
         'title': 'Cast Iron Skillet',
         'description': 'Heavy-duty cookware for restaurant-style searing.',
         'price': 2100.0,
@@ -195,6 +184,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Home',
       },
       {
+        'id': '11',
         'title': 'Bamboo Table Lamp',
         'description': 'Eco-friendly lighting that adds warmth to any room.',
         'price': 1800.0,
@@ -202,6 +192,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
         'category': 'Home',
       },
       {
+        'id': '12',
         'title': 'Linen Summer Shirt',
         'description': 'Lightweight and breathable linen for hot climates.',
         'price': 1500.0,
@@ -221,7 +212,31 @@ class LocalStorageServiceImpl implements LocalStorageService {
     }
   }
 
-  // ---------------- PRODUCTS ----------------
+  // --- USER DATA ---
+  @override
+  Future<void> saveUserData(User user, {String? name, String? username, String? gender}) async {
+    await db.insert(
+      'users',
+      {
+        'id': user.uid,
+        'name': name,
+        'username': username,
+        'email': user.email,
+        'gender': gender,
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Stream<UserModel?> getUserData(String userId) {
+    return Stream.fromFuture(db.query('users', where: 'id = ?', whereArgs: [userId])).map((maps) {
+      if (maps.isEmpty) return null;
+      return serializers.deserializeWith(UserModel.serializer, maps.first);
+    });
+  }
+
 
   @override
   Future<List<Product>> getProducts() async {
@@ -230,27 +245,6 @@ class LocalStorageServiceImpl implements LocalStorageService {
         .map((map) =>
             serializers.deserializeWith(Product.serializer, map) as Product)
         .toList();
-  }
-
-  @override
-  Future<void> insertProduct(Product product) async {
-    final json = serializers.serializeWith(Product.serializer, product)
-        as Map<String, dynamic>;
-
-    await db.insert(
-      'products',
-      json,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  @override
-  Future<void> deleteProduct(int id) async {
-    await db.delete(
-      'products',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
   }
 
  
@@ -277,7 +271,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
   }
 
   @override
-  Future<void> updateCartQuantity(int productId, int quantity) async {
+  Future<void> updateCartQuantity(String productId, int quantity) async {
     await db.update(
       'cart',
       {'quantity': quantity},
@@ -287,7 +281,7 @@ class LocalStorageServiceImpl implements LocalStorageService {
   }
 
   @override
-  Future<void> removeFromCart(int productId) async {
+  Future<void> removeFromCart(String productId) async {
     await db.delete(
       'cart',
       where: 'productId = ?',
@@ -300,24 +294,19 @@ class LocalStorageServiceImpl implements LocalStorageService {
     await db.delete('cart');
   }
 
-
-
   @override
-  Future<List<Order>> getOrders() async {
-    final maps = await db.query('orders', orderBy: 'id DESC');
-
-    return maps.map((map) {
-      final mutable = Map<String, dynamic>.from(map);
-      if (mutable['id'] != null) {
-        mutable['id'] = mutable['id'].toString();
-      }
-      mutable['items'] = jsonDecode(mutable['items']);
-      return serializers.deserializeWith(Order.serializer, mutable) as Order;
-    }).toList();
+  Stream<List<Order>> getOrders(String userId) {
+    return Stream.fromFuture(db.query('orders', where: 'uid = ?', whereArgs: [userId], orderBy: 'dateTime DESC')).map((maps) {
+      return maps.map((map) {
+        final mutable = Map<String, dynamic>.from(map);
+        mutable['items'] = jsonDecode(mutable['items']);
+        return serializers.deserializeWith(Order.serializer, mutable) as Order;
+      }).toList();
+    });
   }
 
   @override
-  Future<void> placeOrder(Order order) async {
+  Future<void> saveOrder(Order order) async {
     final json =
         serializers.serializeWith(Order.serializer, order) as Map<String, dynamic>;
 
@@ -328,17 +317,4 @@ class LocalStorageServiceImpl implements LocalStorageService {
     await clearCart();
   }
 
-  @override
-  Map<String, dynamic> serializeOrder(Order order) {
-    return serializers.serializeWith(Order.serializer, order) as Map<String, dynamic>;
-  }
-
-  @override
-  Order deserializeOrder(Map<String, dynamic> map) {
-    final mutable = Map<String, dynamic>.from(map);
-    if (mutable['id'] != null) {
-      mutable['id'] = mutable['id'].toString();
-    }
-    return serializers.deserializeWith(Order.serializer, mutable) as Order;
-  }
 }

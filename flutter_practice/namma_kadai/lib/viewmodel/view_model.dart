@@ -67,7 +67,8 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<void> init() async {
-    await repository.init();
+    await repository.storageService.init();
+    await repository.firestoreService.init();
     await loadProducts();
     await loadCart();
     if (_currentUser != null) {
@@ -79,7 +80,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   Future<void> loadProducts() async {
     await handleAsync(
       () async {
-        final products = await repository.storageService.getProducts();
+        final products = await repository.firestoreService.getProducts();
         state = state.rebuild((b) => b..products = ListBuilder<Product>(products));
       },
       errorMessage: 'loadProducts error',
@@ -90,7 +91,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   Future<void> loadCart() async {
     await handleAsync(
       () async {
-        final items = await repository.storageService.getCartItems();
+        final items = await repository.firestoreService.getCartItems();
         state = state.rebuild((b) => b..cartItems = ListBuilder<CartItem>(items));
       },
       errorMessage: 'loadCart error',
@@ -115,23 +116,23 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
       ..imageUrl = product.imageUrl
       ..quantity = 1);
 
-    await repository.storageService.addToCart(item);
+    await repository.firestoreService.addToCart(item);
     await loadCart();
     return true;
   }
 
-  Future<void> updateQuantity(int productId, int quantity) async {
+  Future<void> updateQuantity(String productId, int quantity) async {
     if (kDebugMode) print('updateQuantity: ID $productId, New Qty $quantity');
     if (quantity <= 0) {
       await removeFromCart(productId);
     } else {
-      await repository.storageService.updateCartQuantity(productId, quantity);
+      await repository.firestoreService.updateCartQuantity(productId, quantity);
       await loadCart();
     }
   }
 
-  Future<void> removeFromCart(int productId) async {
-    await repository.storageService.removeFromCart(productId);
+  Future<void> removeFromCart(String productId) async {
+    await repository.firestoreService.removeFromCart(productId);
     await loadCart();
   }
 
@@ -143,7 +144,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     if (uid == null) return;
 
     _ordersSubscription?.cancel();
-    _ordersSubscription = repository.firestoreService.getOrderHistory(uid).listen(
+    _ordersSubscription = repository.firestoreService.getOrders(uid).listen(
       (orders) {
         final sortedOrders = orders.toList()
           ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
@@ -188,10 +189,10 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     await handleAsync(
       () async {
         if (_currentUser != null) {
-          await repository.firestoreService.saveOrder(_currentUser!.uid, repository.storageService.serializeOrder(order));
-          await repository.storageService.clearCart();
+          await repository.firestoreService.saveOrder(order);
+          await repository.firestoreService.clearCart();
         } else {
-          await repository.storageService.placeOrder(order);
+          await repository.storageService.saveOrder(order);
         }
         loadOrders();
         await loadCart();

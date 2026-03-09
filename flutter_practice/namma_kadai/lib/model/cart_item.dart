@@ -4,8 +4,8 @@ import 'package:built_value/serializer.dart';
 part 'cart_item.g.dart';
 
 abstract class CartItem implements Built<CartItem, CartItemBuilder> {
-  int? get id;
-  int get productId;
+  String? get id;
+  String get productId;
   String get title;
   double get price;
   String get imageUrl;

@@ -24,7 +24,7 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
       'productId',
       serializers.serialize(
         object.productId,
-        specifiedType: const FullType(int),
+        specifiedType: const FullType(String),
       ),
       'title',
       serializers.serialize(
@@ -52,7 +52,9 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
     if (value != null) {
       result
         ..add('id')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+        ..add(
+          serializers.serialize(value, specifiedType: const FullType(String)),
+        );
     }
     return result;
   }
@@ -73,16 +75,19 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
       switch (key) {
         case 'id':
           result.id =
-              serializers.deserialize(value, specifiedType: const FullType(int))
-                  as int?;
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )
+                  as String?;
           break;
         case 'productId':
           result.productId =
               serializers.deserialize(
                     value,
-                    specifiedType: const FullType(int),
+                    specifiedType: const FullType(String),
                   )!
-                  as int;
+                  as String;
           break;
         case 'title':
           result.title =
@@ -125,9 +130,9 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
 
 class _$CartItem extends CartItem {
   @override
-  final int? id;
+  final String? id;
   @override
-  final int productId;
+  final String productId;
   @override
   final String title;
   @override
@@ -196,13 +201,13 @@ class _$CartItem extends CartItem {
 class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   _$CartItem? _$v;
 
-  int? _id;
-  int? get id => _$this._id;
-  set id(int? id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  int? _productId;
-  int? get productId => _$this._productId;
-  set productId(int? productId) => _$this._productId = productId;
+  String? _productId;
+  String? get productId => _$this._productId;
+  set productId(String? productId) => _$this._productId = productId;
 
   String? _title;
   String? get title => _$this._title;

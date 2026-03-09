@@ -47,7 +47,9 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
     if (value != null) {
       result
         ..add('id')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+        ..add(
+          serializers.serialize(value, specifiedType: const FullType(String)),
+        );
     }
     value = object.category;
     if (value != null) {
@@ -76,8 +78,11 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       switch (key) {
         case 'id':
           result.id =
-              serializers.deserialize(value, specifiedType: const FullType(int))
-                  as int?;
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )
+                  as String?;
           break;
         case 'title':
           result.title =
@@ -128,7 +133,7 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
 
 class _$Product extends Product {
   @override
-  final int? id;
+  final String? id;
   @override
   final String title;
   @override
@@ -199,9 +204,9 @@ class _$Product extends Product {
 class ProductBuilder implements Builder<Product, ProductBuilder> {
   _$Product? _$v;
 
-  int? _id;
-  int? get id => _$this._id;
-  set id(int? id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   String? _title;
   String? get title => _$this._title;

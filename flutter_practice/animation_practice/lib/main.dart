@@ -20,12 +20,12 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
   late AnimationController _loopController;
   late AnimationController _flingController;
   late AnimationController _animateToController;
-
- 
   late AnimationController _colorController;
 
-  
   late Animation<Color?> _colorAnimation;
+
+  late AnimationController _curveController;
+  late Animation<double> _curveAnimation;
 
   @override
   void initState() {
@@ -50,17 +50,27 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
       duration: const Duration(seconds: 2),
     );
 
-  
     _colorController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
 
-  
     _colorAnimation = _colorController.drive(
       ColorTween(
         begin: Colors.purple,
         end: Colors.yellow,
+      ),
+    );
+
+    _curveController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _curveAnimation = Tween<double>(begin: 50, end: 200).animate(
+      CurvedAnimation(
+        parent: _curveController,
+        curve: Curves.elasticOut,
       ),
     );
   }
@@ -71,6 +81,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
     _flingController.dispose();
     _animateToController.dispose();
     _colorController.dispose();
+    _curveController.dispose();
     super.dispose();
   }
 
@@ -137,9 +148,9 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
                 RotationTransition(
                   turns: _loopController,
                   child: Container(
-                    width: 120,
-                    height: 120,
-                    color: Colors.green,
+                    width: 200,
+                    height: 200,
+                    child:Image.asset("Logo.png"),
                   ),
                 ),
 
@@ -175,7 +186,6 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
                 const SizedBox(height: 40),
 
-               
                 AnimatedBuilder(
                   animation: _colorAnimation,
                   builder: (context, child) {
@@ -183,6 +193,19 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
                       width: 120,
                       height: 120,
                       color: _colorAnimation.value,
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 40),
+
+                AnimatedBuilder(
+                  animation: _curveAnimation,
+                  builder: (context, child) {
+                    return Container(
+                      width: _curveAnimation.value,
+                      height: _curveAnimation.value,
+                      color: Colors.teal,
                     );
                   },
                 ),
@@ -207,24 +230,22 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
                       size = size == 100 ? 200 : 100;
                       rotation += 1.57;
                       isCircle = !isCircle;
-
                     });
-                    _loopController.repeat();
 
+                    _loopController.repeat();
                     _flingAnimation();
                     _animateToExample();
+                    _curveController.repeat();
                   },
-                  
                   child: const Text("Animate All Shapes"),
                 ),
+
                 ElevatedButton(
-                    onPressed:(){
-                      setState((){
-                        _loopController.stop();
-                      });
-                    },
-                    child:Text("Stop")
-                  )
+                  onPressed: () {
+                    _loopController.stop();
+                  },
+                  child: const Text("Stop"),
+                )
               ],
             ),
           ),
@@ -243,12 +264,15 @@ class SpinningSquare extends AnimatedWidget {
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: animation.value * 6.28,
+      angle: animation.value * -6.28,
       child: Container(
         width: 100,
         height: 100,
-        color: Colors.orange,
-      ),
+        
+        child:Image.asset("Logo.png",width: 40,height: 40,),
+        
+        
+      )
     );
   }
 }

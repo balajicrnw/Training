@@ -21,6 +21,12 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
   late AnimationController _flingController;
   late AnimationController _animateToController;
 
+ 
+  late AnimationController _colorController;
+
+  
+  late Animation<Color?> _colorAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +49,20 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
       upperBound: 150,
       duration: const Duration(seconds: 2),
     );
+
+  
+    _colorController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
+  
+    _colorAnimation = _colorController.drive(
+      ColorTween(
+        begin: Colors.purple,
+        end: Colors.yellow,
+      ),
+    );
   }
 
   @override
@@ -50,6 +70,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
     _loopController.dispose();
     _flingController.dispose();
     _animateToController.dispose();
+    _colorController.dispose();
     super.dispose();
   }
 
@@ -57,20 +78,22 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
     if (!_flingController.isAnimating) {
       _flingController
         ..reset()
-        ..fling(velocity: 2.0);
+        ..fling(velocity: 10.0);
     }
   }
 
   void _animateToExample() {
-    _animateToController.animateTo(
-      150, 
+    _animateToController
+        .animateTo(
+      150,
       duration: const Duration(seconds: 2),
       curve: Curves.easeInOut,
-    ).then((_) {
+    )
+        .then((_) {
       _animateToController.animateTo(
-        50, 
+        50,
         duration: const Duration(seconds: 2),
-        curve: Curves.easeInOut,
+        curve: Curves.bounceInOut,
       );
     });
   }
@@ -84,7 +107,6 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                
                 TweenAnimationBuilder<double>(
                   tween: Tween(begin: 0, end: rotation),
                   duration: const Duration(seconds: 1),
@@ -96,9 +118,8 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
                         width: size,
                         height: size,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            isCircle ? size / 2 : 10,
-                          ),
+                          borderRadius:
+                              BorderRadius.circular(isCircle ? size / 2 : 10),
                           image: const DecorationImage(
                             image: NetworkImage(
                               "https://images.unsplash.com/photo-1715316110001-c2374d87e753?w=600&auto=format&fit=crop&q=60",
@@ -113,7 +134,6 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
                 const SizedBox(height: 40),
 
-                
                 RotationTransition(
                   turns: _loopController,
                   child: Container(
@@ -125,7 +145,10 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
                 const SizedBox(height: 40),
 
-                
+                SpinningSquare(animation: _loopController),
+
+                const SizedBox(height: 40),
+
                 AnimatedBuilder(
                   animation: _flingController,
                   builder: (context, child) {
@@ -139,7 +162,6 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
                 const SizedBox(height: 40),
 
-                
                 AnimatedBuilder(
                   animation: _animateToController,
                   builder: (context, child) {
@@ -147,6 +169,20 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
                       width: _animateToController.value,
                       height: _animateToController.value,
                       color: Colors.blue,
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 40),
+
+               
+                AnimatedBuilder(
+                  animation: _colorAnimation,
+                  builder: (context, child) {
+                    return Container(
+                      width: 120,
+                      height: 120,
+                      color: _colorAnimation.value,
                     );
                   },
                 ),
@@ -171,17 +207,47 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
                       size = size == 100 ? 200 : 100;
                       rotation += 1.57;
                       isCircle = !isCircle;
-                    });
 
-                    _flingAnimation(); 
-                    _animateToExample(); 
+                    });
+                    _loopController.repeat();
+
+                    _flingAnimation();
+                    _animateToExample();
                   },
+                  
                   child: const Text("Animate All Shapes"),
-                )
+                ),
+                ElevatedButton(
+                    onPressed:(){
+                      setState((){
+                        _loopController.stop();
+                      });
+                    },
+                    child:Text("Stop")
+                  )
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class SpinningSquare extends AnimatedWidget {
+  const SpinningSquare({super.key, required Animation<double> animation})
+      : super(listenable: animation);
+
+  Animation<double> get animation => listenable as Animation<double>;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: animation.value * 6.28,
+      child: Container(
+        width: 100,
+        height: 100,
+        color: Colors.orange,
       ),
     );
   }

@@ -2,7 +2,7 @@ name: CI Pipeline
 
 # Trigger: run workflow on push or pull request to main
 on:
-  push:
+  workflow_dispatch:
     branches: [ main ]
   pull_request:
     branches: [ main ]

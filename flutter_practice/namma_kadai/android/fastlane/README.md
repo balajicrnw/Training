@@ -29,7 +29,7 @@ Runs all the tests
 [bundle exec] fastlane android firebase
 ```
 
-Submit a new Beta Build to Crashlytics Beta
+Build and upload to Firebase
 
 ### android deploy
 
@@ -37,7 +37,7 @@ Submit a new Beta Build to Crashlytics Beta
 [bundle exec] fastlane android deploy
 ```
 
-Deploy a new version to the Google Play
+Deploy to Google Play
 
 ----
 

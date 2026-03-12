@@ -9,7 +9,6 @@ class CartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -51,6 +50,7 @@ class CartScreen extends ConsumerWidget {
                     itemCount: ref.cartItems.length,
                     itemBuilder: (context, index) {
                       final item = ref.cartItems[index];
+
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(12),
@@ -68,7 +68,7 @@ class CartScreen extends ConsumerWidget {
                         child: Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12) ,
                               child: Container(
                                 color: Colors.grey[50],
                                 child: Image.network(
@@ -82,6 +82,8 @@ class CartScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(width: 16),
+
+                            /// Product Info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,6 +96,8 @@ class CartScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
+
+                                  /// Price
                                   Text(
                                     '₹${item.price}',
                                     style: TextStyle(
@@ -103,29 +107,65 @@ class CartScreen extends ConsumerWidget {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+
+                                  const SizedBox(height: 4),
+
+                                  /// Subtotal
+                                  Text(
+                                    'Subtotal: ₹${item.price * item.quantity}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                            Row(
+
+                            /// Quantity Controls
+                            Column(
                               children: [
-                                IconButton(
-                                  onPressed: () => ref.notifier.updateQuantity(
-                                      item.productId, item.quantity - 1),
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  color: Colors.grey,
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () => ref.notifier
+                                          .updateQuantity(item.productId,
+                                              item.quantity - 1),
+                                      icon: const Icon(Icons.remove),
+                                      color: Colors.grey,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '${item.quantity}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => ref.notifier
+                                          .updateQuantity(item.productId,
+                                              item.quantity + 1),
+                                      icon: const Icon(Icons.add),
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '${item.quantity}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
+
+                                
                                 IconButton(
-                                  onPressed: () => ref.notifier.updateQuantity(
-                                      item.productId, item.quantity + 1),
-                                  icon: const Icon(Icons.add_circle_outline),
-                                  color: Theme.of(context).primaryColor,
+                                  icon: const Icon(Icons.delete_outline),
+                                  color: Colors.red,
+                                  onPressed: () {
+                                    ref.notifier.removeFromCart(item.productId);
+                                  },
                                 ),
                               ],
                             ),
@@ -135,12 +175,14 @@ class CartScreen extends ConsumerWidget {
                     },
                   ),
                 ),
+
+                /// Bottom Checkout Section
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(32)),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(32)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.05),
@@ -172,27 +214,37 @@ class CartScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: () async {
-                          await ref.notifier.placeOrder();
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+
+                      /// Place Order Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[600],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () async {
+                            await ref.notifier.placeOrder();
+
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  content: const Text(
+                                      'Order placed successfully!'),
                                 ),
-                                content: const Text('Order placed successfully!'),
-                              ),
-                            );
-                            context.pushReplacementNamed(RouteNames.checkout);
-                          }
-                        },
-                        child: const Text('Place Order'),
+                              );
+
+                              context.pushReplacementNamed(
+                                  RouteNames.checkout);
+                            }
+                          },
+                          child: const Text('Place Order'),
+                        ),
                       ),
                     ],
                   ),

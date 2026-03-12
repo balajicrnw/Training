@@ -16,12 +16,13 @@ val keyProperties = Properties()
 if (keyPropertiesFile.exists()) {
     keyProperties.load(FileInputStream(keyPropertiesFile))
 } else {
-    // Use default values if key.properties is not found
+    
     keyProperties["storePassword"] = ""
     keyProperties["keyPassword"] = ""
 }
 
 android {
+
     namespace = "com.nammakadai.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion

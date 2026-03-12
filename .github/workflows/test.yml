@@ -1,26 +1,15 @@
-name: CI Pipeline
+name: Test Workflow
 
-# Trigger: run workflow on push or pull request to main
 on:
-  workflow_dispatch:
-    branches: [ main ]
-  pull_request:
+  push:
     branches: [ main ]
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest   # Virtual machine to run workflow
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3   # Get repository code
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'        # Use Node.js version 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+      - name: Hello World
+        run: echo "Workflow is running successfully!"

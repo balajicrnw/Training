@@ -9,23 +9,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: 'stable'
 
-      - name: Go to Flutter project
-        run: cd flutter_practice/namma_kadai
-
-      - name: Install dependencies
-        run: |
-          cd flutter_practice/namma_kadai
-          flutter pub get
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: flutter_practice/namma_kadai
 
       - name: Build APK
-        run: |
-          cd flutter_practice/namma_kadai
-          flutter build apk
+        run: flutter build apk
+        working-directory: flutter_practice/namma_kadai

@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: flutter_practice/namma_kadaiy/build/app/outputs/flutter-apk/app-release.apk
+          path: flutter_practice/namma_kadai/build/app/outputs/flutter-apk/app-release.apk

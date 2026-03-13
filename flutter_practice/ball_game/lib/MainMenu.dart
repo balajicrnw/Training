@@ -6,24 +6,46 @@ class Mainmenu extends StatefulWidget {
   _MainmenuState createState() => _MainmenuState();
 }
 
-
 class _MainmenuState extends State<Mainmenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: 300,
-            left: 75,
-            child: Text("MANDA ADI",style:TextStyle(color: Color.fromARGB(159, 5, 161, 252),fontSize: 50))),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
 
-          Positioned(
-            top: 550,
-            left: 100,
-            child: ElevatedButton(onPressed: ()=>Navigator.push(context,MaterialPageRoute(builder: (context)=>GamePage())),child:Text("Play"),style: ElevatedButton.styleFrom( minimumSize: Size(200, 60),backgroundColor: Color.fromARGB(223, 131, 234, 217) ),),)
-        ],
-      )
-    );    throw UnimplementedError();
+            Text(
+              "MANDA ADI",
+              style: TextStyle(
+                color: Color.fromARGB(159, 5, 161, 252),
+                fontSize: 50,
+              ),
+            ),
+
+            SizedBox(height: 40),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GamePage(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(200, 60),
+                backgroundColor: Color.fromARGB(223, 131, 234, 217),
+              ),
+              child: Text(
+                "Play",
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

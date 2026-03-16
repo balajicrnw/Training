@@ -12,10 +12,12 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
   String? _gender;
   bool _isLoading = false;
 
@@ -30,11 +32,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
+      if (_gender == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select gender")),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
 
       final notifier = ref.read(appViewModelProvider.notifier);
+
       final user = await notifier.register(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -52,7 +62,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
         );
-        // The go_router redirect will handle navigation to home.
       }
     }
   }
@@ -78,11 +87,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32.0),
+            padding: const EdgeInsets.all(32),
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
@@ -98,7 +106,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
+
                   const SizedBox(height: 24),
+
                   Text(
                     'Create Account',
                     textAlign: TextAlign.center,
@@ -107,7 +117,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           color: Colors.black87,
                         ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     'Join Namma Kadai community',
                     textAlign: TextAlign.center,
@@ -115,7 +127,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           color: Colors.grey,
                         ),
                   ),
+
                   const SizedBox(height: 32),
+
+                  /// USERNAME
                   TextFormField(
                     controller: _usernameController,
                     decoration: const InputDecoration(
@@ -129,7 +144,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 16),
+
+                  /// EMAIL
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -141,15 +159,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter an email';
                       }
-                      final emailRegex =
-                          RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+                      final emailRegex = RegExp(
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
                       if (!emailRegex.hasMatch(value)) {
                         return 'Please enter a valid email address';
                       }
+
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 16),
+
+                  /// PASSWORD
                   TextFormField(
                     controller: _passwordController,
                     decoration: const InputDecoration(
@@ -161,13 +185,41 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a password';
                       }
+
                       if (value.length < 6) {
                         return 'Password must be at least 6 characters';
                       }
+
                       return null;
                     },
                   ),
+
+                  const SizedBox(height: 16),
+
+                  /// CONFIRM PASSWORD
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm Password',
+                      prefixIcon: Icon(Icons.lock_outline),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+
+                      return null;
+                    },
+                  ),
+
                   const SizedBox(height: 24),
+
+                  /// GENDER
                   Text(
                     'Gender',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -175,7 +227,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           color: Colors.black87,
                         ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Row(
                     children: [
                       Expanded(
@@ -183,7 +237,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           title: const Text('Male'),
                           value: 'Male',
                           groupValue: _gender,
-                          onChanged: (value) => setState(() => _gender = value!),
+                          onChanged: (value) =>
+                              setState(() => _gender = value),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
@@ -192,20 +247,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           title: const Text('Female'),
                           value: 'Female',
                           groupValue: _gender,
-                          onChanged: (value) => setState(() => _gender = value!),
+                          onChanged: (value) =>
+                              setState(() => _gender = value),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 32),
+
+                  /// REGISTER BUTTON
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
                           onPressed: _register,
                           child: const Text('Register'),
                         ),
+
                   const SizedBox(height: 16),
+
+                  /// LOGIN BUTTON
                   TextButton(
                     onPressed: () => context.pop(),
                     child: RichText(

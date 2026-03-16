@@ -9,17 +9,18 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
+  int time=40;
 
-  final AudioPlayer player = AudioPlayer();
 
-  List<bool> isvisible = List.filled(6, false);
+  List<bool> isvisible = List.filled(12, false);
   int score = 0;
 
   Future<void> triggerVisibility() async {
     Random random = Random();
-    int value = random.nextInt(6);
+    int value = random.nextInt(12);
 
     setState(() {
+      time--;
       isvisible[value] = true;
     });
 
@@ -37,7 +38,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   void startGame() async {
-    for (int i = 0; i < 10; i++) {
+    
+    while(time>=1) {
       await triggerVisibility();
     }
   }
@@ -61,9 +63,16 @@ class _GamePageState extends State<GamePage> {
       backgroundColor: Colors.blue[100],
       body: Stack(
         children: [
-
           Positioned(
             top: 50,
+            left: 110,
+            child: Text(
+              "$time",
+              style: TextStyle(fontSize: 50),
+            ),
+          ),
+          Positioned(
+            top: 150,
             left: 110,
             child: Text(
               "Score: $score",
@@ -72,7 +81,7 @@ class _GamePageState extends State<GamePage> {
           ),
 
           Positioned(
-            top: 300,
+            top: 220,
             left: 20,
             right: 20,
             bottom: 20,
@@ -126,15 +135,27 @@ class Hole extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: isvisible
-              ? const Color.fromARGB(255, 244, 95, 54)
-              : Colors.green.shade700,
-          shape: BoxShape.circle,
-        ),
+      child: Stack(
+        children:[
+          Container(
+            decoration: BoxDecoration(
+              color:Colors.black54,
+              shape: BoxShape.circle,
+              ),
+            ),
+            AnimatedOpacity(
+            duration: Duration(milliseconds:200),
+            opacity: isvisible?1.0:0.0,
+            child:Container(
+              color: Colors.transparent,
+              child: Image.asset("assets/Duck.png"),
+            ),
+            )
+            
+      ]
       ),
     );
   }

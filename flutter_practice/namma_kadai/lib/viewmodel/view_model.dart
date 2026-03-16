@@ -21,8 +21,6 @@ final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authStateProvider).asData?.value;
 });
 
-
-
 class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   final AppRepository repository;
   final Ref _ref;
@@ -36,14 +34,16 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     required Ref ref,
   })  : _ref = ref,
         super(AppState.initial()) {
-    _ref.listen<User?>(currentUserProvider, (previous, next) {
+    _ref.listen<User?>(currentUserProvider, (previous, next) async {
       if (next != null) {
         startUserSubscriptions();
+        await loadCart();
       } else {
         cancelUserSubscriptions();
         state = state.rebuild((b) => b
           ..orders = ListBuilder<Order>([])
-          ..userData = null);
+          ..userData = null
+          ..cartItems = ListBuilder<CartItem>([]));
       }
     });
   }
@@ -76,28 +76,29 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     }
   }
 
-
   Future<void> loadProducts() async {
     await handleAsync(
       () async {
         List<Product> products = [];
         try {
           products = await repository.firestoreService.getProducts();
-        }
-        catch(e){
+        } catch (_) {
           products = await repository.storageService.getProducts();
         }
-
         state = state.rebuild((b) => b..products = ListBuilder<Product>(products));
       },
       errorMessage: 'loadProducts error',
     );
   }
 
-
   Future<void> loadCart() async {
     await handleAsync(
       () async {
+        final uid = _currentUser?.uid;
+        if (uid == null) {
+          state = state.rebuild((b) => b..cartItems = ListBuilder<CartItem>([]));
+          return;
+        }
         final items = await repository.firestoreService.getCartItems();
         state = state.rebuild((b) => b..cartItems = ListBuilder<CartItem>(items));
       },
@@ -106,16 +107,15 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<bool> addToCart(Product product) async {
-    final existingItems = state.cartItems.where((item) => item.productId == product.id).toList();
-    
+    final existingItems =
+        state.cartItems.where((item) => item.productId == product.id).toList();
+
     if (existingItems.isNotEmpty) {
       final existingItem = existingItems.first;
-      if (kDebugMode) print('addToCart: Incrementing quantity for ${product.title}');
       await updateQuantity(product.id!, existingItem.quantity + 1);
       return true;
     }
 
-    if (kDebugMode) print('addToCart: Adding new product ${product.title}');
     final item = CartItem((b) => b
       ..productId = product.id!
       ..title = product.title
@@ -129,7 +129,6 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<void> updateQuantity(String productId, int quantity) async {
-    if (kDebugMode) print('updateQuantity: ID $productId, New Qty $quantity');
     if (quantity <= 0) {
       await removeFromCart(productId);
     } else {
@@ -151,18 +150,15 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     if (uid == null) return;
 
     _ordersSubscription?.cancel();
-    _ordersSubscription = repository.firestoreService.getOrders(uid).listen(
-      (orders) {
-        final sortedOrders = orders.toList()
-          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
-        
-        state = state.rebuild((b) => b..orders = ListBuilder<Order>(sortedOrders));
-      },
-      onError: (error) {
-        if (kDebugMode) print('loadOrders: Error: $error');
-        state = state.rebuild((b) => b..errorMessage = 'Failed to load orders: $error');
-      },
-    );
+    _ordersSubscription =
+        repository.firestoreService.getOrders(uid).listen((orders) {
+      final sortedOrders = orders.toList()
+        ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+      state = state.rebuild((b) => b..orders = ListBuilder<Order>(sortedOrders));
+    }, onError: (error) {
+      state =
+          state.rebuild((b) => b..errorMessage = 'Failed to load orders: $error');
+    });
   }
 
   Future<void> loadUserData() async {
@@ -170,17 +166,15 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     if (uid == null) return;
 
     _userDataSubscription?.cancel();
-    _userDataSubscription = repository.firestoreService.getUserData(uid).listen(
-      (userData) {
-        if (userData != null) {
-          state = state.rebuild((b) => b..userData = userData.toBuilder());
-        }
-      },
-      onError: (error) {
-        if (kDebugMode) print('loadUserData: Error: $error');
-        state = state.rebuild((b) => b..errorMessage = 'Failed to load user data: $error');
-      },
-    );
+    _userDataSubscription =
+        repository.firestoreService.getUserData(uid).listen((userData) {
+      if (userData != null) {
+        state = state.rebuild((b) => b..userData = userData.toBuilder());
+      }
+    }, onError: (error) {
+      state = state
+          .rebuild((b) => b..errorMessage = 'Failed to load user data: $error');
+    });
   }
 
   Future<void> placeOrder() async {
@@ -193,25 +187,23 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
       ..totalAmount = totalAmount
       ..dateTime = DateTime.now().toUtc());
 
-    await handleAsync(
-      () async {
-        if (_currentUser != null) {
-          await repository.firestoreService.saveOrder(order);
-          await repository.firestoreService.clearCart();
-        } else {
-          await repository.storageService.saveOrder(order);
-        }
-        loadOrders();
-        await loadCart();
-      },
-      errorMessage: 'placeOrder error',
-    );
+    await handleAsync(() async {
+      if (_currentUser != null) {
+        await repository.firestoreService.saveOrder(order);
+        await repository.firestoreService.clearCart();
+      } else {
+        await repository.storageService.saveOrder(order);
+      }
+      await loadOrders();
+      await loadCart();
+    }, errorMessage: 'placeOrder error');
   }
 
   Future<User?> login(String email, String password) async {
     final user = await repository.authService.signIn(email, password);
     if (user == null) {
-      state = state.rebuild((b) => b..errorMessage = 'Invalid email or password');
+      state =
+          state.rebuild((b) => b..errorMessage = 'Invalid email or password');
     }
     return user;
   }
@@ -224,29 +216,17 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }) async {
     User? user;
     state = state.rebuild((b) => b..errorMessage = null);
-    await handleAsync(
-      () async {
-        user = await repository.authService.signUp(email, password);
-        if (user != null) {
-          await repository.firestoreService.saveUserData(
-            user!,
-            name: username,
-            username: username,
-            gender: gender,
-          );
-        }
-      },
-      errorMessage: 'Registration error',
-      onError: (error) {
-        String message = 'An unexpected error occurred during registration.';
-        if (error is FirebaseAuthException) {
-          if (error.code == 'email-already-in-use') message = 'This email is already in use.';
-          if (error.code == 'weak-password') message = 'The password is too weak.';
-          if (error.code == 'invalid-email') message = 'The email address is not valid.';
-        }
-        state = state.rebuild((b) => b..errorMessage = message);
-      },
-    );
+    await handleAsync(() async {
+      user = await repository.authService.signUp(email, password);
+      if (user != null) {
+        await repository.firestoreService.saveUserData(
+          user!,
+          name: username,
+          username: username,
+          gender: gender,
+        );
+      }
+    }, errorMessage: 'Registration error');
     return user;
   }
 
@@ -267,7 +247,8 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 }
 
-final appViewModelProvider = StateNotifierProvider<AppNotifier, AppState>((ref) {
+final appViewModelProvider =
+    StateNotifierProvider<AppNotifier, AppState>((ref) {
   final repository = ref.watch(appRepositoryProvider);
   return AppNotifier(repository: repository, ref: ref)..init();
 });

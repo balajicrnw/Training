@@ -9,8 +9,8 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  int time=40;
-
+  int time = 40;
+  AudioPlayer player = AudioPlayer();
 
   List<bool> isvisible = List.filled(12, false);
   int score = 0;
@@ -38,14 +38,17 @@ class _GamePageState extends State<GamePage> {
   }
 
   void startGame() async {
-    
-    while(time>=1) {
+    while (time >= 1) {
       await triggerVisibility();
     }
   }
 
-  void playSound() {
-    AudioPlayer().play(AssetSource('duck.mp3'));
+  void playSound() async {
+    await player.play(AssetSource('duck.mp3'));
+
+    Future.delayed(Duration(milliseconds: 500), () {
+      player.stop();
+    });
   }
 
   void incrementScore(bool visible) {
@@ -59,13 +62,15 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.blue[100],
       body: Stack(
         children: [
           Positioned(
             top: 50,
-            left: 110,
+            left: width * 0.4,
             child: Text(
               "$time",
               style: TextStyle(fontSize: 50),
@@ -73,13 +78,12 @@ class _GamePageState extends State<GamePage> {
           ),
           Positioned(
             top: 150,
-            left: 110,
+            left: width * 0.3,
             child: Text(
               "Score: $score",
               style: TextStyle(fontSize: 50),
             ),
           ),
-
           Positioned(
             top: 220,
             left: 20,
@@ -108,10 +112,9 @@ class _GamePageState extends State<GamePage> {
               ),
             ),
           ),
-
           Positioned(
             bottom: 100,
-            left: 125,
+            left: width * 0.3,
             child: ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -126,7 +129,6 @@ class _GamePageState extends State<GamePage> {
 }
 
 class Hole extends StatelessWidget {
-
   final bool isvisible;
   final VoidCallback? onTap;
 
@@ -134,29 +136,25 @@ class Hole extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-
     return GestureDetector(
       onTap: onTap,
-      child: Stack(
-        children:[
-          Container(
-            decoration: BoxDecoration(
-              color:Colors.black54,
-              shape: BoxShape.circle,
-              ),
-            ),
-            AnimatedOpacity(
-            duration: Duration(milliseconds:200),
-            opacity: isvisible?1.0:0.0,
-            child:Container(
-              color: Colors.transparent,
-              child: Image.asset("assets/Duck.png"),
-            ),
-            )
-            
-      ]
-      ),
+      child: Stack(children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            shape: BoxShape.circle,
+          ),
+        ),
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 200),
+          opacity: isvisible ? 1.0 : 0.0,
+          child: Container(
+            alignment: Alignment.center,
+            color: Colors.transparent,
+            child: Image.asset("assets/Duck.png"),
+          ),
+        )
+      ]),
     );
   }
 }

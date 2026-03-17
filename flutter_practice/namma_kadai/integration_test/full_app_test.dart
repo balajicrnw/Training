@@ -65,9 +65,8 @@ void main() {
 
     expect(find.textContaining('added to cart'), findsWidgets);
 
-    // Wait for SnackBar to disappear
     await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
+
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
@@ -77,11 +76,9 @@ void main() {
 
     expect(find.text('My Cart'), findsOneWidget);
 
-    // Scroll "Place Order" into view
     final placeOrder = find.widgetWithText(ElevatedButton, 'Place Order');
     await tester.ensureVisible(placeOrder);
 
-    // Wait for any SnackBar to disappear
     final snackBar = find.byType(SnackBar);
     if (snackBar.evaluate().isNotEmpty) {
       await tester.pump(const Duration(seconds: 1));

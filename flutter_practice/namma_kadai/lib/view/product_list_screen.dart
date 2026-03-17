@@ -70,6 +70,8 @@ class ProductListScreen extends ConsumerWidget {
                 onPressed: () => context.pushNamed(RouteNames.checkout),
               ),
               Stack(
+                                    key: const ValueKey('cart_button'),
+
                 alignment: Alignment.center,
                 children: [
                   IconButton(

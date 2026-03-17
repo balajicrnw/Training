@@ -83,7 +83,7 @@ void main() {
     if (snackBar.evaluate().isNotEmpty) {
       await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
-    }
+    } 
 
     await tester.tap(placeOrder);
     await tester.pumpAndSettle(const Duration(seconds: 5));

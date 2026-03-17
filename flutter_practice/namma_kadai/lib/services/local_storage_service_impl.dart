@@ -8,6 +8,8 @@ import '../model/cart_item.dart';
 import '../model/order.dart';
 import '../model/user_model.dart';
 import '../model/serializers.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 class LocalStorageServiceImpl implements StorageService {
   
@@ -24,9 +26,14 @@ class LocalStorageServiceImpl implements StorageService {
 
 
   @override
-  Future<void> init() async {
-    if (_database != null) return;
+Future<void> init() async {
+  if (_database != null) return;
 
+  if (kIsWeb) {
+    
+    await _initWebDatabase();
+  } else {
+    
     final path = join(await getDatabasesPath(), 'namma_kadai.db');
 
     _database = await openDatabase(
@@ -46,6 +53,31 @@ class LocalStorageServiceImpl implements StorageService {
           await _seedData(db);
         }
       },
+    );
+  }
+}
+
+  Future<void> _initWebDatabase() async {
+    var factory = databaseFactoryFfiWeb;
+    _database = await factory.openDatabase(
+      'namma_kadai.db',
+      options: OpenDatabaseOptions(
+        version: 12,
+        onCreate: (db, version) async {
+          await _createTables(db);
+          await _seedData(db);
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 12) {
+            await db.execute('DROP TABLE IF EXISTS users');
+            await db.execute('DROP TABLE IF EXISTS products');
+            await db.execute('DROP TABLE IF EXISTS cart');
+            await db.execute('DROP TABLE IF EXISTS orders');
+            await _createTables(db);
+            await _seedData(db);
+          }
+        },
+      ),
     );
   }
 

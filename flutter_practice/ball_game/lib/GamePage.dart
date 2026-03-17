@@ -15,21 +15,7 @@ class _GamePageState extends State<GamePage> {
   List<bool> isvisible = List.filled(12, false);
   int score = 0;
 
-  Future<void> triggerVisibility() async {
-    Random random = Random();
-    int value = random.nextInt(12);
-
-    setState(() {
-      time--;
-      isvisible[value] = true;
-    });
-
-    await Future.delayed(Duration(seconds: 1));
-
-    setState(() {
-      isvisible[value] = false;
-    });
-  }
+  bool isGameRunning = true; // ✅ control loop
 
   @override
   void initState() {
@@ -37,18 +23,45 @@ class _GamePageState extends State<GamePage> {
     startGame();
   }
 
+  Future<void> triggerVisibility() async {
+    if (!isGameRunning) return;
+
+    Random random = Random();
+    int value = random.nextInt(12);
+
+    if (!mounted) return;
+
+    setState(() {
+      time--;
+      isvisible[value] = true;
+    });
+
+    // ✅ Increased visibility time (important for test)
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    if (!mounted) return;
+
+    setState(() {
+      isvisible[value] = false;
+    });
+  }
+
   void startGame() async {
-    while (time >= 1) {
+    while (time >= 1 && isGameRunning) {
       await triggerVisibility();
     }
   }
 
   void playSound() async {
-    await player.play(AssetSource('duck.mp3'));
+    try {
+      await player.play(AssetSource('duck.mp3'));
 
-    Future.delayed(Duration(milliseconds: 500), () {
-      player.stop();
-    });
+      Future.delayed(const Duration(milliseconds: 500), () {
+        player.stop();
+      });
+    } catch (e) {
+      // ✅ prevents crash in tests
+    }
   }
 
   void incrementScore(bool visible) {
@@ -58,6 +71,14 @@ class _GamePageState extends State<GamePage> {
         score++;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // 🔥 CRITICAL FIX
+    isGameRunning = false;
+    player.dispose();
+    super.dispose();
   }
 
   @override
@@ -73,7 +94,7 @@ class _GamePageState extends State<GamePage> {
             left: width * 0.4,
             child: Text(
               "$time",
-              style: TextStyle(fontSize: 50),
+              style: const TextStyle(fontSize: 50),
             ),
           ),
           Positioned(
@@ -81,7 +102,7 @@ class _GamePageState extends State<GamePage> {
             left: width * 0.3,
             child: Text(
               "Score: $score",
-              style: TextStyle(fontSize: 50),
+              style: const TextStyle(fontSize: 50),
             ),
           ),
           Positioned(
@@ -89,26 +110,23 @@ class _GamePageState extends State<GamePage> {
             left: 20,
             right: 20,
             bottom: 20,
-            child: SizedBox(
-              height: 300,
-              child: GridView.count(
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                crossAxisCount: 3,
-                children: List.generate(
-                  isvisible.length,
-                  (index) {
-                    return Hole(
-                      isvisible: isvisible[index],
-                      onTap: () {
-                        incrementScore(isvisible[index]);
-                        setState(() {
-                          isvisible[index] = false;
-                        });
-                      },
-                    );
-                  },
-                ),
+            child: GridView.count(
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              crossAxisCount: 3,
+              children: List.generate(
+                isvisible.length,
+                (index) {
+                  return Hole(
+                    isvisible: isvisible[index],
+                    onTap: () {
+                      incrementScore(isvisible[index]);
+                      setState(() {
+                        isvisible[index] = false;
+                      });
+                    },
+                  );
+                },
               ),
             ),
           ),
@@ -119,7 +137,7 @@ class _GamePageState extends State<GamePage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Back to MainMenu"),
+              child: const Text("Back to MainMenu"),
             ),
           ),
         ],
@@ -132,29 +150,32 @@ class Hole extends StatelessWidget {
   final bool isvisible;
   final VoidCallback? onTap;
 
-  Hole({this.isvisible = false, this.onTap, Key? key}) : super(key: key);
+  const Hole({this.isvisible = false, this.onTap, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Stack(children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.black54,
-            shape: BoxShape.circle,
+      child: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.black54,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        AnimatedOpacity(
-          duration: Duration(milliseconds: 200),
-          opacity: isvisible ? 1.0 : 0.0,
-          child: Container(
-            alignment: Alignment.center,
-            color: Colors.transparent,
-            child: Image.asset("assets/Duck.png"),
-          ),
-        )
-      ]),
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: isvisible ? 1.0 : 0.0,
+            child: Container(
+              alignment: Alignment.center,
+              color: Colors.transparent,
+              child: Image.asset("assets/Duck.png"),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

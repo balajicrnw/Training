@@ -11,7 +11,6 @@ void main() {
     expect(find.byType(ElevatedButton), findsOneWidget);
     expect(find.text("Play"), findsOneWidget);
 
-    // Navigate using images
     for (int i = 0; i < 3; i++) {
       await tester.tap(find.byType(Image));
       await tester.pumpAndSettle();
@@ -20,7 +19,6 @@ void main() {
     await tester.tap(find.byType(ElevatedButton));
     await tester.pumpAndSettle();
 
-    // 🔥 FAST LOOP (critical fix)
     for (int i = 0; i < 400; i++) {
       await tester.pump(const Duration(milliseconds: 100));
 
@@ -36,7 +34,6 @@ void main() {
       }
     }
 
-    // ✅ allow cleanup
     await tester.pump(const Duration(seconds: 2));
   });
 }

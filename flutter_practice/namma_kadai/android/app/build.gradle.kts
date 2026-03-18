@@ -45,7 +45,8 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
-    }
+        testInstrumentationRunner="pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments += mapOf("clearPackageData" to "true")
 
     signingConfigs {
         create("release") {
@@ -68,8 +69,15 @@ android {
             }
         }
     }
+
+
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    androidTestImplementation(project(":patrol"))
+}
 }

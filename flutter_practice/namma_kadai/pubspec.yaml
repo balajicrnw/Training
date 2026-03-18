@@ -96,3 +96,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+patrol:
+  app_name: namma_kadai
+  android: 
+     package_name: com.nammakadai.app
+  ios: 
+     bundle_id: com.nammakadai.app
+  macos:
+     bundle_id: com.nammakadai.app
+

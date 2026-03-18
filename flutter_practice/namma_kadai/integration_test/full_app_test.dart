@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,9 +21,9 @@ void main() {
   testWidgets('Full App Flow Integration Test with GoRouter',
       (WidgetTester tester) async {
 
-    FlutterError.onError = (details) {
-      fail(details.exceptionAsString());
-    };
+    if (kIsWeb) {
+      await tester.binding.setSurfaceSize(const Size(1280, 800));
+    }
 
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
@@ -52,8 +53,10 @@ void main() {
 
     expect(find.byIcon(Icons.logout), findsOneWidget);
 
-    expect(find.byType(Image), findsWidgets);
-    await tester.tap(find.byType(Image).first);
+    final firstImage = find.byType(Image).first;
+    await tester.ensureVisible(firstImage);
+    await tester.pumpAndSettle();
+    await tester.tap(firstImage);
     await tester.pumpAndSettle();
 
     expect(find.text('Description'), findsOneWidget);

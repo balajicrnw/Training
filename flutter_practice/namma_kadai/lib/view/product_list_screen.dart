@@ -16,7 +16,7 @@ class ProductListScreen extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Elegant Gradient Header
+          // Header
           SliverAppBar(
             expandedHeight: 120.0,
             floating: true,
@@ -32,7 +32,8 @@ class ProductListScreen extends ConsumerWidget {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 60.0, left: 20, right: 20),
+                  padding:
+                      const EdgeInsets.only(top: 60.0, left: 20, right: 20),
                   child: Row(
                     children: [
                       Column(
@@ -50,12 +51,17 @@ class ProductListScreen extends ConsumerWidget {
                                 ),
                               );
                             },
-                            loading: () => const Text('Welcome', style: TextStyle(color: Colors.white, fontSize: 24)),
-                            error: (error, stackTrace) => const Text('Hi there', style: TextStyle(color: Colors.white, fontSize: 24)),
+                            loading: () => const Text('Welcome',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 24)),
+                            error: (_, __) => const Text('Hi there',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 24)),
                           ),
                           const Text(
                             "What would you like to buy today?",
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 14),
                           ),
                         ],
                       ),
@@ -69,38 +75,54 @@ class ProductListScreen extends ConsumerWidget {
                 icon: const Icon(Icons.history_outlined, color: Colors.white),
                 onPressed: () => context.pushNamed(RouteNames.checkout),
               ),
-              Stack(
-                                    key: const ValueKey('cart_button'),
 
-                alignment: Alignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
-                    onPressed: () => context.pushNamed(RouteNames.cart),
-                  ),
-                  if (ref.cartItems.isNotEmpty)
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                        child: Text(
-                          '${ref.cartItems.length}',
-                          style: const TextStyle(color: Colors.indigo, fontSize: 8, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
+              /// ✅ FIXED CART BUTTON (Stack now tappable)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: InkWell(
+                  key: const ValueKey('cart_button'),
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () => context.pushNamed(RouteNames.cart),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(Icons.shopping_cart_outlined,
+                            color: Colors.white),
                       ),
-                    ),
-                ],
+                      if (ref.cartItems.isNotEmpty)
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.amber,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                                minWidth: 16, minHeight: 16),
+                            child: Text(
+                              '${ref.cartItems.length}',
+                              style: const TextStyle(
+                                color: Colors.indigo,
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
+
               userState.when(
                 data: (user) => IconButton(
-                  icon: Icon(user != null ? Icons.logout : Icons.login, color: Colors.white),
+                  icon: Icon(user != null ? Icons.logout : Icons.login,
+                      color: Colors.white),
                   onPressed: () {
                     if (user != null) {
                       ref.read(appViewModelProvider.notifier).logout();
@@ -110,13 +132,12 @@ class ProductListScreen extends ConsumerWidget {
                   },
                 ),
                 loading: () => const SizedBox.shrink(),
-                error: (error, stackTrace) => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
               ),
-              const SizedBox(width: 8),
             ],
           ),
 
-          // Search Section
+          // Search
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -133,46 +154,55 @@ class ProductListScreen extends ConsumerWidget {
                   ],
                 ),
                 child: TextField(
-                  onChanged: (value) => ref.notifier.updateSearchQuery(value),
-                  decoration: InputDecoration(
+                  onChanged: (value) =>
+                      ref.notifier.updateSearchQuery(value),
+                  decoration: const InputDecoration(
                     hintText: "Search items...",
-                    prefixIcon: const Icon(Icons.search, color: Colors.indigo),
+                    prefixIcon:
+                        Icon(Icons.search, color: Colors.indigo),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
               ),
             ),
           ),
 
-          
+          // Categories
           SliverToBoxAdapter(
             child: Container(
               height: 60,
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: ['All', 'Coffee', 'Fashion', 'Electronics', 'Home'].map((cat) {
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16),
+                children: ['All', 'Coffee', 'Fashion', 'Electronics', 'Home']
+                    .map((cat) {
                   return _CategoryChip(
                     label: cat,
                     isSelected: ref.selectedCategory == cat,
-                    onTap: () => ref.notifier.updateCategory(cat),
+                    onTap: () =>
+                        ref.notifier.updateCategory(cat),
                   );
                 }).toList(),
               ),
             ),
           ),
 
-          // Product Grid
+          // Products
           isLoading
               ? const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                  child:
+                      Center(child: CircularProgressIndicator()),
                 )
               : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  padding:
+                      const EdgeInsets.fromLTRB(16, 0, 16, 20),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.7,
                       crossAxisSpacing: 16,
@@ -180,10 +210,12 @@ class ProductListScreen extends ConsumerWidget {
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final product = ref.filteredProducts[index];
+                        final product =
+                            ref.filteredProducts[index];
                         return _ProductCard(product: product);
                       },
-                      childCount: ref.filteredProducts.length,
+                      childCount:
+                          ref.filteredProducts.length,
                     ),
                   ),
                 ),
@@ -192,7 +224,6 @@ class ProductListScreen extends ConsumerWidget {
     );
   }
 }
-
 
 class _CategoryChip extends StatelessWidget {
   final String label;
@@ -219,8 +250,12 @@ class _CategoryChip extends StatelessWidget {
           color: isSelected ? Colors.white : Colors.indigo,
           fontWeight: FontWeight.bold,
         ),
-        side: BorderSide(color: isSelected ? Colors.transparent : Colors.indigo.withValues(alpha: 0.2)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        side: BorderSide(
+            color: isSelected
+                ? Colors.transparent
+                : Colors.indigo.withValues(alpha: 0.2)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)),
         showCheckmark: false,
       ),
     );
@@ -253,11 +288,14 @@ class _ProductCard extends ConsumerWidget {
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius:
+                    const BorderRadius.vertical(
+                        top: Radius.circular(24)),
                 child: Container(
                   width: double.infinity,
                   color: Colors.grey[50],
@@ -266,49 +304,63 @@ class _ProductCard extends ConsumerWidget {
                     child: Image.network(
                       product.imageUrl,
                       fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
+                      loadingBuilder:
+                          (context, child, loadingProgress) {
+                        if (loadingProgress == null)
+                          return child;
                         return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
+                          child:
+                              CircularProgressIndicator(
+                            value: loadingProgress
+                                        .expectedTotalBytes !=
+                                    null
+                                ? loadingProgress
+                                        .cumulativeBytesLoaded /
+                                    loadingProgress
+                                        .expectedTotalBytes!
                                 : null,
                             strokeWidth: 2,
                           ),
                         );
                       },
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.broken_image_outlined, size: 50, color: Colors.grey),
+                      errorBuilder:
+                          (_, __, ___) => const Icon(
+                        Icons.broken_image_outlined,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding:
+                  const EdgeInsets.all(12.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     product.title,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight:
+                            FontWeight.bold,
+                        fontSize: 14),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '₹${product.price}',
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    '₹${product.price}',
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .primaryColor,
+                      fontWeight:
+                          FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),

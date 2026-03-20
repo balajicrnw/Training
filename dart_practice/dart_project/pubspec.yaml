@@ -11,6 +11,8 @@ dependencies:
   http: ^1.6.0
   built_value: ^8.12.2
   built_collection: ^5.1.1
+  package_practice:
+    path: ../../flutter_practice/package_practice
   # path: ^1.8.0
 
 dev_dependencies:

@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <VersionHelpers.h>
+#include <commctrl.h>
+#pragma comment(lib, "comctl32.lib")
 
 #include <flutter/event_channel.h>
 #include <flutter/event_stream_handler_functions.h>
@@ -16,99 +18,97 @@
 #include <ctime>
 #include <thread>
 #include <atomic>
+#include <iostream>
 
 #include <functional>
 
-#define WM_FLUTTER_TASK (WM_USER + 1)
+static UINT WM_FLUTTER_TASK = 0;
+
+namespace plugin_practice {
+
 
 // -----------------------------
 // Time Stream using StreamHandlerFunctions (True Thread-Safe)
 // -----------------------------
-class TimePublisher {
- public:
-  TimePublisher(flutter::BinaryMessenger* messenger, std::string channel_name, HWND hwnd)
-      : messenger_(messenger), channel_name_(channel_name), hwnd_(hwnd), is_running_(false) {}
+// -----------------------------
+// TimePublisher Implementation
+// -----------------------------
+void TimePublisher::Start(std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> events) {
+  if (is_running_) Stop();
 
-  void Start() {
-    if (is_running_) return;
-    is_running_ = true;
+  events_ = std::move(events);
+  is_running_ = true;
 
-    thread_ = std::thread([this]() {
-      while (is_running_) {
-        std::time_t t = std::time(nullptr);
-        char buffer[100];
-        std::tm timeinfo;
-        localtime_s(&timeinfo, &t);
-        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  thread_ = std::thread([this]() {
+    while (is_running_) {
+      std::time_t t = std::time(nullptr);
+      char buffer[100];
+      std::tm timeinfo;
+      localtime_s(&timeinfo, &t);
+      std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
 
-        std::string time_str(buffer);
-        // Post task to platform thread to comply with Flutter threading requirements
-        auto task = new std::function<void()>([this, time_str]() {
-          flutter::EncodableValue value(time_str);
-          auto message = flutter::StandardMethodCodec::GetInstance().EncodeSuccessEnvelope(&value);
-          messenger_->Send(channel_name_, message->data(), message->size());
-        });
-        PostMessage(hwnd_, WM_FLUTTER_TASK, 0, (LPARAM)task);
+      std::string time_str(buffer);
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+      // Post task to platform thread
+      auto task = new std::function<void()>([this, time_str]() {
+        if (events_) {
+          events_->Success(flutter::EncodableValue(time_str));
+        }
+      });
+
+      if (!PostMessage(hwnd_, WM_FLUTTER_TASK, 0, (LPARAM)task)) {
+        delete task;
       }
-    });
-  }
 
-  void Stop() {
-    is_running_ = false;
-    if (thread_.joinable()) thread_.join();
-  }
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+  });
+}
 
- private:
-  flutter::BinaryMessenger* messenger_;
-  std::string channel_name_;
-  HWND hwnd_;
-  std::atomic<bool> is_running_;
-  std::thread thread_;
-};
+void TimePublisher::Stop() {
+  is_running_ = false;
+  if (thread_.joinable()) thread_.join();
+  events_ = nullptr;
+}
 
 // -----------------------------
 // Register Plugin
 // -----------------------------
 void PluginPracticePlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows* registrar) {
+  if (WM_FLUTTER_TASK == 0) {
+    WM_FLUTTER_TASK = RegisterWindowMessage(L"PluginPracticeTask");
+  }
 
   auto plugin = std::make_unique<PluginPracticePlugin>();
   HWND hwnd = registrar->GetView()->GetNativeWindow();
 
   // Method channel
-  auto method_channel = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+  plugin->method_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
       registrar->messenger(), "plugin_practice",
       &flutter::StandardMethodCodec::GetInstance());
 
-  method_channel->SetMethodCallHandler(
+  plugin->method_channel_->SetMethodCallHandler(
       [plugin_pointer = plugin.get()](const flutter::MethodCall<flutter::EncodableValue>& call,
                                      std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
         plugin_pointer->HandleMethodCall(call, std::move(result));
       });
 
-  registrar->RegisterTopLevelWindowProcDelegate(
-      [plugin_pointer = plugin.get()](HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
-        return plugin_pointer->HandleWindowMessage(hwnd, message, wparam, lparam);
-      });
-
-  registrar->AddPlugin(std::move(plugin));
-
   // Event channel for time
   const std::string time_channel_name = "plugin_practice/timeStream";
-  auto event_channel = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
+  plugin->event_channel_ = std::make_unique<flutter::EventChannel<flutter::EncodableValue>>(
       registrar->messenger(), time_channel_name,
       &flutter::StandardMethodCodec::GetInstance());
 
-  auto publisher = std::make_shared<TimePublisher>(registrar->messenger(), time_channel_name, hwnd);
+  plugin->publisher_ = std::make_shared<TimePublisher>(registrar->messenger(), hwnd);
 
-  event_channel->SetStreamHandler(std::make_unique<
+  auto publisher = plugin->publisher_;
+  plugin->event_channel_->SetStreamHandler(std::make_unique<
       flutter::StreamHandlerFunctions<flutter::EncodableValue>>(
       [publisher](const flutter::EncodableValue* arguments,
                   std::unique_ptr<flutter::EventSink<flutter::EncodableValue>>&& events)
           -> std::unique_ptr<flutter::StreamHandlerError<flutter::EncodableValue>> {
-        publisher->Start();
+        publisher->Start(std::move(events));
         return nullptr;
       },
       [publisher](const flutter::EncodableValue* arguments)
@@ -116,6 +116,16 @@ void PluginPracticePlugin::RegisterWithRegistrar(
         publisher->Stop();
         return nullptr;
       }));
+
+  auto plugin_ptr = plugin.get();
+  registrar->AddPlugin(std::move(plugin));
+
+  SetWindowSubclass(hwnd, [](HWND hwnd, UINT msg, WPARAM wp, LPARAM lp, UINT_PTR id, DWORD_PTR data) -> LRESULT {
+    auto plugin = reinterpret_cast<PluginPracticePlugin*>(data);
+    auto result = plugin->HandleWindowMessage(hwnd, msg, wp, lp);
+    if (result.has_value()) return result.value();
+    return DefSubclassProc(hwnd, msg, wp, lp);
+  }, 1, (DWORD_PTR)plugin_ptr);
 }
 
 // -----------------------------
@@ -173,5 +183,4 @@ std::optional<LRESULT> PluginPracticePlugin::HandleWindowMessage(
   }
   return std::nullopt;
 }
-
 }  // namespace plugin_practice

@@ -1,13 +1,36 @@
 #ifndef FLUTTER_PLUGIN_PLUGIN_PRACTICE_PLUGIN_H_
 #define FLUTTER_PLUGIN_PLUGIN_PRACTICE_PLUGIN_H_
 
+#include <flutter/event_channel.h>
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
 
 #include <memory>
 #include <optional>
+#include <string>
+#include <thread>
+#include <atomic>
 
 namespace plugin_practice {
+
+// -----------------------------
+// Time Stream using StreamHandler (Thread-Safe)
+// -----------------------------
+class TimePublisher {
+ public:
+  TimePublisher(flutter::BinaryMessenger* messenger, HWND hwnd)
+      : messenger_(messenger), hwnd_(hwnd), is_running_(false) {}
+
+  void Start(std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> events);
+  void Stop();
+
+ private:
+  flutter::BinaryMessenger* messenger_;
+  HWND hwnd_;
+  std::atomic<bool> is_running_;
+  std::thread thread_;
+  std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> events_;
+};
 
 class PluginPracticePlugin : public flutter::Plugin {
  public:
@@ -29,6 +52,11 @@ class PluginPracticePlugin : public flutter::Plugin {
   // Called for top-level window messages.
   std::optional<LRESULT> HandleWindowMessage(HWND hwnd, UINT message,
                                               WPARAM wparam, LPARAM lparam);
+
+ private:
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> method_channel_;
+  std::unique_ptr<flutter::EventChannel<flutter::EncodableValue>> event_channel_;
+  std::shared_ptr<TimePublisher> publisher_;
 };
 
 }  // namespace plugin_practice

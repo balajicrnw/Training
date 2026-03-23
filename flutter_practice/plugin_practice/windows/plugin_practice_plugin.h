@@ -5,6 +5,7 @@
 #include <flutter/plugin_registrar_windows.h>
 
 #include <memory>
+#include <optional>
 
 namespace plugin_practice {
 
@@ -24,6 +25,10 @@ class PluginPracticePlugin : public flutter::Plugin {
   void HandleMethodCall(
       const flutter::MethodCall<flutter::EncodableValue> &method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+
+  // Called for top-level window messages.
+  std::optional<LRESULT> HandleWindowMessage(HWND hwnd, UINT message,
+                                              WPARAM wparam, LPARAM lparam);
 };
 
 }  // namespace plugin_practice

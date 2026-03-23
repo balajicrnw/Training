@@ -13,6 +13,7 @@ enum AnalysisGoal {
 }
 
 class AIService {
+  /// Analyzes a GitHub repository using either ChatGPT or Gemini
   static Future<String> analyzeRepo({
     required String apiKey,
     required AIModel model,
@@ -22,24 +23,69 @@ class AIService {
   }) async {
     String fullPrompt;
 
+    // PROMPT for commit summary with dates
     if (goal == AnalysisGoal.summarizeCommits) {
       fullPrompt = '''
-You are a helpful assistant that can summarise github commits from the link $repoUrl. 
-Summarise the commits done by me in a table format based on timeline based on clustering and grouping the commits based on the commit messages and the files changed by dates and time.
+You are an expert software mentor and code reviewer.
+
+Summarize the commits from the GitHub repository at $repoUrl. Include commit messages and exact commit dates (YYYY-MM-DD).
+
+Return ONLY valid JSON with this structure:
+
+{
+  "topics": [
+    {"name": "Technical topic", "date": "YYYY-MM-DD"}
+  ],
+  "skills": [
+    {"name": "Skill acquired", "date": "YYYY-MM-DD"}
+  ],
+  "technologies": ["list of tools/frameworks like Firebase, Dart, Python"],
+  "project_type": "type of project (e.g., Mobile App, Web App, ML Project)",
+  "difficulty_level": "Beginner | Intermediate | Advanced",
+  "summary": "2-3 sentence summary of what the student learned",
+  "confidence_score": number between 0 and 1
+}
+
+Rules:
+- Avoid duplicates
+- Keep items concise (1-3 words per topic/skill)
+- Ignore meaningless commits like "fix" or "update"
+- Return ONLY JSON
 ''';
     } else {
-      const fileAnalysisInstructions = '''
-Analyze the following list of files and directories from a GitHub repository.
-Based solely on the file structure and names, provide:
-1. Topics learned (the core concepts and technologies used in this project)
-2. Skills acquired (what someone would learn by building or studying this project)
-3. A short summary (2-3 sentences explaining what this repository likely is)
+      // PROMPT for file analysis with inferred dates
+      fullPrompt = '''
+You are an expert software mentor and code reviewer.
 
-File list:
+Analyze the following GitHub repository files and directories:
+
+${(files ?? []).join('\n')}
+
+Based solely on the file names and structure, generate ONLY valid JSON in this format:
+
+{
+  "topics": [
+    {"name": "Technical topic", "date": "YYYY-MM-DD"}
+  ],
+  "skills": [
+    {"name": "Skill acquired", "date": "YYYY-MM-DD"}
+  ],
+  "technologies": ["list of tools/frameworks like Firebase, Dart, Python"],
+  "project_type": "type of project (e.g., Mobile App, Web App, ML Project)",
+  "difficulty_level": "Beginner | Intermediate | Advanced",
+  "summary": "2-3 sentence summary of what the student learned",
+  "confidence_score": number between 0 and 1
+}
+
+Rules:
+- Infer learning dates from file creation/commit dates if available
+- Avoid duplicates
+- Keep items concise (1-3 words per topic/skill)
+- Return ONLY JSON
 ''';
-      fullPrompt = '$fileAnalysisInstructions\n${(files ?? []).join('\n')}';
     }
 
+    // Call the selected AI model
     if (model == AIModel.chatGpt) {
       return _generateChatGPT(apiKey, fullPrompt);
     } else {
@@ -47,9 +93,10 @@ File list:
     }
   }
 
+  /// ChatGPT integration
   static Future<String> _generateChatGPT(String apiKey, String prompt) async {
     final url = Uri.parse('https://api.openai.com/v1/chat/completions');
-    
+
     try {
       final response = await http.post(
         url,
@@ -61,11 +108,11 @@ File list:
           'model': 'gpt-3.5-turbo-16k',
           'messages': [
             {
-              'role': 'system', 
+              'role': 'system',
               'content': 'You are an expert software engineer and code analyzer.'
             },
             {
-              'role': 'user', 
+              'role': 'user',
               'content': prompt
             }
           ]
@@ -78,12 +125,14 @@ File list:
       }
 
       final data = jsonDecode(response.body);
-      return data['choices'][0]['message']['content'];
+      final text = data['choices'][0]['message']['content'];
+      return _extractJsonFromText(text);
     } catch (e) {
       throw Exception('ChatGPT Integration Error: $e');
     }
   }
 
+  /// Gemini integration
   static Future<String> _generateGemini(String apiKey, String prompt) async {
     try {
       final model = GenerativeModel(
@@ -101,15 +150,34 @@ File list:
       final response = await model.generateContent(content);
 
       if (response.text == null) {
-        if (response.candidates.isNotEmpty && response.candidates.first.finishReason == FinishReason.safety) {
-          throw Exception('Gemini analysis was blocked by safety filters. Please try a different repository or check the content.');
+        if (response.candidates.isNotEmpty &&
+            response.candidates.first.finishReason == FinishReason.safety) {
+          throw Exception(
+              'Gemini analysis was blocked by safety filters. Please try a different repository or check the content.');
         }
         throw Exception('No analysis result generated from Gemini.');
       }
 
-      return response.text!;
+      return _extractJsonFromText(response.text!);
     } catch (e) {
       throw Exception('Gemini Integration Error (gemini-3-flash-preview): $e');
+    }
+  }
+
+  /// Utility: Extract JSON from AI response text (in case AI adds extra text)
+  static String _extractJsonFromText(String text) {
+    try {
+      final start = text.indexOf('{');
+      final end = text.lastIndexOf('}');
+      if (start == -1 || end == -1) {
+        throw Exception('No JSON found in AI response');
+      }
+      final jsonString = text.substring(start, end + 1);
+      // Validate JSON
+      jsonDecode(jsonString);
+      return jsonString;
+    } catch (e) {
+      throw Exception('Failed to parse JSON from AI response: $e\nText: $text');
     }
   }
 }

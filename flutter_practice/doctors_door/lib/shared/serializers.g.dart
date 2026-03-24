@@ -11,6 +11,7 @@ Serializers _$serializers =
           ..add(AppointmentModel.serializer)
           ..add(DoctorModel.serializer)
           ..add(HospitalModel.serializer)
+          ..add(MedicineModel.serializer)
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(DateTime)]),
             () => ListBuilder<DateTime>(),

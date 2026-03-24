@@ -8,6 +8,8 @@ import 'package:doctors_door/features/hospital_list_page/hospital_details_page.d
 import 'package:doctors_door/features/appointments/appointments_page.dart';
 import 'package:doctors_door/features/appointments/book_appointment_page.dart';
 import 'package:doctors_door/shared/hospital_model.dart';
+import 'package:doctors_door/features/pharmacy/pharmacy_page.dart';
+import 'package:doctors_door/features/pharmacy/cart_page.dart';
 
 class RoutePages{
   GoRouter router=GoRouter(
@@ -42,6 +44,18 @@ class RoutePages{
       pageBuilder:(context,state){
         return(MaterialPage(
           child:const BookAppointmentPage()
+        ));
+      } ),
+      GoRoute(path: '/pharmacy',
+      pageBuilder:(context,state){
+        return(MaterialPage(
+          child:const PharmacyPage()
+        ));
+      } ),
+      GoRoute(path: '/cart',
+      pageBuilder:(context,state){
+        return(MaterialPage(
+          child:const CartPage()
         ));
       } ),
       GoRoute(path: '/dashboard',

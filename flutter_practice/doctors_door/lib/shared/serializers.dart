@@ -8,6 +8,7 @@ import 'doctor_model.dart';
 
 import 'appointment_model.dart';
 import 'hospital_model.dart';
+import 'medicine_model.dart';
 
 part 'serializers.g.dart';
 
@@ -15,6 +16,7 @@ part 'serializers.g.dart';
   DoctorModel,
   HospitalModel,
   AppointmentModel,
+  MedicineModel,
 ])
 final Serializers serializers = (_$serializers.toBuilder()
       ..add(Iso8601DateTimeSerializer())

@@ -36,7 +36,7 @@ class DashboardPage extends StatelessWidget {
 
   Widget buildCard(BuildContext context, int index) {
     final items = [
-      {"title": "Hospitals", "icon": Icons.local_hospital, "route": "/hospitals"},
+      {"title": "Hospitals", "icon": Icons.local_hospital, "route": "/hospitalsList"},
       {"title": "Doctors", "icon": Icons.person, "route": "/doctorsList"},
       {"title": "Appointments", "icon": Icons.calendar_today, "route": "/appointments"},
       {"title": "Pharmacy", "icon": Icons.local_pharmacy, "route": "/pharmacy"},
@@ -54,7 +54,7 @@ class DashboardPage extends StatelessWidget {
         onTap: () {
           final route = items[index]["route"] as String;
           if (route.isNotEmpty) {
-            GoRouter.of(context).go(route);
+            GoRouter.of(context).push(route);
           }
         },
         child: Column(

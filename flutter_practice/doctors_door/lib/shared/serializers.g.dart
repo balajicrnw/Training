@@ -8,7 +8,9 @@ part of 'serializers.dart';
 
 Serializers _$serializers =
     (Serializers().toBuilder()
+          ..add(AppointmentModel.serializer)
           ..add(DoctorModel.serializer)
+          ..add(HospitalModel.serializer)
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(DateTime)]),
             () => ListBuilder<DateTime>(),

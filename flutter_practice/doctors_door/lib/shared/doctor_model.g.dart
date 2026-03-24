@@ -30,6 +30,11 @@ class _$DoctorModelSerializer implements StructuredSerializer<DoctorModel> {
       ),
       'age',
       serializers.serialize(object.age, specifiedType: const FullType(int)),
+      'hospital',
+      serializers.serialize(
+        object.hospital,
+        specifiedType: const FullType(String),
+      ),
       'dates',
       serializers.serialize(
         object.dates,
@@ -80,6 +85,14 @@ class _$DoctorModelSerializer implements StructuredSerializer<DoctorModel> {
                   )!
                   as int;
           break;
+        case 'hospital':
+          result.hospital =
+              serializers.deserialize(
+                    value,
+                    specifiedType: const FullType(String),
+                  )!
+                  as String;
+          break;
         case 'dates':
           result.dates.replace(
             serializers.deserialize(
@@ -106,6 +119,8 @@ class _$DoctorModel extends DoctorModel {
   @override
   final int age;
   @override
+  final String hospital;
+  @override
   final BuiltList<DateTime> dates;
 
   factory _$DoctorModel([void Function(DoctorModelBuilder)? updates]) =>
@@ -115,6 +130,7 @@ class _$DoctorModel extends DoctorModel {
     required this.name,
     required this.qualification,
     required this.age,
+    required this.hospital,
     required this.dates,
   }) : super._();
   @override
@@ -131,6 +147,7 @@ class _$DoctorModel extends DoctorModel {
         name == other.name &&
         qualification == other.qualification &&
         age == other.age &&
+        hospital == other.hospital &&
         dates == other.dates;
   }
 
@@ -140,6 +157,7 @@ class _$DoctorModel extends DoctorModel {
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, qualification.hashCode);
     _$hash = $jc(_$hash, age.hashCode);
+    _$hash = $jc(_$hash, hospital.hashCode);
     _$hash = $jc(_$hash, dates.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -151,6 +169,7 @@ class _$DoctorModel extends DoctorModel {
           ..add('name', name)
           ..add('qualification', qualification)
           ..add('age', age)
+          ..add('hospital', hospital)
           ..add('dates', dates))
         .toString();
   }
@@ -172,6 +191,10 @@ class DoctorModelBuilder implements Builder<DoctorModel, DoctorModelBuilder> {
   int? get age => _$this._age;
   set age(int? age) => _$this._age = age;
 
+  String? _hospital;
+  String? get hospital => _$this._hospital;
+  set hospital(String? hospital) => _$this._hospital = hospital;
+
   ListBuilder<DateTime>? _dates;
   ListBuilder<DateTime> get dates => _$this._dates ??= ListBuilder<DateTime>();
   set dates(ListBuilder<DateTime>? dates) => _$this._dates = dates;
@@ -184,6 +207,7 @@ class DoctorModelBuilder implements Builder<DoctorModel, DoctorModelBuilder> {
       _name = $v.name;
       _qualification = $v.qualification;
       _age = $v.age;
+      _hospital = $v.hospital;
       _dates = $v.dates.toBuilder();
       _$v = null;
     }
@@ -223,6 +247,11 @@ class DoctorModelBuilder implements Builder<DoctorModel, DoctorModelBuilder> {
               age,
               r'DoctorModel',
               'age',
+            ),
+            hospital: BuiltValueNullFieldError.checkNotNull(
+              hospital,
+              r'DoctorModel',
+              'hospital',
             ),
             dates: dates.build(),
           );

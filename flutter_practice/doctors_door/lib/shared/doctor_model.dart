@@ -10,6 +10,7 @@ abstract class DoctorModel implements Built<DoctorModel, DoctorModelBuilder> {
   String get name;
   String get qualification;
   int get age;
+  String get hospital;
   BuiltList<DateTime> get dates;
 
   DoctorModel._();

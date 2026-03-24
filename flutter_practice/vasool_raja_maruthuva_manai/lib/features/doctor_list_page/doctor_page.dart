@@ -1,0 +1,13 @@
+import 'package:flutter/material.dart';
+
+class DoctorPage extends StatefulWidget{
+    @override
+    State<DoctorPage> createState() => _DoctorPageState();
+}
+
+class _DoctorPageState extends State<DoctorPage>{
+    @override
+  Widget build(BuildContext context) {
+    
+  }
+}

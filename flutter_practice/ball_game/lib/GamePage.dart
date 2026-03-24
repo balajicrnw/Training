@@ -15,7 +15,7 @@ class _GamePageState extends State<GamePage> {
   List<bool> isvisible = List.filled(12, false);
   int score = 0;
 
-  bool isGameRunning = true; // ✅ control loop
+  bool isGameRunning = true;
 
   @override
   void initState() {
@@ -36,7 +36,6 @@ class _GamePageState extends State<GamePage> {
       isvisible[value] = true;
     });
 
-    // ✅ Increased visibility time (important for test)
     await Future.delayed(const Duration(milliseconds: 1200));
 
     if (!mounted) return;
@@ -55,13 +54,10 @@ class _GamePageState extends State<GamePage> {
   void playSound() async {
     try {
       await player.play(AssetSource('duck.mp3'));
-
       Future.delayed(const Duration(milliseconds: 500), () {
         player.stop();
       });
-    } catch (e) {
-      // ✅ prevents crash in tests
-    }
+    } catch (e) {}
   }
 
   void incrementScore(bool visible) {
@@ -75,7 +71,6 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void dispose() {
-    // 🔥 CRITICAL FIX
     isGameRunning = false;
     player.dispose();
     super.dispose();
@@ -118,6 +113,7 @@ class _GamePageState extends State<GamePage> {
                 isvisible.length,
                 (index) {
                   return Hole(
+                    key: ValueKey(index), // ✅ ensures widget rebuild per hole
                     isvisible: isvisible[index],
                     onTap: () {
                       incrementScore(isvisible[index]);
@@ -146,35 +142,80 @@ class _GamePageState extends State<GamePage> {
   }
 }
 
-class Hole extends StatelessWidget {
+class Hole extends StatefulWidget {
   final bool isvisible;
   final VoidCallback? onTap;
 
-  const Hole({this.isvisible = false, this.onTap, Key? key})
-      : super(key: key);
+  const Hole({required Key key, this.isvisible = false, this.onTap}) : super(key: key);
+
+  @override
+  _HoleState createState() => _HoleState();
+}
+
+class _HoleState extends State<Hole> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  bool _clicked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void didUpdateWidget(Hole oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // ✅ Reset state if visibility changed
+    if (widget.isvisible && !_clicked) {
+      _controller.forward(from: 0.0);
+    } else if (!widget.isvisible) {
+      _controller.reset();
+      _clicked = false;
+    }
+  }
+
+  void handleTap() {
+    if (!_clicked && widget.isvisible) {
+      _clicked = true;
+      _controller.reverse(from: _controller.value);
+      widget.onTap?.call();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.black54,
-              shape: BoxShape.circle,
-            ),
-          ),
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            opacity: isvisible ? 1.0 : 0.0,
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.transparent,
-              child: Image.asset("assets/Duck.png"),
-            ),
-          )
-        ],
+      onTap: handleTap,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.black54,
+          shape: BoxShape.circle,
+        ),
+        child: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Align(
+              alignment: Alignment(0, _animation.value),
+              child: child,
+            );
+          },
+          child: Image.asset("assets/Duck.png"),
+        ),
       ),
     );
   }

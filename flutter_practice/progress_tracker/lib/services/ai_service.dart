@@ -29,7 +29,7 @@ class AIService {
 You are an expert software mentor and code reviewer.
 
 Summarize the commits from the GitHub repository at $repoUrl. Include commit messages and exact commit dates (YYYY-MM-DD).
-
+Get the exact date of the file from the git history.s
 Return ONLY valid JSON with this structure:
 
 {
@@ -62,7 +62,7 @@ Analyze the following GitHub repository files and directories:
 ${(files ?? []).join('\n')}
 
 Based solely on the file names and structure, generate ONLY valid JSON in this format:
-
+Get the exact date of the file from the git history.
 {
   "topics": [
     {"name": "Technical topic", "date": "YYYY-MM-DD"}

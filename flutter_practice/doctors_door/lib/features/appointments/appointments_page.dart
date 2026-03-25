@@ -149,12 +149,6 @@ class _AppointmentsPageState extends ConsumerState<AppointmentsPage> {
   }
 
   void _removeAppointment(AppointmentModel appointment, int index) {
-    // If dismissed via Dismissible, it's already "visually" gone, 
-    // but the state update will trigger another removeItem via ref.listen 
-    // unless we handle it carefully.
-    
-    // To avoid double removal animation, we update the state first.
-    // The ref.listen will handle the sync.
     ref.read(appointmentsProvider.notifier).removeAppointment(appointment.id);
 
     ScaffoldMessenger.of(context).showSnackBar(

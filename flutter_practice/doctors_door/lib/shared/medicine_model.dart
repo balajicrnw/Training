@@ -8,7 +8,7 @@ part 'medicine_model.g.dart';
 abstract class MedicineModel implements Built<MedicineModel, MedicineModelBuilder> {
   String get id;
   String get name;
-  String get type; // e.g., 'Tablet', 'Syrup', 'Capsule', 'Cream'
+  String get type;
   double get price;
   String get description;
   String get imageUrl;

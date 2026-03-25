@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:doctors_door/core/doctors_service.dart';
 import 'package:doctors_door/shared/doctor_model.dart';
+import 'package:doctors_door/shared/web_safe_image.dart';
 
 class DoctorPage extends StatefulWidget {
   const DoctorPage({super.key});
@@ -53,11 +54,21 @@ class _DoctorPageState extends State<DoctorPage> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ExpansionTile(
-        leading: const Icon(Icons.person, color: Colors.teal),
+        leading: ClipOval(
+          child: WebSafeImage(
+            imageUrl: "https://api.dicebear.com/7.x/avataaars/png?seed=${doctor.name}",
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+            errorWidget: const Icon(Icons.person, color: Colors.teal),
+          ),
+        ),
         title: Text(doctor.name),
         subtitle: Text("${doctor.qualification} - ${doctor.hospital}"),
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         childrenPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        expandedCrossAxisAlignment: CrossAxisAlignment.start,
+        expandedAlignment: Alignment.centerLeft,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

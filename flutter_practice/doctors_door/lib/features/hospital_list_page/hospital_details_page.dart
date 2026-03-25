@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/hospital_model.dart';
+import '../../shared/web_safe_image.dart';
 
 class HospitalDetailsPage extends StatelessWidget {
   final HospitalModel hospital;
@@ -26,9 +27,13 @@ class HospitalDetailsPage extends StatelessWidget {
               ),
               background: Hero(
                 tag: 'hospital_image_${hospital.name}',
-                child: Image.network(
-                  hospital.imageUrl,
+                child: WebSafeImage(
+                  imageUrl: hospital.imageUrl,
                   fit: BoxFit.cover,
+                  errorWidget: Container(
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.broken_image, size: 50),
+                  ),
                 ),
               ),
             ),

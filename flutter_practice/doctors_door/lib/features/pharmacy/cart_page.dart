@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/cart_provider.dart';
 import '../../shared/medicine_model.dart';
+import '../../shared/web_safe_image.dart';
 
 class CartPage extends ConsumerWidget {
   const CartPage({super.key});
@@ -48,11 +49,17 @@ class CartPage extends ConsumerWidget {
                   child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
-                      leading: Image.network(
-                        medicine.imageUrl,
+                      leading: WebSafeImage(
+                        imageUrl: medicine.imageUrl,
                         width: 40,
                         height: 40,
                         fit: BoxFit.cover,
+                        errorWidget: Container(
+                          width: 40,
+                          height: 40,
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.medication, size: 20, color: Colors.grey),
+                        ),
                       ),
                       title: Text(medicine.name),
                       subtitle: Text("${medicine.type} - \$${medicine.price}"),

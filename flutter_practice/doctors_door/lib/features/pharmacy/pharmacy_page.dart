@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/pharmacy_service.dart';
 import '../../core/cart_provider.dart';
+import '../../shared/web_safe_image.dart';
+
 import '../../shared/medicine_model.dart';
 
 class PharmacyPage extends ConsumerStatefulWidget {
@@ -82,11 +84,17 @@ class _PharmacyPageState extends ConsumerState<PharmacyPage> {
             child: ListTile(
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  medicine.imageUrl,
+                child: WebSafeImage(
+                  imageUrl: medicine.imageUrl,
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
+                  errorWidget: Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.medication, size: 30, color: Colors.grey),
+                  ),
                 ),
               ),
               title: Text(medicine.name, style: const TextStyle(fontWeight: FontWeight.bold)),

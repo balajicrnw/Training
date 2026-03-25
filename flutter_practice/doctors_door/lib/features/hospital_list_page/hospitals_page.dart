@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/hospitals_service.dart';
 import '../../shared/hospital_model.dart';
+import '../../shared/web_safe_image.dart';
 
 class HospitalsPage extends StatefulWidget {
   const HospitalsPage({super.key});
@@ -48,12 +49,12 @@ class _HospitalsPageState extends State<HospitalsPage> {
                     tag: 'hospital_image_${hospital.name}',
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                      child: Image.network(
-                        hospital.imageUrl,
+                      child: WebSafeImage(
+                        imageUrl: hospital.imageUrl,
                         height: 180,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
+                        errorWidget: Container(
                           height: 180,
                           color: Colors.grey[300],
                           child: const Icon(Icons.broken_image, size: 50),

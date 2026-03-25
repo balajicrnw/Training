@@ -9,7 +9,12 @@ class PieChartPage extends StatefulWidget{
 
 class PieChartPageState extends State<PieChartPage>{
   bool showList=true;
-  int list_count=1;
+  TextEditingController titleController = TextEditingController();
+  TextEditingController valueController = TextEditingController();
+  List<Map<String, dynamic>> chartData = [
+  {"title": "food", "value": 20.0},
+  {"title": "transport", "value": 10.0},
+];
   // PieChartValues updateList=PieChartValues();
   @override
   Widget build(BuildContext context) {
@@ -22,61 +27,85 @@ class PieChartPageState extends State<PieChartPage>{
                 height: 300,
                 child: PieChart(
                   PieChartData(
-                    sections:[
-                      PieChartSectionData(
-                        value:20,
-                        title:"food",
-                        showTitle:true,
-                        radius: 70
-                      ),
-                      PieChartSectionData(
-                        value:10,
-                        title:"transport",
-                        showTitle:true,
-                        radius: 70
-                  
-                      ),
-                      PieChartSectionData(
-                        value:20,
-                        title:"rent",
-                        showTitle:true,
-                        radius: 70
-                      ),
-                      PieChartSectionData(
-                        value:20,
-                        title:"clothes",
-                        showTitle:true,
-                        radius: 70
-                      ),
-                      PieChartSectionData(
-                        value:30,
-                        title:"savings",
-                        showTitle:true,
-                        radius: 70
-                      )     
-                    ],
+                    sections: chartData.map((data) {
+                      return PieChartSectionData(
+                        value: data["value"],
+                        title: data["title"],
+                        radius: 70,
+                        showTitle: true,
+                      );
+                  }).toList(),
                   ),
                 ),
               ),
-              if(showList)
-            Expanded(
-              child: ListView.builder(
-              itemCount: list_count,
-              itemBuilder: (BuildContext centext,int index){
-                return Text("data");
-              },
-            ),
-          ),
+              
             ],
           ),
           SizedBox(height:20),
           
-          
+          if(showList)
+            Expanded(
+              child: ListView.builder(
+              itemCount: chartData.length,
+              itemBuilder: (BuildContext centext,int index){
+                return ListTile(
+                   title: Text(chartData[index]["title"]),
+                   trailing: Text(chartData[index]["value"].toString()),
+                );
+              },
+            ),
+          ),
+          TextButton(onPressed: ()=>setState(() {
+            if(showList){
+              showList=false;
+            }
+            else{
+              showList=true;
+            }
+          }), child: Text("Show List")),
           SizedBox(height:20),
           GestureDetector(
-            onTap: () => setState(() {
-              list_count++;
-            }),
+            onTap: () {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Add Data"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(labelText: "Title"),
+            ),
+            TextField(
+              controller: valueController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: "Value"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                chartData.add({
+                  "title": titleController.text,
+                  "value": double.parse(valueController.text),
+                });
+              });
+
+              titleController.clear();
+              valueController.clear();
+              Navigator.pop(context);
+            },
+            child: Text("Add"),
+          )
+        ],
+      );
+    },
+  );
+},
             child: Stack(
               alignment: Alignment.center,
               children: [   
@@ -100,3 +129,4 @@ class PieChartPageState extends State<PieChartPage>{
     );
   }
 }
+

@@ -6,7 +6,7 @@ import 'abstract_factory/screens/home_page.dart' as af;
 import 'abstract_factory/core/theme_selector.dart';
 import 'builder_pattern/screens/home_page.dart' as bp;
 import 'factory_method/screens/api_example_page.dart' as fm;
-
+import 'prototype_pattern/screens/document_page.dart' as pt;
 
 class ListPage extends StatelessWidget {
   const ListPage({super.key});
@@ -41,6 +41,15 @@ class ListPage extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const fm.ApiExamplePage()),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Prototype Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const pt.DocumentPage()),
             ),
           ),
           const Divider(),  

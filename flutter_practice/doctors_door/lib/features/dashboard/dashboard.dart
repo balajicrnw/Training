@@ -1,8 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../shared/tooltip_overlay.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  // Flag to ensure we only show the onboarding once per app session
+  static bool _hasShownOnboarding = false;
+
+  final List<GlobalKey> _cardKeys = List.generate(6, (_) => GlobalKey());
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_hasShownOnboarding) {
+        _hasShownOnboarding = true;
+        _showOnboarding();
+      }
+    });
+  }
+
+  void _showOnboarding() {
+    final steps = [
+      TooltipStep(
+        targetKey: _cardKeys[0],
+        title: "Hospitals",
+        description: "Browse and discover our network of partner hospitals.",
+      ),
+      TooltipStep(
+        targetKey: _cardKeys[1],
+        title: "Doctors",
+        description: "Find specialists and book consultations easily.",
+      ),
+      TooltipStep(
+        targetKey: _cardKeys[2],
+        title: "Appointments",
+        description: "Manage your upcoming and past medical appointments.",
+      ),
+      TooltipStep(
+        targetKey: _cardKeys[3],
+        title: "Pharmacy",
+        description: "Order medicines online with fast home delivery.",
+      ),
+      TooltipStep(
+        targetKey: _cardKeys[4],
+        title: "Reports",
+        description: "Access your lab results and medical history securely.",
+      ),
+      TooltipStep(
+        targetKey: _cardKeys[5],
+        title: "Emergency",
+        description: "Get immediate medical assistance when you need it most.",
+      ),
+    ];
+
+    OverlayHelper.show(context, steps);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +104,7 @@ class DashboardPage extends StatelessWidget {
     ];
 
     return Card(
+      key: _cardKeys[index],
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),

@@ -5,6 +5,8 @@ import 'abstract_factory/factory/ui_factory.dart';
 import 'abstract_factory/screens/home_page.dart' as af;
 import 'abstract_factory/core/theme_selector.dart';
 import 'builder_pattern/screens/home_page.dart' as bp;
+import 'factory_method/screens/api_example_page.dart' as fm;
+
 
 class ListPage extends StatelessWidget {
   const ListPage({super.key});
@@ -33,6 +35,15 @@ class ListPage extends StatelessWidget {
             ),
           ),
           const Divider(),
+          ListTile(
+            title: const Text('Factory Method'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const fm.ApiExamplePage()),
+            ),
+          ),
+          const Divider(),  
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:design_patterns/bridge_pattern/bridge_pattern_page.dart';
 import 'package:flutter/material.dart';
 import 'abstract_factory/factory/light_factory.dart';
 import 'abstract_factory/factory/dark_factory.dart';
@@ -8,6 +9,7 @@ import 'builder_pattern/screens/home_page.dart' as bp;
 import 'factory_method/screens/api_example_page.dart' as fm;
 import 'prototype_pattern/screens/document_page.dart' as pt;
 import 'singleton_pattern/screens/home_page.dart' as sg;
+import 'adaptor_pattern/adaptor_homepage.dart' as ap;
 
 class ListPage extends StatelessWidget {
   const ListPage({super.key});
@@ -63,6 +65,25 @@ class ListPage extends StatelessWidget {
             ),
           ),
           const Divider(),
+         ListTile(
+            title: const Text('Adapter Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ap.AdaptorHomepage()),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Bridge Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const BridgePatternPage()),
+            ),
+          ),
+          const Divider(),
+        
         ],
       ),
     );

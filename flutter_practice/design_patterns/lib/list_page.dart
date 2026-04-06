@@ -1,4 +1,5 @@
 import 'package:design_patterns/bridge_pattern/bridge_pattern_page.dart';
+import 'package:design_patterns/composite_pattern/file_page.dart';
 import 'package:flutter/material.dart';
 import 'abstract_factory/factory/light_factory.dart';
 import 'abstract_factory/factory/dark_factory.dart';
@@ -80,6 +81,15 @@ class ListPage extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const BridgePatternPage()),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Composite Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FilePage()),
             ),
           ),
           const Divider(),

@@ -1,5 +1,6 @@
 import 'package:design_patterns/bridge_pattern/bridge_pattern_page.dart';
 import 'package:design_patterns/chain_of_responsibility/order_page.dart';
+import 'package:design_patterns/command_pattern/cart_page.dart';
 import 'package:design_patterns/composite_pattern/file_page.dart';
 import 'package:design_patterns/decorator_pattern/ui/coffee_page.dart';
 import 'package:design_patterns/facade_pattern/presentation/computer_page.dart';
@@ -152,6 +153,15 @@ class ListPage extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) =>  OrderPage()),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Command Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) =>  CartPage()),
             ),
           ),
           const Divider(),

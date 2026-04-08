@@ -12,5 +12,5 @@ class UserRepository {
 
   Future<List<User>> fetchUsers() {
     return storage.getUsers();
-  }
+  }  
 }

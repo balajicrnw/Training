@@ -43,14 +43,12 @@ class _HomePageState extends State<HomePage> {
             child: ListView.builder(
               itemCount: _playlist.length,
               itemBuilder: (context, index) {
-                final song = _playlist[index];
-                
+                final song = _playlist[index];              
                 return StreamBuilder<Song?>(
                   stream: _audioManager.currentSongStream,
                   initialData: _audioManager.currentSong,
                   builder: (context, snapshot) {
-                    final isPlayingThisSong = snapshot.data?.id == song.id;
-
+                    final isPlayingThisSong = snapshot.data?.id == song.id; 
                     return ListTile(
                       leading: const CircleAvatar(child: Icon(Icons.music_note)),
                       title: Text(song.title, style: TextStyle(fontWeight: isPlayingThisSong ? FontWeight.bold : FontWeight.normal)),

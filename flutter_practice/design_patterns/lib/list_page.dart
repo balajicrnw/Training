@@ -18,6 +18,7 @@ import 'factory_method/screens/api_example_page.dart' as fm;
 import 'prototype_pattern/screens/document_page.dart' as pt;
 import 'singleton_pattern/screens/home_page.dart' as sg;
 import 'adaptor_pattern/adaptor_homepage.dart' as ap;
+import 'iterator_pattern/ui/product_page.dart';
 
 class ListPage extends StatelessWidget {
   const ListPage({super.key});
@@ -172,6 +173,15 @@ class ListPage extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => InterpreterUI()),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Iterator Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ProductPage()),
             ),
           ),
           const Divider(),

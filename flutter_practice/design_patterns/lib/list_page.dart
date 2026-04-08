@@ -5,6 +5,7 @@ import 'package:design_patterns/composite_pattern/file_page.dart';
 import 'package:design_patterns/decorator_pattern/ui/coffee_page.dart';
 import 'package:design_patterns/facade_pattern/presentation/computer_page.dart';
 import 'package:design_patterns/flyweight_pattern/screens/flyweight_demo.dart';
+import 'package:design_patterns/interpreter_pattern/interpreter_ui.dart';
 import 'package:design_patterns/proxy_pattern/ui/proxy_page.dart';
 import 'package:flutter/material.dart';
 import 'abstract_factory/factory/light_factory.dart';
@@ -162,6 +163,15 @@ class ListPage extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) =>  CartPage()),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Interpreter Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => InterpreterUI()),
             ),
           ),
           const Divider(),

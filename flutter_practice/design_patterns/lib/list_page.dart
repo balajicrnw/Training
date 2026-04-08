@@ -1,4 +1,5 @@
 import 'package:design_patterns/bridge_pattern/bridge_pattern_page.dart';
+import 'package:design_patterns/chain_of_responsibility/order_page.dart';
 import 'package:design_patterns/composite_pattern/file_page.dart';
 import 'package:design_patterns/decorator_pattern/ui/coffee_page.dart';
 import 'package:design_patterns/facade_pattern/presentation/computer_page.dart';
@@ -25,6 +26,8 @@ class ListPage extends StatelessWidget {
       appBar: AppBar(title: const Text('Design Patterns')),
       body: ListView(
         children: [
+          ExpansionTile(title: Text("Creational Patterns"),
+            children: [
           ListTile(
             title: const Text('Abstract Factory'),
             trailing: const Icon(Icons.chevron_right),
@@ -70,6 +73,10 @@ class ListPage extends StatelessWidget {
             ),
           ),
           const Divider(),
+          ],
+        ),
+        ExpansionTile(title:Text("Structural Patterns"),
+        children: [
          ListTile(
             title: const Text('Adapter Pattern'),
             trailing: const Icon(Icons.chevron_right),
@@ -135,7 +142,23 @@ class ListPage extends StatelessWidget {
           const Divider(),
         
         ],
-      ),
+
+        ),
+        ExpansionTile(title: Text("Behavioral Patterns"),
+        children: [
+          ListTile(
+            title: const Text('Chain of Responsibility Pattern'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) =>  OrderPage()),
+            ),
+          ),
+          const Divider(),
+        ],
+        )
+        ],
+      )
     );
   }
 }

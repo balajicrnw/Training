@@ -11,6 +11,7 @@ import 'package:design_patterns/memento_pattern/ui/drawing_page.dart';
 import 'package:design_patterns/observer_pattern/observer_page.dart';
 import 'package:design_patterns/proxy_pattern/ui/proxy_page.dart';
 import 'package:design_patterns/strategy_pattern/ui/checkout_page.dart';
+import 'package:design_patterns/template_pattern/ui/bmi_page.dart';
 import './state_pattern/ui/order_page.dart';
 import 'package:flutter/material.dart';
 import 'abstract_factory/factory/light_factory.dart';
@@ -237,6 +238,16 @@ class ListPage extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) =>  CheckoutPage()),
+              ),
+            ),
+            const Divider(),
+
+            ListTile(
+              title: const Text('Template Method Pattern'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) =>  BmiPage()),
               ),
             ),
         ],

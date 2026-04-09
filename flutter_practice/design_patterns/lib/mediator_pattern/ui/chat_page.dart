@@ -12,7 +12,7 @@ class _ChatPageState extends State<ChatPage> {
   late ChatRoom chatRoom;
 
   late User balaji;
-  late User bob;
+  late User edward;
   late User john;
 
   final TextEditingController controller = TextEditingController();
@@ -24,11 +24,11 @@ class _ChatPageState extends State<ChatPage> {
     chatRoom = ChatRoom();
 
     balaji = User("Balaji")..setMediator(chatRoom);
-    bob = User("Bob")..setMediator(chatRoom);
+    edward = User("Edward")..setMediator(chatRoom);
     john = User("John")..setMediator(chatRoom);
 
     chatRoom.addUser(balaji);
-    chatRoom.addUser(bob);
+    chatRoom.addUser(edward);
     chatRoom.addUser(john);
   }
 
@@ -96,8 +96,8 @@ class _ChatPageState extends State<ChatPage> {
                 child: Text("Balaji"),
               ),
               ElevatedButton(
-                onPressed: () => sendMessage(bob),
-                child: Text("Bob"),
+                onPressed: () => sendMessage(edward),
+                child: Text("Edward"),
               ),
               ElevatedButton(
                 onPressed: () => sendMessage(john),

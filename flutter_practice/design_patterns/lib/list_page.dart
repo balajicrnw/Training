@@ -10,6 +10,7 @@ import 'package:design_patterns/mediator_pattern/ui/chat_page.dart';
 import 'package:design_patterns/memento_pattern/ui/drawing_page.dart';
 import 'package:design_patterns/observer_pattern/observer_page.dart';
 import 'package:design_patterns/proxy_pattern/ui/proxy_page.dart';
+import './state_pattern/ui/order_page.dart';
 import 'package:flutter/material.dart';
 import 'abstract_factory/factory/light_factory.dart';
 import 'abstract_factory/factory/dark_factory.dart';
@@ -215,6 +216,16 @@ class ListPage extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) =>  ObserverPage()),
+              ),
+            ),
+            const Divider(),
+
+             ListTile(
+              title: const Text('State Pattern'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) =>  StatePage()),
               ),
             )
         ],

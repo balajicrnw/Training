@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:namma_kadai/core/services/auth_service.dart';
 
 class AuthServiceImpl implements AuthService {
@@ -6,17 +6,23 @@ class AuthServiceImpl implements AuthService {
 
   AuthServiceImpl(this._firebaseAuth);
 
-  @override
-  Stream<User?> authStateChanges() => _firebaseAuth.authStateChanges();
+  AuthUser? _mapUser(User? user) {
+    if (user == null) return null;
+    return AuthUser(id: user.uid, email: user.email ?? '');
+  }
 
   @override
-  Future<User?> signIn(String email, String password) async {
+  Stream<AuthUser?> authStateChanges() =>
+      _firebaseAuth.authStateChanges().map(_mapUser);
+
+  @override
+  Future<AuthUser?> signIn(String email, String password) async {
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user;
+      return _mapUser(userCredential.user);
     } on FirebaseAuthException catch (e) {
       print("Firebase Sign In Error: ${e.code} - ${e.message}");
       return null;
@@ -29,14 +35,19 @@ class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<User?> signUp(String email, String password) async {
+  Future<AuthUser?> signUp(String email, String password) async {
     try {
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user;
+      return _mapUser(userCredential.user);
     } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        throw Exception(
+          'The email address is already in use by another account.',
+        );
+      }
       print("Firebase Sign Up Error: ${e.code} - ${e.message}");
       rethrow;
     }

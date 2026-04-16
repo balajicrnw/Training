@@ -1,8 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
+class AuthUser {
+  final String id;
+  final String email;
+
+  AuthUser({required this.id, required this.email});
+}
 
 abstract class AuthService {
-  Future<User?> signIn(String email, String password);
-  Future<User?> signUp(String email, String password);
+  Future<AuthUser?> signIn(String email, String password);
+  Future<AuthUser?> signUp(String email, String password);
   Future<void> signOut();
-  Stream<User?> authStateChanges();
+  Stream<AuthUser?> authStateChanges();
 }

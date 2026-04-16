@@ -32,8 +32,11 @@ class ProductListScreen extends ConsumerWidget {
                   ),
                 ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.only(top: 60.0, left: 20, right: 20),
+                  padding: const EdgeInsets.only(
+                    top: 60.0,
+                    left: 20,
+                    right: 20,
+                  ),
                   child: Row(
                     children: [
                       Column(
@@ -51,17 +54,27 @@ class ProductListScreen extends ConsumerWidget {
                                 ),
                               );
                             },
-                            loading: () => const Text('Welcome',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24)),
-                            error: (_, __) => const Text('Hi there',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24)),
+                            loading: () => const Text(
+                              'Welcome',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                              ),
+                            ),
+                            error: (_, __) => const Text(
+                              'Hi there',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                              ),
+                            ),
                           ),
                           const Text(
                             "What would you like to buy today?",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 14),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
@@ -88,8 +101,10 @@ class ProductListScreen extends ConsumerWidget {
                     children: [
                       const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Icon(Icons.shopping_cart_outlined,
-                            color: Colors.white),
+                        child: Icon(
+                          Icons.shopping_cart_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                       if (ref.cartItems.isNotEmpty)
                         Positioned(
@@ -102,7 +117,9 @@ class ProductListScreen extends ConsumerWidget {
                               shape: BoxShape.circle,
                             ),
                             constraints: const BoxConstraints(
-                                minWidth: 16, minHeight: 16),
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
                             child: Text(
                               '${ref.cartItems.length}',
                               style: const TextStyle(
@@ -121,8 +138,10 @@ class ProductListScreen extends ConsumerWidget {
 
               userState.when(
                 data: (user) => IconButton(
-                  icon: Icon(user != null ? Icons.logout : Icons.login,
-                      color: Colors.white),
+                  icon: Icon(
+                    user != null ? Icons.logout : Icons.login,
+                    color: Colors.white,
+                  ),
                   onPressed: () {
                     if (user != null) {
                       ref.read(appViewModelProvider.notifier).logout();
@@ -154,15 +173,12 @@ class ProductListScreen extends ConsumerWidget {
                   ],
                 ),
                 child: TextField(
-                  onChanged: (value) =>
-                      ref.notifier.updateSearchQuery(value),
+                  onChanged: (value) => ref.notifier.updateSearchQuery(value),
                   decoration: const InputDecoration(
                     hintText: "Search items...",
-                    prefixIcon:
-                        Icon(Icons.search, color: Colors.indigo),
+                    prefixIcon: Icon(Icons.search, color: Colors.indigo),
                     border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 15),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
               ),
@@ -176,17 +192,16 @@ class ProductListScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: ['All', 'Coffee', 'Fashion', 'Electronics', 'Home']
                     .map((cat) {
-                  return _CategoryChip(
-                    label: cat,
-                    isSelected: ref.selectedCategory == cat,
-                    onTap: () =>
-                        ref.notifier.updateCategory(cat),
-                  );
-                }).toList(),
+                      return _CategoryChip(
+                        label: cat,
+                        isSelected: ref.selectedCategory == cat,
+                        onTap: () => ref.notifier.updateCategory(cat),
+                      );
+                    })
+                    .toList(),
               ),
             ),
           ),
@@ -194,29 +209,22 @@ class ProductListScreen extends ConsumerWidget {
           // Products
           isLoading
               ? const SliverFillRemaining(
-                  child:
-                      Center(child: CircularProgressIndicator()),
+                  child: Center(child: CircularProgressIndicator()),
                 )
               : SliverPadding(
-                  padding:
-                      const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                   sliver: SliverGrid(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.7,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final product =
-                            ref.filteredProducts[index];
-                        return _ProductCard(product: product);
-                      },
-                      childCount:
-                          ref.filteredProducts.length,
-                    ),
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.7,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final product = ref.filteredProducts[index];
+                      return _ProductCard(product: product);
+                    }, childCount: ref.filteredProducts.length),
                   ),
                 ),
         ],
@@ -251,11 +259,11 @@ class _CategoryChip extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
         side: BorderSide(
-            color: isSelected
-                ? Colors.transparent
-                : Colors.indigo.withValues(alpha: 0.2)),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
+          color: isSelected
+              ? Colors.transparent
+              : Colors.indigo.withValues(alpha: 0.2),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         showCheckmark: false,
       ),
     );
@@ -288,14 +296,13 @@ class _ProductCard extends ConsumerWidget {
           ],
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(
-                        top: Radius.circular(24)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
                 child: Container(
                   width: double.infinity,
                   color: Colors.grey[50],
@@ -304,27 +311,19 @@ class _ProductCard extends ConsumerWidget {
                     child: Image.network(
                       product.imageUrl,
                       fit: BoxFit.cover,
-                      loadingBuilder:
-                          (context, child, loadingProgress) {
-                        if (loadingProgress == null)
-                          return child;
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
                         return Center(
-                          child:
-                              CircularProgressIndicator(
-                            value: loadingProgress
-                                        .expectedTotalBytes !=
-                                    null
-                                ? loadingProgress
-                                        .cumulativeBytesLoaded /
-                                    loadingProgress
-                                        .expectedTotalBytes!
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
                                 : null,
                             strokeWidth: 2,
                           ),
                         );
                       },
-                      errorBuilder:
-                          (_, __, ___) => const Icon(
+                      errorBuilder: (_, __, ___) => const Icon(
                         Icons.broken_image_outlined,
                         size: 50,
                         color: Colors.grey,
@@ -335,30 +334,25 @@ class _ProductCard extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     product.title,
                     maxLines: 1,
-                    overflow:
-                        TextOverflow.ellipsis,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        fontWeight:
-                            FontWeight.bold,
-                        fontSize: 14),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '₹${product.price}',
                     style: TextStyle(
-                      color: Theme.of(context)
-                          .primaryColor,
-                      fontWeight:
-                          FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),

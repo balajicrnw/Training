@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'auth_service.dart';
 import '../../model/user_model.dart';
 import '../../model/product.dart';
 import '../../model/cart_item.dart';
@@ -9,7 +9,7 @@ abstract class StorageService {
 
   // User Data
   Future<void> saveUserData(
-    User user, {
+    AuthUser user, {
     String? name,
     String? username,
     String? gender,
@@ -18,6 +18,8 @@ abstract class StorageService {
 
   // Products
   Future<List<Product>> getProducts();
+  Future<void> saveProduct(Map<String, dynamic> data);
+  Future<void> seedProducts();
 
   // Cart
   Future<List<CartItem>> getCartItems();

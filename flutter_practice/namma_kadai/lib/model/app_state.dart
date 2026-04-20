@@ -16,19 +16,21 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   String? get errorMessage;
   String get selectedCategory;
   String get searchQuery;
+  bool get isLoading;
 
   AppState._();
   factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
 
   factory AppState.initial() => AppState(
-    (b) => b
-      ..products = ListBuilder<Product>([])
-      ..cartItems = ListBuilder<CartItem>([])
-      ..orders = ListBuilder<Order>([])
-      ..errorMessage = null
-      ..selectedCategory = 'All'
-      ..searchQuery = '',
-  );
+        (b) => b
+          ..products = ListBuilder<Product>([])
+          ..cartItems = ListBuilder<CartItem>([])
+          ..orders = ListBuilder<Order>([])
+          ..errorMessage = null
+          ..selectedCategory = 'All'
+          ..searchQuery = ''
+          ..isLoading = false,
+      );
 
   static Serializer<AppState> get serializer => _$appStateSerializer;
 }

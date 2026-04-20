@@ -8,12 +8,7 @@ abstract class StorageService {
   Future<void> init();
 
   // User Data
-  Future<void> saveUserData(
-    AuthUser user, {
-    String? name,
-    String? username,
-    String? gender,
-  });
+  Future<void> saveUserData(AuthUser user, {String? name, String? gender});
   Stream<UserModel?> getUserData(String userId);
 
   // Products

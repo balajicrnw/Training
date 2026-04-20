@@ -6,6 +6,7 @@ import 'package:namma_kadai/model/product.dart';
 import 'package:namma_kadai/view/cart_screen.dart';
 import 'package:namma_kadai/view/checkout_screen.dart';
 import 'package:namma_kadai/view/login_screen.dart';
+import 'package:namma_kadai/view/otp_screen.dart';
 import 'package:namma_kadai/view/product_detail_screen.dart';
 import 'package:namma_kadai/view/product_list_screen.dart';
 import 'package:namma_kadai/view/register_screen.dart';
@@ -18,24 +19,33 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: RouteNames.home,
-    refreshListenable: GoRouterRefreshStream(ref.read(authStateProvider.stream)),
+    refreshListenable: GoRouterRefreshStream(
+      ref.read(authStateProvider.stream),
+    ),
     redirect: (BuildContext context, GoRouterState state) {
       final bool loggedIn = authState.asData?.value != null;
       final bool onLoginPage = state.matchedLocation == RouteNames.login;
       final bool onRegisterPage = state.matchedLocation == RouteNames.register;
+      final bool onOtpPage = state.matchedLocation == RouteNames.otp;
       final bool onHomePage = state.matchedLocation == RouteNames.home;
-      final bool onProductDetailPage = state.matchedLocation.startsWith('/product/');
+      final bool onProductDetailPage = state.matchedLocation.startsWith(
+        '/product/',
+      );
 
-      if (!loggedIn && !onLoginPage && !onRegisterPage && !onHomePage && !onProductDetailPage) {
+      if (!loggedIn &&
+          !onLoginPage &&
+          !onRegisterPage &&
+          !onOtpPage &&
+          !onHomePage &&
+          !onProductDetailPage) {
         return RouteNames.login;
       }
 
-     
       if (loggedIn && (onLoginPage || onRegisterPage)) {
         return RouteNames.home;
       }
 
-      return null; 
+      return null;
     },
     routes: [
       GoRoute(
@@ -47,7 +57,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/product/:id',
         name: RouteNames.productDetail,
         builder: (context, state) {
-          
           final product = state.extra as Product;
           return ProductDetailScreen(product: product);
         },
@@ -72,15 +81,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.checkout,
         builder: (context, state) => const CheckoutScreen(),
       ),
-    ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text('Page not found: ${state.error}'),
+      GoRoute(
+        path: RouteNames.otp,
+        name: RouteNames.otp,
+        builder: (context, state) {
+          final email = state.extra as String? ?? '';
+          return OTPScreen(email: email);
+        },
       ),
-    ),
+    ],
+    errorBuilder: (context, state) =>
+        Scaffold(body: Center(child: Text('Page not found: ${state.error}'))),
   );
 });
-
 
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;

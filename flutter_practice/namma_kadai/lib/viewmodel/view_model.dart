@@ -222,19 +222,45 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<AuthUser?> login(String email, String password) async {
-    final user = await repository.appwriteAuthService.signIn(email, password);
-    if (user == null) {
+    state = state.rebuild(
+      (b) => b
+        ..errorMessage = null
+        ..isLoading = true,
+    );
+    try {
+      final registered = await repository.appwriteAuthService
+          .isAccountRegistered(email);
+      if (!registered) {
+        state = state.rebuild(
+          (b) => b
+            ..errorMessage = 'No account found with this email.'
+            ..isLoading = false,
+        );
+        return null;
+      }
+
+      final user = await repository.appwriteAuthService.signIn(email, password);
+      if (user == null) {
+        state = state.rebuild(
+          (b) => b..errorMessage = 'Invalid email or password',
+        );
+      }
+      state = state.rebuild((b) => b..isLoading = false);
+      return user;
+    } catch (e) {
       state = state.rebuild(
-        (b) => b..errorMessage = 'Invalid email or password',
+        (b) => b
+          ..errorMessage = e.toString()
+          ..isLoading = false,
       );
+      return null;
     }
-    return user;
   }
 
   Future<AuthUser?> register({
     required String email,
     required String password,
-    required String username,
+    required String name,
     required String gender,
   }) async {
     if (password.length < 8) {
@@ -245,22 +271,75 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     }
 
     AuthUser? user;
-    state = state.rebuild((b) => b..errorMessage = null);
+    state = state.rebuild(
+      (b) => b
+        ..errorMessage = null
+        ..isLoading = true,
+    );
     await handleAsync(() async {
-      user = await repository.appwriteAuthService.signUp(email, password);
+      user = await repository.appwriteAuthService.signUp(
+        email,
+        password,
+        name: name,
+      );
       if (user != null) {
-        await appwriteStore.saveUserData(
-          user!,
-          name: username,
-          username: username,
-          gender: gender,
-        );
+        await appwriteStore.saveUserData(user!, name: name, gender: gender);
       }
     }, errorMessage: 'Registration error');
+    state = state.rebuild((b) => b..isLoading = false);
     return user;
   }
 
   Future<void> logout() async => repository.appwriteAuthService.signOut();
+
+  // 📧 OTP Flow
+  Future<bool> sendOtp(String email) async {
+    state = state.rebuild(
+      (b) => b
+        ..errorMessage = null
+        ..isLoading = true,
+    );
+    try {
+      await repository.appwriteAuthService.sendOtp(email);
+      state = state.rebuild((b) => b..isLoading = false);
+      return true;
+    } catch (e) {
+      String message = e.toString();
+      if (message.toLowerCase().contains('user_not_found') ||
+          message.toLowerCase().contains('user not found')) {
+        state = state.rebuild(
+          (b) => b..errorMessage = 'Please register first.',
+        );
+      } else {
+        state = state.rebuild(
+          (b) => b..errorMessage = 'Failed to send OTP: $e',
+        );
+      }
+      state = state.rebuild((b) => b..isLoading = false);
+      return false;
+    }
+  }
+
+  Future<AuthUser?> verifyOtp(String email, String otp) async {
+    state = state.rebuild(
+      (b) => b
+        ..errorMessage = null
+        ..isLoading = true,
+    );
+    AuthUser? user;
+    try {
+      user = await repository.appwriteAuthService.verifyOtp(email, otp);
+      if (user == null) {
+        state = state.rebuild((b) => b..errorMessage = 'Invalid OTP code');
+      }
+    } catch (e) {
+      state = state.rebuild(
+        (b) => b..errorMessage = 'OTP Verification failed: $e',
+      );
+    }
+    state = state.rebuild((b) => b..isLoading = false);
+    return user;
+  }
 
   void updateCategory(String category) {
     state = state.rebuild((b) => b..selectedCategory = category);

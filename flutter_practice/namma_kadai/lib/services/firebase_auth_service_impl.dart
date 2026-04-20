@@ -35,7 +35,11 @@ class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<AuthUser?> signUp(String email, String password) async {
+  Future<AuthUser?> signUp(
+    String email,
+    String password, {
+    String? name,
+  }) async {
     try {
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
@@ -51,5 +55,21 @@ class AuthServiceImpl implements AuthService {
       print("Firebase Sign Up Error: ${e.code} - ${e.message}");
       rethrow;
     }
+  }
+
+  @override
+  Future<void> sendOtp(String email) async {
+    throw UnimplementedError('OTP not supported for Firebase in this project');
+  }
+
+  @override
+  Future<AuthUser?> verifyOtp(String email, String otp) async {
+    throw UnimplementedError('OTP not supported for Firebase in this project');
+  }
+
+  @override
+  Future<bool> isAccountRegistered(String email) async {
+    // For now, return false or throw error since Firebase OTP is not used
+    return false;
   }
 }

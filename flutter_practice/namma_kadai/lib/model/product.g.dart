@@ -15,59 +15,43 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
   final String wireName = 'Product';
 
   @override
-  Iterable<Object?> serialize(
-    Serializers serializers,
-    Product object, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  Iterable<Object?> serialize(Serializers serializers, Product object,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
       'title',
-      serializers.serialize(
-        object.title,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.title,
+          specifiedType: const FullType(String)),
       'description',
-      serializers.serialize(
-        object.description,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.description,
+          specifiedType: const FullType(String)),
       'price',
-      serializers.serialize(
-        object.price,
-        specifiedType: const FullType(double),
-      ),
+      serializers.serialize(object.price,
+          specifiedType: const FullType(double)),
       'imageUrl',
-      serializers.serialize(
-        object.imageUrl,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.imageUrl,
+          specifiedType: const FullType(String)),
     ];
     Object? value;
     value = object.id;
     if (value != null) {
       result
         ..add('id')
-        ..add(
-          serializers.serialize(value, specifiedType: const FullType(String)),
-        );
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
     }
     value = object.category;
     if (value != null) {
       result
         ..add('category')
-        ..add(
-          serializers.serialize(value, specifiedType: const FullType(String)),
-        );
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
     }
     return result;
   }
 
   @override
-  Product deserialize(
-    Serializers serializers,
-    Iterable<Object?> serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  Product deserialize(Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = ProductBuilder();
 
     final iterator = serialized.iterator;
@@ -77,52 +61,28 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       final Object? value = iterator.current;
       switch (key) {
         case 'id':
-          result.id =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String?;
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'title':
-          result.title =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.title = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'description':
-          result.description =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.description = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'price':
-          result.price =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(double),
-                  )!
-                  as double;
+          result.price = serializers.deserialize(value,
+              specifiedType: const FullType(double))! as double;
           break;
         case 'imageUrl':
-          result.imageUrl =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.imageUrl = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'category':
-          result.category =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String?;
+          result.category = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -148,14 +108,14 @@ class _$Product extends Product {
   factory _$Product([void Function(ProductBuilder)? updates]) =>
       (ProductBuilder()..update(updates))._build();
 
-  _$Product._({
-    this.id,
-    required this.title,
-    required this.description,
-    required this.price,
-    required this.imageUrl,
-    this.category,
-  }) : super._();
+  _$Product._(
+      {this.id,
+      required this.title,
+      required this.description,
+      required this.price,
+      required this.imageUrl,
+      this.category})
+      : super._();
   @override
   Product rebuild(void Function(ProductBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -258,30 +218,17 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   Product build() => _build();
 
   _$Product _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$Product._(
           id: id,
-          title: BuiltValueNullFieldError.checkNotNull(
-            title,
-            r'Product',
-            'title',
-          ),
+          title:
+              BuiltValueNullFieldError.checkNotNull(title, r'Product', 'title'),
           description: BuiltValueNullFieldError.checkNotNull(
-            description,
-            r'Product',
-            'description',
-          ),
-          price: BuiltValueNullFieldError.checkNotNull(
-            price,
-            r'Product',
-            'price',
-          ),
+              description, r'Product', 'description'),
+          price:
+              BuiltValueNullFieldError.checkNotNull(price, r'Product', 'price'),
           imageUrl: BuiltValueNullFieldError.checkNotNull(
-            imageUrl,
-            r'Product',
-            'imageUrl',
-          ),
+              imageUrl, r'Product', 'imageUrl'),
           category: category,
         );
     replace(_$result);

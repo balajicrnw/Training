@@ -15,31 +15,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _loading = false;
-
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
+    await ref
+        .read(appViewModelProvider.notifier)
+        .login(_emailController.text.trim(), _passwordController.text.trim());
+  }
 
-    setState(() => _loading = true);
-    final user = await ref.read(appViewModelProvider.notifier).login(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
+  Future<void> _loginWithOtp() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email first')),
+      );
+      return;
+    }
 
-    if (mounted) {
-      setState(() => _loading = false);
-      if (user == null) {
-        final errorMessage = ref.read(appViewModelProvider).errorMessage;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage ?? 'Login failed')),
-        );
-      }
-     
+    final success = await ref
+        .read(appViewModelProvider.notifier)
+        .sendOtp(email);
+    if (success && mounted) {
+      context.pushNamed(RouteNames.otp, extra: email);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<String?>(
+      appViewModelProvider.select((state) => state.errorMessage),
+      (previous, next) {
+        if (next != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(next), // Already clean message from ViewModel
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+
+          ref.read(appViewModelProvider.notifier).clearError();
+        }
+      },
+    );
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -69,19 +86,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     'Welcome Back',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Login to continue shopping',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                   ),
                   const SizedBox(height: 48),
+
+                  /// EMAIL
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -96,7 +115,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 16),
+
+                  /// PASSWORD
                   TextFormField(
                     controller: _passwordController,
                     decoration: const InputDecoration(
@@ -111,14 +133,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 32),
-                  _loading
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _loginWithOtp,
+                      child: const Text('Login with OTP instead'),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  ref.watch(appViewModelProvider.select((s) => s.isLoading))
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
                           onPressed: _login,
                           child: const Text('Login'),
                         ),
+
                   const SizedBox(height: 16),
+
                   TextButton(
                     onPressed: () => context.pushNamed(RouteNames.register),
                     child: RichText(

@@ -15,30 +15,22 @@ class _$LocalUserSerializer implements StructuredSerializer<LocalUser> {
   final String wireName = 'LocalUser';
 
   @override
-  Iterable<Object?> serialize(
-    Serializers serializers,
-    LocalUser object, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  Iterable<Object?> serialize(Serializers serializers, LocalUser object,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(int)),
       'email',
-      serializers.serialize(
-        object.email,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.email,
+          specifiedType: const FullType(String)),
     ];
 
     return result;
   }
 
   @override
-  LocalUser deserialize(
-    Serializers serializers,
-    Iterable<Object?> serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  LocalUser deserialize(Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = LocalUserBuilder();
 
     final iterator = serialized.iterator;
@@ -48,20 +40,12 @@ class _$LocalUserSerializer implements StructuredSerializer<LocalUser> {
       final Object? value = iterator.current;
       switch (key) {
         case 'id':
-          result.id =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(int),
-                  )!
-                  as int;
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(int))! as int;
           break;
         case 'email':
-          result.email =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.email = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -148,15 +132,11 @@ class LocalUserBuilder implements Builder<LocalUser, LocalUserBuilder> {
   LocalUser build() => _build();
 
   _$LocalUser _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$LocalUser._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'LocalUser', 'id'),
           email: BuiltValueNullFieldError.checkNotNull(
-            email,
-            r'LocalUser',
-            'email',
-          ),
+              email, r'LocalUser', 'email'),
         );
     replace(_$result);
     return _$result;

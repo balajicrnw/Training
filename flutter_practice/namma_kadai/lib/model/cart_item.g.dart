@@ -15,56 +15,39 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
   final String wireName = 'CartItem';
 
   @override
-  Iterable<Object?> serialize(
-    Serializers serializers,
-    CartItem object, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  Iterable<Object?> serialize(Serializers serializers, CartItem object,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
       'productId',
-      serializers.serialize(
-        object.productId,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.productId,
+          specifiedType: const FullType(String)),
       'title',
-      serializers.serialize(
-        object.title,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.title,
+          specifiedType: const FullType(String)),
       'price',
-      serializers.serialize(
-        object.price,
-        specifiedType: const FullType(double),
-      ),
+      serializers.serialize(object.price,
+          specifiedType: const FullType(double)),
       'imageUrl',
-      serializers.serialize(
-        object.imageUrl,
-        specifiedType: const FullType(String),
-      ),
+      serializers.serialize(object.imageUrl,
+          specifiedType: const FullType(String)),
       'quantity',
-      serializers.serialize(
-        object.quantity,
-        specifiedType: const FullType(int),
-      ),
+      serializers.serialize(object.quantity,
+          specifiedType: const FullType(int)),
     ];
     Object? value;
     value = object.id;
     if (value != null) {
       result
         ..add('id')
-        ..add(
-          serializers.serialize(value, specifiedType: const FullType(String)),
-        );
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
     }
     return result;
   }
 
   @override
-  CartItem deserialize(
-    Serializers serializers,
-    Iterable<Object?> serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  CartItem deserialize(Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = CartItemBuilder();
 
     final iterator = serialized.iterator;
@@ -74,52 +57,28 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
       final Object? value = iterator.current;
       switch (key) {
         case 'id':
-          result.id =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String?;
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'productId':
-          result.productId =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.productId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'title':
-          result.title =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.title = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'price':
-          result.price =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(double),
-                  )!
-                  as double;
+          result.price = serializers.deserialize(value,
+              specifiedType: const FullType(double))! as double;
           break;
         case 'imageUrl':
-          result.imageUrl =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )!
-                  as String;
+          result.imageUrl = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'quantity':
-          result.quantity =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(int),
-                  )!
-                  as int;
+          result.quantity = serializers.deserialize(value,
+              specifiedType: const FullType(int))! as int;
           break;
       }
     }
@@ -145,14 +104,14 @@ class _$CartItem extends CartItem {
   factory _$CartItem([void Function(CartItemBuilder)? updates]) =>
       (CartItemBuilder()..update(updates))._build();
 
-  _$CartItem._({
-    this.id,
-    required this.productId,
-    required this.title,
-    required this.price,
-    required this.imageUrl,
-    required this.quantity,
-  }) : super._();
+  _$CartItem._(
+      {this.id,
+      required this.productId,
+      required this.title,
+      required this.price,
+      required this.imageUrl,
+      required this.quantity})
+      : super._();
   @override
   CartItem rebuild(void Function(CartItemBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -255,35 +214,19 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   CartItem build() => _build();
 
   _$CartItem _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$CartItem._(
           id: id,
           productId: BuiltValueNullFieldError.checkNotNull(
-            productId,
-            r'CartItem',
-            'productId',
-          ),
+              productId, r'CartItem', 'productId'),
           title: BuiltValueNullFieldError.checkNotNull(
-            title,
-            r'CartItem',
-            'title',
-          ),
+              title, r'CartItem', 'title'),
           price: BuiltValueNullFieldError.checkNotNull(
-            price,
-            r'CartItem',
-            'price',
-          ),
+              price, r'CartItem', 'price'),
           imageUrl: BuiltValueNullFieldError.checkNotNull(
-            imageUrl,
-            r'CartItem',
-            'imageUrl',
-          ),
+              imageUrl, r'CartItem', 'imageUrl'),
           quantity: BuiltValueNullFieldError.checkNotNull(
-            quantity,
-            r'CartItem',
-            'quantity',
-          ),
+              quantity, r'CartItem', 'quantity'),
         );
     replace(_$result);
     return _$result;

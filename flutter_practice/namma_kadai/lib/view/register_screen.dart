@@ -14,17 +14,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
-  final _usernameController = TextEditingController();
+  final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-
   String? _gender;
-  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _usernameController.dispose();
+    _nameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -33,32 +31,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       if (_gender == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select gender")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Please select gender")));
         return;
       }
 
-      setState(() {
-        _isLoading = true;
-      });
+      final user = await ref
+          .read(appViewModelProvider.notifier)
+          .register(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+            name: _nameController.text.trim(),
+            gender: _gender!,
+          );
 
-      final notifier = ref.read(appViewModelProvider.notifier);
-
-      final user = await notifier.register(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        username: _usernameController.text.trim(),
-        gender: _gender!,
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (user != null) {
+      if (mounted && user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
         );
@@ -113,9 +101,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     'Create Account',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
 
                   const SizedBox(height: 8),
@@ -123,23 +111,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   Text(
                     'Join Namma Kadai community',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                   ),
 
                   const SizedBox(height: 32),
 
-                  /// USERNAME
+                  /// NAME
                   TextFormField(
-                    controller: _usernameController,
+                    controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Full Name',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter a username';
+                        return 'Please enter your name';
                       }
                       return null;
                     },
@@ -161,7 +149,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       }
 
                       final emailRegex = RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                      );
 
                       if (!emailRegex.hasMatch(value)) {
                         return 'Please enter a valid email address';
@@ -223,9 +212,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   Text(
                     'Gender',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
 
                   const SizedBox(height: 8),
@@ -237,8 +226,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           title: const Text('Male'),
                           value: 'Male',
                           groupValue: _gender,
-                          onChanged: (value) =>
-                              setState(() => _gender = value),
+                          onChanged: (value) => setState(() => _gender = value),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
@@ -247,8 +235,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           title: const Text('Female'),
                           value: 'Female',
                           groupValue: _gender,
-                          onChanged: (value) =>
-                              setState(() => _gender = value),
+                          onChanged: (value) => setState(() => _gender = value),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
@@ -258,7 +245,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: 32),
 
                   /// REGISTER BUTTON
-                  _isLoading
+                  ref.watch(appViewModelProvider.select((s) => s.isLoading))
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
                           onPressed: _register,

@@ -12,7 +12,6 @@ class AppRepository {
   final StorageService storageService = LocalStorageServiceImpl();
   final AuthService firebaseAuthService = AuthServiceImpl(FirebaseAuth.instance);
   final AuthService appwriteAuthService = AppwriteAuthServiceImpl();
-
   final StorageService firestoreService = FirebaseFirestoreServiceImpl();
   final StorageService appwriteStorageService = AppwriteStorageServiceImpl();
 

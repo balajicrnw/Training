@@ -8,6 +8,7 @@ import '../model/cart_item.dart';
 import '../model/order.dart';
 import '../model/user_model.dart';
 import '../model/serializers.dart';
+import '../data/product_seed_data.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
@@ -300,28 +301,8 @@ class LocalStorageServiceImpl implements StorageService {
 
   @override
   Future<void> seedProducts() async {
-    final productData = [
-      {
-        'title': 'Namma Filter Coffee',
-        'description':
-            'Pure roasted South Indian coffee blend for the perfect morning.',
-        'price': 299.0,
-        'imageUrl':
-            'https://plus.unsplash.com/premium_photo-1675435644687-562e8042b9db?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8fDB8fHww',
-        'category': 'Coffee',
-      },
-      {
-        'title': 'Royal Silk Saree',
-        'description':
-            'Exquisite Kanchipuram silk with handcrafted gold zari work.',
-        'price': 8500.0,
-        'imageUrl':
-            'https://images.unsplash.com/photo-1618901185975-d59f7091bcfe?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2lsayUyMHNhcmVlfGVufDB8fDB8fHww',
-        'category': 'Fashion',
-      },
-    ];
-    for (var p in productData) {
-      await saveProduct(p);
+    for (final p in kProductSeedData) {
+      await saveProduct(Map<String, dynamic>.from(p));
     }
   }
 

@@ -15,56 +15,41 @@ class _$OrderSerializer implements StructuredSerializer<Order> {
   final String wireName = 'Order';
 
   @override
-  Iterable<Object?> serialize(
-    Serializers serializers,
-    Order object, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  Iterable<Object?> serialize(Serializers serializers, Order object,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
       'items',
-      serializers.serialize(
-        object.items,
-        specifiedType: const FullType(BuiltList, const [
-          const FullType(CartItem),
-        ]),
-      ),
+      serializers.serialize(object.items,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(CartItem)])),
       'totalAmount',
-      serializers.serialize(
-        object.totalAmount,
-        specifiedType: const FullType(double),
-      ),
+      serializers.serialize(object.totalAmount,
+          specifiedType: const FullType(double)),
       'dateTime',
-      serializers.serialize(
-        object.dateTime,
-        specifiedType: const FullType(DateTime),
-      ),
+      serializers.serialize(object.dateTime,
+          specifiedType: const FullType(DateTime)),
     ];
     Object? value;
     value = object.id;
     if (value != null) {
       result
         ..add('id')
-        ..add(
-          serializers.serialize(value, specifiedType: const FullType(String)),
-        );
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
     }
     value = object.uid;
     if (value != null) {
       result
         ..add('uid')
-        ..add(
-          serializers.serialize(value, specifiedType: const FullType(String)),
-        );
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
     }
     return result;
   }
 
   @override
-  Order deserialize(
-    Serializers serializers,
-    Iterable<Object?> serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) {
+  Order deserialize(Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
     final result = OrderBuilder();
 
     final iterator = serialized.iterator;
@@ -74,47 +59,26 @@ class _$OrderSerializer implements StructuredSerializer<Order> {
       final Object? value = iterator.current;
       switch (key) {
         case 'id':
-          result.id =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String?;
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'uid':
-          result.uid =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String?;
+          result.uid = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'items':
-          result.items.replace(
-            serializers.deserialize(
-                  value,
-                  specifiedType: const FullType(BuiltList, const [
-                    const FullType(CartItem),
-                  ]),
-                )!
-                as BuiltList<Object?>,
-          );
+          result.items.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(CartItem)]))!
+              as BuiltList<Object?>);
           break;
         case 'totalAmount':
-          result.totalAmount =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(double),
-                  )!
-                  as double;
+          result.totalAmount = serializers.deserialize(value,
+              specifiedType: const FullType(double))! as double;
           break;
         case 'dateTime':
-          result.dateTime =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(DateTime),
-                  )!
-                  as DateTime;
+          result.dateTime = serializers.deserialize(value,
+              specifiedType: const FullType(DateTime))! as DateTime;
           break;
       }
     }
@@ -138,13 +102,13 @@ class _$Order extends Order {
   factory _$Order([void Function(OrderBuilder)? updates]) =>
       (OrderBuilder()..update(updates))._build();
 
-  _$Order._({
-    this.id,
-    this.uid,
-    required this.items,
-    required this.totalAmount,
-    required this.dateTime,
-  }) : super._();
+  _$Order._(
+      {this.id,
+      this.uid,
+      required this.items,
+      required this.totalAmount,
+      required this.dateTime})
+      : super._();
   @override
   Order rebuild(void Function(OrderBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -241,22 +205,15 @@ class OrderBuilder implements Builder<Order, OrderBuilder> {
   _$Order _build() {
     _$Order _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$Order._(
             id: id,
             uid: uid,
             items: items.build(),
             totalAmount: BuiltValueNullFieldError.checkNotNull(
-              totalAmount,
-              r'Order',
-              'totalAmount',
-            ),
+                totalAmount, r'Order', 'totalAmount'),
             dateTime: BuiltValueNullFieldError.checkNotNull(
-              dateTime,
-              r'Order',
-              'dateTime',
-            ),
+                dateTime, r'Order', 'dateTime'),
           );
     } catch (_) {
       late String _$failedField;

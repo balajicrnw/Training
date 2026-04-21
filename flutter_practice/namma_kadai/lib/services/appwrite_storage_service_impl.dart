@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:dart_appwrite/dart_appwrite.dart' as server;
 import 'package:appwrite/models.dart' as models;
-import 'package:http/http.dart' as http;
 import '../core/services/auth_service.dart';
 import '../core/services/storage_service.dart';
 import '../model/cart_item.dart';
@@ -13,6 +13,7 @@ import '../data/product_seed_data.dart';
 import 'dart:convert';
 
 class AppwriteStorageServiceImpl implements StorageService {
+  final Client _client;
   final Databases _db;
   final Account _account;
   final Storage _storage;
@@ -25,7 +26,8 @@ class AppwriteStorageServiceImpl implements StorageService {
   static const _profileBucket = Environment.appwriteProfileBucketId;
 
   AppwriteStorageServiceImpl({required Client client})
-    : _db = Databases(client),
+    : _client = client,
+      _db = Databases(client),
       _account = Account(client),
       _storage = Storage(client);
 
@@ -62,57 +64,81 @@ class AppwriteStorageServiceImpl implements StorageService {
   @override
   Future<void> init() async {
     // Run setup in background to avoid blocking data fetch
-    _setupBackendViaRest();
+    _setupBackend();
   }
 
-  Future<void> _createBucketIfNotExists(
-    http.Client client,
-    String base,
-    Map<String, String> headers,
-  ) async {
+  Future<void> _setupBackend() async {
+    final apiKey = Environment.appwriteApiKey;
+    if (apiKey.isEmpty) return;
     try {
-      final bucketUrl = Uri.parse('$base/storage/buckets/$_profileBucket');
-      final res = await client.get(bucketUrl, headers: headers);
+      print('DEBUG: AppwriteSetup: Initializing server client...');
+      final serverClient = server.Client()
+          .setEndpoint(Environment.appwritePublicEndpoint)
+          .setProject(Environment.appwriteProjectId)
+          .setKey(apiKey);
 
-      final bucketConfig = {
-        'name': 'Profiles',
-        'permissions': [
+      final serverDb = server.Databases(serverClient);
+      final serverStorage = server.Storage(serverClient);
+
+      print('DEBUG: AppwriteSetup: Ensuring storage bucket...');
+      // 1. Create/Update Profile Bucket
+      await _ensureBucket(serverStorage);
+
+      print('DEBUG: AppwriteSetup: Ensuring collections...');
+      // 2. Create/Update Collections and Attributes
+      await _ensureCollections(serverDb);
+
+      print('DEBUG: AppwriteSetup: Setup completed successfully');
+      await Future.delayed(const Duration(seconds: 1));
+    } catch (e) {
+      print('DEBUG: AppwriteSetup: Fatal error: $e');
+    }
+  }
+
+  Future<void> _ensureBucket(server.Storage storage) async {
+    final bucketId = _profileBucket;
+    try {
+      print('DEBUG: AppwriteSetup: Checking bucket: $bucketId');
+      await storage.getBucket(bucketId: bucketId);
+      print('DEBUG: AppwriteSetup: Bucket exists, updating...');
+      await storage.updateBucket(
+        bucketId: bucketId,
+        name: 'Profiles',
+        permissions: List<String>.from([
           'read("any")',
           'create("any")',
           'update("any")',
           'delete("any")',
-        ],
-        'fileSecurity': false,
-        'enabled': true,
-      };
-
-      if (res.statusCode == 200) {
-        await client.put(
-          bucketUrl,
-          headers: headers,
-          body: jsonEncode(bucketConfig),
+        ]),
+        fileSecurity: false,
+        enabled: true,
+      );
+    } catch (e) {
+      final isAppwriteException =
+          e is AppwriteException || e is server.AppwriteException;
+      final dynamic err = e;
+      if (isAppwriteException && (err.code == 404 || err.code == 401)) {
+        print('DEBUG: AppwriteSetup: Creating new bucket: $bucketId');
+        await storage.createBucket(
+          bucketId: bucketId,
+          name: 'Profiles',
+          permissions: List<String>.from([
+            'read("any")',
+            'create("any")',
+            'update("any")',
+            'delete("any")',
+          ]),
+          fileSecurity: false,
+          enabled: true,
         );
-      } else if (res.statusCode == 404 || res.statusCode == 401) {
-        await client.post(
-          Uri.parse('$base/storage/buckets'),
-          headers: headers,
-          body: jsonEncode({'bucketId': _profileBucket, ...bucketConfig}),
-        );
+      } else {
+        print('DEBUG: AppwriteSetup: _ensureBucket error: $e');
+        rethrow;
       }
-    } catch (_) {}
+    }
   }
 
-  Future<void> _setupBackendViaRest() async {
-    final apiKey = Environment.appwriteApiKey;
-    if (apiKey.isEmpty) return;
-
-    final base = Environment.appwritePublicEndpoint;
-    final headers = {
-      'X-Appwrite-Project': Environment.appwriteProjectId,
-      'X-Appwrite-Key': apiKey,
-      'Content-Type': 'application/json',
-    };
-
+  Future<void> _ensureCollections(server.Databases db) async {
     final schema = {
       _users: {
         'name': 'Users',
@@ -156,51 +182,92 @@ class AppwriteStorageServiceImpl implements StorageService {
       },
     };
 
-    final client = http.Client();
-    try {
-      await _createBucketIfNotExists(client, base, headers);
+    final schemaTyped = Map<String, Map<String, dynamic>>.from(
+      schema.map((k, v) => MapEntry(k, Map<String, dynamic>.from(v))),
+    );
 
-      for (final entry in schema.entries) {
-        final colId = entry.key;
-        final colUrl = Uri.parse('$base/databases/$_dbId/collections/$colId');
-        final config = {
-          'name': entry.value['name'],
-          'permissions': [
+    for (final entry in schemaTyped.entries) {
+      final colId = entry.key;
+      final config = entry.value;
+
+      try {
+        print('DEBUG: AppwriteSetup: Checking collection: $colId');
+        await db.getCollection(databaseId: _dbId, collectionId: colId);
+        print('DEBUG: AppwriteSetup: Collection exists, updating: $colId');
+        await db.updateCollection(
+          databaseId: _dbId,
+          collectionId: colId,
+          name: config['name'] as String,
+          permissions: List<String>.from([
             'read("any")',
             'create("any")',
             'update("any")',
             'delete("any")',
-          ],
-          'documentSecurity': false,
-        };
-
-        final res = await client.get(colUrl, headers: headers);
-        if (res.statusCode == 200) {
-          await client.put(colUrl, headers: headers, body: jsonEncode(config));
-        } else if (res.statusCode == 404) {
-          await client.post(
-            Uri.parse('$base/databases/$_dbId/collections'),
-            headers: headers,
-            body: jsonEncode({'collectionId': colId, ...config}),
+          ]),
+          documentSecurity: false,
+          enabled: true,
+        );
+      } catch (e) {
+        final isAppwriteException =
+            e is AppwriteException || e is server.AppwriteException;
+        final dynamic err = e;
+        if (isAppwriteException && err.code == 404) {
+          print('DEBUG: AppwriteSetup: Creating new collection: $colId');
+          await db.createCollection(
+            databaseId: _dbId,
+            collectionId: colId,
+            name: config['name'] as String,
+            permissions: List<String>.from([
+              'read("any")',
+              'create("any")',
+              'update("any")',
+              'delete("any")',
+            ]),
+            documentSecurity: false,
+            enabled: true,
           );
-        }
-
-        for (final a
-            in (entry.value['attr'] as List).cast<Map<String, dynamic>>()) {
-          try {
-            await client.post(
-              Uri.parse(
-                '$base/databases/$_dbId/collections/$colId/attributes/${a['type']}',
-              ),
-              headers: headers,
-              body: jsonEncode({...a, 'required': false}),
-            );
-          } catch (_) {}
+        } else {
+          print(
+            'DEBUG: AppwriteSetup: _ensureCollections error for $colId: $e',
+          );
+          rethrow;
         }
       }
-      await Future.delayed(const Duration(seconds: 1));
-    } finally {
-      client.close();
+
+      // Add attributes
+      final List<dynamic> attrsRaw = config['attr'] as List<dynamic>;
+      final attrs = attrsRaw.map((a) => Map<String, dynamic>.from(a)).toList();
+      for (final a in attrs) {
+        try {
+          final key = a['key'] as String;
+          final type = a['type'] as String;
+          print('DEBUG: AppwriteSetup: Ensuring attribute $key in $colId');
+
+          if (type == 'string') {
+            await db.createStringAttribute(
+              databaseId: _dbId,
+              collectionId: colId,
+              key: key,
+              size: a['size'] as int,
+              xrequired: false,
+            );
+          } else if (type == 'integer') {
+            await db.createIntegerAttribute(
+              databaseId: _dbId,
+              collectionId: colId,
+              key: key,
+              xrequired: false,
+            );
+          } else if (type == 'float') {
+            await db.createFloatAttribute(
+              databaseId: _dbId,
+              collectionId: colId,
+              key: key,
+              xrequired: false,
+            );
+          }
+        } catch (_) {}
+      }
     }
   }
 

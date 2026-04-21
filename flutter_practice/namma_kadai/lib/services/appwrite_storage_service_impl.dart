@@ -61,9 +61,8 @@ class AppwriteStorageServiceImpl implements StorageService {
 
   @override
   Future<void> init() async {
-    try {
-      await _setupBackendViaRest();
-    } catch (_) {}
+    // Run setup in background to avoid blocking data fetch
+    _setupBackendViaRest();
   }
 
   Future<void> _createBucketIfNotExists(
@@ -376,36 +375,6 @@ class AppwriteStorageServiceImpl implements StorageService {
       data['dateTime'] = o.dateTime.toIso8601String();
       await _create(_orders, id, data);
     } catch (_) {}
-  }
-
-  @override
-  Future<String?> uploadProfilePhoto(String userId, String filePath) async {
-    try {
-      final file = await _storage.createFile(
-        bucketId: _profileBucket,
-        fileId: userId,
-        file: InputFile.fromPath(
-          path: filePath,
-          filename: 'profile_$userId.jpg',
-        ),
-      );
-      final url =
-          '${Environment.appwritePublicEndpoint}/storage/buckets/$_profileBucket/files/${file.$id}/view?project=${Environment.appwriteProjectId}';
-      final currentUser = await _account.get();
-      await saveUserData(
-        AuthUser(id: currentUser.$id, email: currentUser.email),
-        profileImageUrl: url,
-      );
-      return url;
-    } catch (e) {
-      if (e is AppwriteException && e.code == 409) {
-        try {
-          await _storage.deleteFile(bucketId: _profileBucket, fileId: userId);
-          return await uploadProfilePhoto(userId, filePath);
-        } catch (_) {}
-      }
-      return null;
-    }
   }
 
   @override

@@ -250,8 +250,9 @@ class LocalStorageServiceImpl implements StorageService {
       final product =
           serializers.deserializeWith(Product.serializer, data) as Product;
 
-      final json = serializers.serializeWith(Product.serializer, product)
-          as Map<String, dynamic>;
+      final json =
+          serializers.serializeWith(Product.serializer, product)
+              as Map<String, dynamic>;
 
       await db.insert('products', json);
     }
@@ -266,23 +267,14 @@ class LocalStorageServiceImpl implements StorageService {
     String? gender,
     String? profileImageUrl,
   }) async {
-    await db.insert(
-        'users',
-        {
-          'id': user.id,
-          'name': name,
-          'username': username,
-          'email': user.email,
-          'gender': gender,
-          'createdAt': DateTime.now().millisecondsSinceEpoch,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  @override
-  Future<String?> uploadProfilePhoto(String userId, String filePath) async {
-    // Local storage placeholder
-    return null;
+    await db.insert('users', {
+      'id': user.id,
+      'name': name,
+      'username': username,
+      'email': user.email,
+      'gender': gender,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
@@ -328,8 +320,9 @@ class LocalStorageServiceImpl implements StorageService {
 
   @override
   Future<void> addToCart(CartItem item) async {
-    final json = serializers.serializeWith(CartItem.serializer, item)
-        as Map<String, dynamic>;
+    final json =
+        serializers.serializeWith(CartItem.serializer, item)
+            as Map<String, dynamic>;
 
     await db.insert('cart', json, conflictAlgorithm: ConflictAlgorithm.replace);
   }
@@ -374,8 +367,9 @@ class LocalStorageServiceImpl implements StorageService {
 
   @override
   Future<void> saveOrder(Order order) async {
-    final json = serializers.serializeWith(Order.serializer, order)
-        as Map<String, dynamic>;
+    final json =
+        serializers.serializeWith(Order.serializer, order)
+            as Map<String, dynamic>;
 
     final mutable = Map<String, dynamic>.from(json);
     mutable['items'] = jsonEncode(mutable['items']);

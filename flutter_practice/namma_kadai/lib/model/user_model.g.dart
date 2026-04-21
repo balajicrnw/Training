@@ -39,6 +39,13 @@ class _$UserModelSerializer implements StructuredSerializer<UserModel> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.profileImageUrl;
+    if (value != null) {
+      result
+        ..add('profileImageUrl')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.createdAt;
     if (value != null) {
       result
@@ -76,6 +83,10 @@ class _$UserModelSerializer implements StructuredSerializer<UserModel> {
           result.gender = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'profileImageUrl':
+          result.profileImageUrl = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
         case 'createdAt':
           result.createdAt = serializers.deserialize(value,
               specifiedType: const FullType(DateTime)) as DateTime?;
@@ -97,6 +108,8 @@ class _$UserModel extends UserModel {
   @override
   final String? gender;
   @override
+  final String? profileImageUrl;
+  @override
   final DateTime? createdAt;
 
   factory _$UserModel([void Function(UserModelBuilder)? updates]) =>
@@ -107,6 +120,7 @@ class _$UserModel extends UserModel {
       required this.email,
       this.name,
       this.gender,
+      this.profileImageUrl,
       this.createdAt})
       : super._();
   @override
@@ -124,6 +138,7 @@ class _$UserModel extends UserModel {
         email == other.email &&
         name == other.name &&
         gender == other.gender &&
+        profileImageUrl == other.profileImageUrl &&
         createdAt == other.createdAt;
   }
 
@@ -134,6 +149,7 @@ class _$UserModel extends UserModel {
     _$hash = $jc(_$hash, email.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, gender.hashCode);
+    _$hash = $jc(_$hash, profileImageUrl.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -146,6 +162,7 @@ class _$UserModel extends UserModel {
           ..add('email', email)
           ..add('name', name)
           ..add('gender', gender)
+          ..add('profileImageUrl', profileImageUrl)
           ..add('createdAt', createdAt))
         .toString();
   }
@@ -170,6 +187,11 @@ class UserModelBuilder implements Builder<UserModel, UserModelBuilder> {
   String? get gender => _$this._gender;
   set gender(String? gender) => _$this._gender = gender;
 
+  String? _profileImageUrl;
+  String? get profileImageUrl => _$this._profileImageUrl;
+  set profileImageUrl(String? profileImageUrl) =>
+      _$this._profileImageUrl = profileImageUrl;
+
   DateTime? _createdAt;
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
@@ -183,6 +205,7 @@ class UserModelBuilder implements Builder<UserModel, UserModelBuilder> {
       _email = $v.email;
       _name = $v.name;
       _gender = $v.gender;
+      _profileImageUrl = $v.profileImageUrl;
       _createdAt = $v.createdAt;
       _$v = null;
     }
@@ -210,6 +233,7 @@ class UserModelBuilder implements Builder<UserModel, UserModelBuilder> {
               email, r'UserModel', 'email'),
           name: name,
           gender: gender,
+          profileImageUrl: profileImageUrl,
           createdAt: createdAt,
         );
     replace(_$result);

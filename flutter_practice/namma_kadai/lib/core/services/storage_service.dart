@@ -8,8 +8,12 @@ abstract class StorageService {
   Future<void> init();
 
   // User Data
-  Future<void> saveUserData(AuthUser user, {String? name, String? gender});
+  Future<void> saveUserData(AuthUser user,
+      {String? name, String? gender, String? profileImageUrl});
   Stream<UserModel?> getUserData(String userId);
+  Future<String?> uploadProfilePhoto(String userId, String filePath);
+  Future<String?> uploadProfilePhotoBytes(
+      String userId, List<int> bytes, String fileName);
 
   // Products
   Future<List<Product>> getProducts();

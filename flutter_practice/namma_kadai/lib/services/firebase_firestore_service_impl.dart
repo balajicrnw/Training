@@ -13,7 +13,7 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   final FirebaseFirestore _firestore;
 
   FirebaseFirestoreServiceImpl({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   static const String _usersCollection = 'users';
   static const String _ordersCollectionName = 'orders';
@@ -27,10 +27,8 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   Future<void> _seedProducts() async {
     try {
-      final snapshot = await _firestore
-          .collection(_productsCollection)
-          .limit(1)
-          .get();
+      final snapshot =
+          await _firestore.collection(_productsCollection).limit(1).get();
       if (snapshot.docs.isNotEmpty) return;
 
       final batch = _firestore.batch();
@@ -50,6 +48,7 @@ class FirebaseFirestoreServiceImpl implements StorageService {
     String? name,
     String? username,
     String? gender,
+    String? profileImageUrl,
   }) async {
     try {
       final userData = <String, dynamic>{
@@ -73,6 +72,12 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   }
 
   @override
+  Future<String?> uploadProfilePhoto(String userId, String filePath) async {
+    // Firebase implementation would use Firebase Storage
+    return null;
+  }
+
+  @override
   Stream<UserModel?> getUserData(String userId) {
     return _firestore.collection(_usersCollection).doc(userId).snapshots().map((
       doc,
@@ -85,9 +90,8 @@ class FirebaseFirestoreServiceImpl implements StorageService {
       data['id'] = doc.id;
 
       if (data['createdAt'] is Timestamp) {
-        data['createdAt'] = (data['createdAt'] as Timestamp)
-            .toDate()
-            .microsecondsSinceEpoch;
+        data['createdAt'] =
+            (data['createdAt'] as Timestamp).toDate().microsecondsSinceEpoch;
       }
 
       return serializers.deserializeWith(UserModel.serializer, data);
@@ -131,9 +135,8 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   @override
   Future<void> insertProduct(Product product) async {
     try {
-      final data =
-          serializers.serializeWith(Product.serializer, product)
-              as Map<String, dynamic>;
+      final data = serializers.serializeWith(Product.serializer, product)
+          as Map<String, dynamic>;
       if (product.id != null) {
         await _firestore
             .collection(_productsCollection)
@@ -193,9 +196,8 @@ class FirebaseFirestoreServiceImpl implements StorageService {
     if (user == null) return;
 
     try {
-      final data =
-          serializers.serializeWith(CartItem.serializer, item)
-              as Map<String, dynamic>;
+      final data = serializers.serializeWith(CartItem.serializer, item)
+          as Map<String, dynamic>;
       await _cartCollection(user.uid).doc(item.productId).set(data);
     } catch (e) {
       print('Error adding to cart: $e');
@@ -272,9 +274,8 @@ class FirebaseFirestoreServiceImpl implements StorageService {
         data['id'] = doc.id;
 
         if (data['orderDate'] is Timestamp) {
-          data['dateTime'] = (data['orderDate'] as Timestamp)
-              .toDate()
-              .microsecondsSinceEpoch;
+          data['dateTime'] =
+              (data['orderDate'] as Timestamp).toDate().microsecondsSinceEpoch;
         }
 
         return serializers.deserializeWith(Order.serializer, data)!;
@@ -291,5 +292,14 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   @override
   Order deserializeOrder(Map<String, dynamic> map) {
     return serializers.deserializeWith(Order.serializer, map) as Order;
+  }
+
+  @override
+  Future<String?> uploadProfilePhotoBytes(
+    String userId,
+    List<int> bytes,
+    String fileName,
+  ) async {
+    return null;
   }
 }

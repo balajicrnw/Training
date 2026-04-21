@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../viewmodel/view_model.dart';
 import '../core/extensions/widget_ref_extension.dart';
 import '../core/routing/route_names.dart';
 
 class ProductListScreen extends ConsumerWidget {
   const ProductListScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userState = ref.watch(authStateProvider);
     final isLoading = ref.products.isEmpty;
+
+    // Listen for error messages
+    ref.listen<String?>(appViewModelProvider.select((s) => s.errorMessage),
+        (prev, next) {
+      if (next != null && next.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        ref.read(appViewModelProvider.notifier).clearError();
+      }
+    });
 
     return Scaffold(
       body: CustomScrollView(
@@ -39,6 +54,46 @@ class ProductListScreen extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
+                      GestureDetector(
+                        onTap: () async {
+                          final picker = ImagePicker();
+                          final XFile? image = await picker.pickImage(
+                            source: ImageSource.gallery,
+                            maxWidth: 512,
+                            maxHeight: 512,
+                          );
+                          if (image != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Uploading profile photo...'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            final bytes = await image.readAsBytes();
+                            debugPrint(
+                              'DEBUG: Image picked, size: ${bytes.length} bytes',
+                            );
+                            ref
+                                .read(appViewModelProvider.notifier)
+                                .updateProfilePhoto(bytes, image.name);
+                          }
+                        },
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.white24,
+                          backgroundImage: ref.userData?.profileImageUrl != null
+                              ? NetworkImage(ref.userData!.profileImageUrl!)
+                              : null,
+                          child: ref.userData?.profileImageUrl == null
+                              ? const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 20,
+                                )
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 15),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -195,13 +250,12 @@ class ProductListScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: ['All', 'Coffee', 'Fashion', 'Electronics', 'Home']
                     .map((cat) {
-                      return _CategoryChip(
-                        label: cat,
-                        isSelected: ref.selectedCategory == cat,
-                        onTap: () => ref.notifier.updateCategory(cat),
-                      );
-                    })
-                    .toList(),
+                  return _CategoryChip(
+                    label: cat,
+                    isSelected: ref.selectedCategory == cat,
+                    onTap: () => ref.notifier.updateCategory(cat),
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -216,11 +270,11 @@ class ProductListScreen extends ConsumerWidget {
                   sliver: SliverGrid(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.7,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.7,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final product = ref.filteredProducts[index];
                       return _ProductCard(product: product);
@@ -317,7 +371,7 @@ class _ProductCard extends ConsumerWidget {
                           child: CircularProgressIndicator(
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                    loadingProgress.expectedTotalBytes!
                                 : null,
                             strokeWidth: 2,
                           ),

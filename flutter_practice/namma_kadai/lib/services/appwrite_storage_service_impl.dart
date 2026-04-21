@@ -15,36 +15,21 @@ import 'dart:convert';
 class AppwriteStorageServiceImpl implements StorageService {
   final Databases _db;
   final Account _account;
+  final Storage _storage;
 
   static const _dbId = Environment.appwriteDatabaseId;
   static const _users = Environment.appwriteUsersCollectionId;
   static const _prods = Environment.appwriteProductsCollectionId;
   static const _cart = Environment.appwriteCartCollectionId;
   static const _orders = Environment.appwriteOrdersCollectionId;
+  static const _profileBucket = Environment.appwriteProfileBucketId;
 
-  AppwriteStorageServiceImpl({Databases? databases, Account? account})
-      : _db = databases ??
-            Databases(
-              Client()
-                  .setEndpoint(Environment.appwritePublicEndpoint)
-                  .setProject(Environment.appwriteProjectId)
-                  .setSelfSigned(status: true),
-            ),
-        _account = account ??
-            Account(
-              Client()
-                  .setEndpoint(Environment.appwritePublicEndpoint)
-                  .setProject(Environment.appwriteProjectId)
-                  .setSelfSigned(status: true),
-            );
+  AppwriteStorageServiceImpl({required Client client})
+    : _db = Databases(client),
+      _account = Account(client),
+      _storage = Storage(client);
 
   Future<String> get _uid async => (await _account.get()).$id;
-
-  Future<List<String>> _p(String uid) async => [
-        Permission.read(Role.user(uid)),
-        Permission.update(Role.user(uid)),
-        Permission.delete(Role.user(uid)),
-      ];
 
   Map<String, dynamic> _data(models.Document doc) =>
       Map<String, dynamic>.from(doc.data)..['id'] = doc.$id;
@@ -58,43 +43,64 @@ class AppwriteStorageServiceImpl implements StorageService {
   Future<models.DocumentList> _list(String col, [List<String>? q]) =>
       _db.listDocuments(databaseId: _dbId, collectionId: col, queries: q);
 
-  Future<models.Document> _create(
-    String col,
-    String id,
-    Map data, [
-    List<String>? perms,
-  ]) =>
+  Future<models.Document> _create(String col, String id, Map data) =>
       _db.createDocument(
         databaseId: _dbId,
         collectionId: col,
         documentId: id,
         data: data,
-        permissions: perms,
       );
 
-  Future<models.Document> _update(
-    String col,
-    String id,
-    Map data, [
-    List<String>? perms,
-  ]) =>
+  Future<models.Document> _update(String col, String id, Map data) =>
       _db.updateDocument(
         databaseId: _dbId,
         collectionId: col,
         documentId: id,
         data: data,
-        permissions: perms,
       );
-
-  // ─── Setup ──────────────────────────────────────────────────────────────────
 
   @override
   Future<void> init() async {
     try {
       await _setupBackendViaRest();
-    } catch (e) {
-      print('CRITICAL: Appwrite Setup Error: $e');
-    }
+    } catch (_) {}
+  }
+
+  Future<void> _createBucketIfNotExists(
+    http.Client client,
+    String base,
+    Map<String, String> headers,
+  ) async {
+    try {
+      final bucketUrl = Uri.parse('$base/storage/buckets/$_profileBucket');
+      final res = await client.get(bucketUrl, headers: headers);
+
+      final bucketConfig = {
+        'name': 'Profiles',
+        'permissions': [
+          'read("any")',
+          'create("any")',
+          'update("any")',
+          'delete("any")',
+        ],
+        'fileSecurity': false,
+        'enabled': true,
+      };
+
+      if (res.statusCode == 200) {
+        await client.put(
+          bucketUrl,
+          headers: headers,
+          body: jsonEncode(bucketConfig),
+        );
+      } else if (res.statusCode == 404 || res.statusCode == 401) {
+        await client.post(
+          Uri.parse('$base/storage/buckets'),
+          headers: headers,
+          body: jsonEncode({'bucketId': _profileBucket, ...bucketConfig}),
+        );
+      }
+    } catch (_) {}
   }
 
   Future<void> _setupBackendViaRest() async {
@@ -116,6 +122,7 @@ class AppwriteStorageServiceImpl implements StorageService {
           {'key': 'email', 'type': 'string', 'size': 255},
           {'key': 'name', 'type': 'string', 'size': 255},
           {'key': 'gender', 'type': 'string', 'size': 50},
+          {'key': 'profileImageUrl', 'type': 'string', 'size': 1000},
           {'key': 'createdAt', 'type': 'integer'},
         ],
       },
@@ -152,55 +159,44 @@ class AppwriteStorageServiceImpl implements StorageService {
 
     final client = http.Client();
     try {
+      await _createBucketIfNotExists(client, base, headers);
+
       for (final entry in schema.entries) {
         final colId = entry.key;
-        final colName = entry.value['name'] as String;
-        final attrs = entry.value['attr'] as List;
         final colUrl = Uri.parse('$base/databases/$_dbId/collections/$colId');
-
         final config = {
-          'name': colName,
+          'name': entry.value['name'],
           'permissions': [
             'read("any")',
-            'create("users")',
-            'update("users")',
-            'delete("users")',
+            'create("any")',
+            'update("any")',
+            'delete("any")',
           ],
-          'documentSecurity': true,
+          'documentSecurity': false,
         };
 
         final res = await client.get(colUrl, headers: headers);
-        if (res.statusCode == 404) {
+        if (res.statusCode == 200) {
+          await client.put(colUrl, headers: headers, body: jsonEncode(config));
+        } else if (res.statusCode == 404) {
           await client.post(
             Uri.parse('$base/databases/$_dbId/collections'),
             headers: headers,
             body: jsonEncode({'collectionId': colId, ...config}),
           );
-          print(
-            'DEBUG: Created collection $colId with Document Security ENABLED.',
-          );
-        } else {
-          final cur = jsonDecode(res.body);
-          if (cur['documentSecurity'] == false) {
-            final up = await client.put(
-              colUrl,
-              headers: headers,
-              body: jsonEncode(config),
-            );
-            print(
-              'DEBUG: Updated collection $colId - Status: ${up.statusCode}. Response: ${up.body}',
-            );
-          }
         }
 
-        for (final a in attrs.cast<Map<String, dynamic>>()) {
-          await client.post(
-            Uri.parse(
-              '$base/databases/$_dbId/collections/$colId/attributes/${a['type']}',
-            ),
-            headers: headers,
-            body: jsonEncode({...a, 'required': false}),
-          );
+        for (final a
+            in (entry.value['attr'] as List).cast<Map<String, dynamic>>()) {
+          try {
+            await client.post(
+              Uri.parse(
+                '$base/databases/$_dbId/collections/$colId/attributes/${a['type']}',
+              ),
+              headers: headers,
+              body: jsonEncode({...a, 'required': false}),
+            );
+          } catch (_) {}
         }
       }
       await Future.delayed(const Duration(seconds: 1));
@@ -208,8 +204,6 @@ class AppwriteStorageServiceImpl implements StorageService {
       client.close();
     }
   }
-
-  // ─── Operations ─────────────────────────────────────────────────────────────
 
   @override
   Future<void> addToCart(CartItem item) async {
@@ -222,31 +216,12 @@ class AppwriteStorageServiceImpl implements StorageService {
         Query.equal('userId', uid),
         Query.equal('productId', item.productId),
       ]);
-      final perms = await _p(uid);
       if (res.total > 0) {
-        await _update(_cart, res.documents.first.$id, data, perms);
+        await _update(_cart, res.documents.first.$id, data);
       } else {
-        await _create(_cart, ID.unique(), data, perms);
+        await _create(_cart, ID.unique(), data);
       }
-    } catch (e) {
-      if (e is AppwriteException &&
-          e.message?.contains('any, guests') == true) {
-        print(
-          'WARNING: Document Security is not enabled on Cart. Retrying without user-specific permissions.',
-        );
-        final uid = await _uid;
-        final data = _ser(CartItem.serializer, item)
-          ..['userId'] = uid
-          ..remove('id');
-        await _create(
-          _cart,
-          ID.unique(),
-          data,
-        );
-      } else {
-        print('CRITICAL: Error adding to cart: $e');
-      }
-    }
+    } catch (_) {}
   }
 
   @override
@@ -262,9 +237,7 @@ class AppwriteStorageServiceImpl implements StorageService {
           );
         } catch (_) {}
       }
-    } catch (e) {
-      print('CRITICAL: Error clearing cart: $e');
-    }
+    } catch (_) {}
   }
 
   @override
@@ -282,30 +255,20 @@ class AppwriteStorageServiceImpl implements StorageService {
   @override
   Future<void> updateCartQuantity(String pid, int q) async {
     try {
-      final uid = await _uid;
       final res = await _list(_cart, [
-        Query.equal('userId', uid),
+        Query.equal('userId', await _uid),
         Query.equal('productId', pid),
       ]);
       if (res.total > 0)
-        await _update(
-            _cart,
-            res.documents.first.$id,
-            {
-              'quantity': q,
-            },
-            await _p(uid));
-    } catch (e) {
-      print('CRITICAL: Error updating cart quantity: $e');
-    }
+        await _update(_cart, res.documents.first.$id, {'quantity': q});
+    } catch (_) {}
   }
 
   @override
   Future<void> removeFromCart(String pid) async {
     try {
-      final uid = await _uid;
       final res = await _list(_cart, [
-        Query.equal('userId', uid),
+        Query.equal('userId', await _uid),
         Query.equal('productId', pid),
       ]);
       if (res.total > 0)
@@ -314,9 +277,7 @@ class AppwriteStorageServiceImpl implements StorageService {
           collectionId: _cart,
           documentId: res.documents.first.$id,
         );
-    } catch (e) {
-      print('CRITICAL: Error removing from cart: $e');
-    }
+    } catch (_) {}
   }
 
   @override
@@ -336,7 +297,9 @@ class AppwriteStorageServiceImpl implements StorageService {
 
   @override
   Future<void> saveProduct(Map<String, dynamic> data) async {
-    await _create(_prods, ID.unique(), data);
+    try {
+      await _create(_prods, ID.unique(), data);
+    } catch (_) {}
   }
 
   @override
@@ -360,16 +323,22 @@ class AppwriteStorageServiceImpl implements StorageService {
   }
 
   @override
-  Future<void> saveUserData(AuthUser u, {String? name, String? gender}) async {
+  Future<void> saveUserData(
+    AuthUser u, {
+    String? name,
+    String? gender,
+    String? profileImageUrl,
+  }) async {
     final data = {
       'id': u.id,
       'email': u.email,
       if (name != null) 'name': name,
       if (gender != null) 'gender': gender,
+      if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
     };
     try {
-      await _create(_users, u.id, data, await _p(u.id));
+      await _create(_users, u.id, data);
     } catch (e) {
       if (e is AppwriteException && e.code == 409) {
         await _update(
@@ -378,13 +347,7 @@ class AppwriteStorageServiceImpl implements StorageService {
           data
             ..remove('id')
             ..remove('createdAt'),
-          await _p(u.id),
         );
-      } else {
-        print('CRITICAL: Error saving user data: $e');
-        if (e.toString().contains('any, guests')) {
-          await _create(_users, u.id, data); // Fallback
-        }
       }
     }
   }
@@ -406,31 +369,73 @@ class AppwriteStorageServiceImpl implements StorageService {
   @override
   Future<void> saveOrder(Order o) async {
     try {
-      final uid = await _uid;
       final data = _ser(Order.serializer, o);
       final id = ID.unique();
       data['id'] = id;
       data['items'] = jsonEncode(data['items']);
       data['dateTime'] = o.dateTime.toIso8601String();
-      await _create(_orders, id, data, await _p(uid));
+      await _create(_orders, id, data);
+    } catch (_) {}
+  }
+
+  @override
+  Future<String?> uploadProfilePhoto(String userId, String filePath) async {
+    try {
+      final file = await _storage.createFile(
+        bucketId: _profileBucket,
+        fileId: userId,
+        file: InputFile.fromPath(
+          path: filePath,
+          filename: 'profile_$userId.jpg',
+        ),
+      );
+      final url =
+          '${Environment.appwritePublicEndpoint}/storage/buckets/$_profileBucket/files/${file.$id}/view?project=${Environment.appwriteProjectId}';
+      final currentUser = await _account.get();
+      await saveUserData(
+        AuthUser(id: currentUser.$id, email: currentUser.email),
+        profileImageUrl: url,
+      );
+      return url;
     } catch (e) {
-      print('CRITICAL: Error saving order: $e');
-      if (e.toString().contains('any, guests')) {
-        await saveOrderFallback(o);
+      if (e is AppwriteException && e.code == 409) {
+        try {
+          await _storage.deleteFile(bucketId: _profileBucket, fileId: userId);
+          return await uploadProfilePhoto(userId, filePath);
+        } catch (_) {}
       }
+      return null;
     }
   }
 
-  Future<void> saveOrderFallback(Order o) async {
+  @override
+  Future<String?> uploadProfilePhotoBytes(
+    String userId,
+    List<int> bytes,
+    String fileName,
+  ) async {
     try {
-      final data = _ser(Order.serializer, o);
-      final id = ID.unique();
-      data['id'] = id;
-      data['items'] = jsonEncode(data['items']);
-      data['dateTime'] = o.dateTime.toIso8601String();
-      await _create(_orders, id, data); // No permissions
+      final file = await _storage.createFile(
+        bucketId: _profileBucket,
+        fileId: userId,
+        file: InputFile.fromBytes(bytes: bytes, filename: fileName),
+      );
+      final url =
+          '${Environment.appwritePublicEndpoint}/storage/buckets/$_profileBucket/files/${file.$id}/view?project=${Environment.appwriteProjectId}';
+      final currentUser = await _account.get();
+      await saveUserData(
+        AuthUser(id: currentUser.$id, email: currentUser.email),
+        profileImageUrl: url,
+      );
+      return url;
     } catch (e) {
-      print("CRITICAL: Error saving order fallback: $e");
+      if (e is AppwriteException && e.code == 409) {
+        try {
+          await _storage.deleteFile(bucketId: _profileBucket, fileId: userId);
+          return await uploadProfilePhotoBytes(userId, bytes, fileName);
+        } catch (_) {}
+      }
+      return null;
     }
   }
 }

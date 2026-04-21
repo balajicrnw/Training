@@ -11,21 +11,9 @@ class AppwriteAuthServiceImpl implements AuthService {
   static const _dbId = Environment.appwriteDatabaseId;
   static const _users = Environment.appwriteUsersCollectionId;
 
-  AppwriteAuthServiceImpl({Account? account, Databases? databases})
-      : _account = account ??
-            Account(
-              Client()
-                  .setEndpoint(Environment.appwritePublicEndpoint)
-                  .setProject(Environment.appwriteProjectId)
-                  .setSelfSigned(status: true),
-            ),
-        _db = databases ??
-            Databases(
-              Client()
-                  .setEndpoint(Environment.appwritePublicEndpoint)
-                  .setProject(Environment.appwriteProjectId)
-                  .setSelfSigned(status: true),
-            ) {
+  AppwriteAuthServiceImpl({required Client client})
+    : _account = Account(client),
+      _db = Databases(client) {
     _update();
   }
 
@@ -39,7 +27,6 @@ class AppwriteAuthServiceImpl implements AuthService {
       final user = await _account.get();
       _ctrl.add(AuthUser(id: user.$id, email: user.email));
     } catch (e) {
-      print("CRITICAL: Error updating auth state: $e");
       _ctrl.add(null);
     }
   }
@@ -52,9 +39,7 @@ class AppwriteAuthServiceImpl implements AuthService {
     try {
       try {
         await _account.deleteSession(sessionId: 'current');
-      } catch (e) {
-        print("CRITICAL: Error deleting session: $e");
-      }
+      } catch (_) {}
       await _account.createEmailPasswordSession(
         email: email,
         password: password,
@@ -64,7 +49,6 @@ class AppwriteAuthServiceImpl implements AuthService {
       _ctrl.add(authUser);
       return authUser;
     } catch (e) {
-      print("CRITICAL: Error signing in: $e");
       return null;
     }
   }
@@ -73,9 +57,7 @@ class AppwriteAuthServiceImpl implements AuthService {
   Future<void> signOut() async {
     try {
       await _account.deleteSession(sessionId: 'current');
-    } catch (e) {
-      print("CRITICAL: Error signing out: $e");
-    }
+    } catch (_) {}
     _ctrl.add(null);
   }
 
@@ -105,13 +87,7 @@ class AppwriteAuthServiceImpl implements AuthService {
   @override
   Future<void> sendOtp(String email) async {
     final id = _getId(email);
-
-    final exists = await isAccountRegistered(email);
-
-    if (!exists) {
-      throw Exception("USER_NOT_FOUND");
-    }
-
+    if (!(await isAccountRegistered(email))) throw Exception("USER_NOT_FOUND");
     await _account.createEmailToken(userId: id, email: email);
   }
 
@@ -125,7 +101,6 @@ class AppwriteAuthServiceImpl implements AuthService {
       _ctrl.add(authUser);
       return authUser;
     } catch (e) {
-      print("CRITICAL: Error verifying OTP: $e");
       return null;
     }
   }
@@ -139,8 +114,7 @@ class AppwriteAuthServiceImpl implements AuthService {
         documentId: _getId(email),
       );
       return true;
-    } catch (e) {
-      print("CRITICAL: Error checking if account is registered: $e");
+    } catch (_) {
       return false;
     }
   }

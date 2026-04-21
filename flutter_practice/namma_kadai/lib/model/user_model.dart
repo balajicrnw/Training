@@ -8,6 +8,7 @@ abstract class UserModel implements Built<UserModel, UserModelBuilder> {
   String get email;
   String? get name;
   String? get gender;
+  String? get profileImageUrl;
   DateTime? get createdAt;
 
   UserModel._();

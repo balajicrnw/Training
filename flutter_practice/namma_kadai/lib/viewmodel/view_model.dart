@@ -30,12 +30,12 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
 
   AuthUser? get _currentUser => _ref.read(currentUserProvider);
 
-  StorageService get firestore => repository.firestoreService;
+  // StorageService get firestore => repository.firestoreService;
   StorageService get appwriteStore => repository.appwriteStorageService;
 
   AppNotifier({required this.repository, required Ref ref})
-    : _ref = ref,
-      super(AppState.initial()) {
+      : _ref = ref,
+        super(AppState.initial()) {
     _ref.listen<AuthUser?>(currentUserProvider, (previous, next) async {
       if (next != null) {
         startUserSubscriptions();
@@ -112,9 +112,8 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   }
 
   Future<bool> addToCart(Product product) async {
-    final existingItems = state.cartItems
-        .where((item) => item.productId == product.id)
-        .toList();
+    final existingItems =
+        state.cartItems.where((item) => item.productId == product.id).toList();
 
     if (existingItems.isNotEmpty) {
       final existingItem = existingItems.first;
@@ -158,22 +157,20 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     if (uid == null) return;
 
     _ordersSubscription?.cancel();
-    _ordersSubscription = appwriteStore
-        .getOrders(uid)
-        .listen(
-          (orders) {
-            final sortedOrders = orders.toList()
-              ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
-            state = state.rebuild(
-              (b) => b..orders = ListBuilder<Order>(sortedOrders),
-            );
-          },
-          onError: (error) {
-            state = state.rebuild(
-              (b) => b..errorMessage = 'Failed to load orders: $error',
-            );
-          },
+    _ordersSubscription = appwriteStore.getOrders(uid).listen(
+      (orders) {
+        final sortedOrders = orders.toList()
+          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+        state = state.rebuild(
+          (b) => b..orders = ListBuilder<Order>(sortedOrders),
         );
+      },
+      onError: (error) {
+        state = state.rebuild(
+          (b) => b..errorMessage = 'Failed to load orders: $error',
+        );
+      },
+    );
   }
 
   Future<void> loadUserData() async {
@@ -181,20 +178,18 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
     if (uid == null) return;
 
     _userDataSubscription?.cancel();
-    _userDataSubscription = appwriteStore
-        .getUserData(uid)
-        .listen(
-          (userData) {
-            if (userData != null) {
-              state = state.rebuild((b) => b..userData = userData.toBuilder());
-            }
-          },
-          onError: (error) {
-            state = state.rebuild(
-              (b) => b..errorMessage = 'Failed to load user data: $error',
-            );
-          },
+    _userDataSubscription = appwriteStore.getUserData(uid).listen(
+      (userData) {
+        if (userData != null) {
+          state = state.rebuild((b) => b..userData = userData.toBuilder());
+        }
+      },
+      onError: (error) {
+        state = state.rebuild(
+          (b) => b..errorMessage = 'Failed to load user data: $error',
         );
+      },
+    );
   }
 
   Future<void> placeOrder() async {
@@ -228,8 +223,8 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
         ..isLoading = true,
     );
     try {
-      final registered = await repository.appwriteAuthService
-          .isAccountRegistered(email);
+      final registered =
+          await repository.appwriteAuthService.isAccountRegistered(email);
       if (!registered) {
         state = state.rebuild(
           (b) => b
@@ -358,6 +353,22 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
       );
     } catch (e) {
       state = state.rebuild((b) => b..errorMessage = 'Seeding failed: $e');
+    }
+  }
+
+  Future<void> updateProfilePhoto(List<int> bytes, String fileName) async {
+    final uid = _currentUser?.id;
+    if (uid == null) return;
+
+    state = state.rebuild((b) => b..isLoading = true);
+    try {
+      await appwriteStore.uploadProfilePhotoBytes(uid, bytes, fileName);
+    } catch (e) {
+      state = state.rebuild(
+        (b) => b..errorMessage = 'Error uploading photo: $e',
+      );
+    } finally {
+      state = state.rebuild((b) => b..isLoading = false);
     }
   }
 

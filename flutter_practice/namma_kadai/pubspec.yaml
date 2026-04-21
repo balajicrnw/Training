@@ -47,6 +47,7 @@ dependencies:
   patrol: ^4.3.0
   appwrite: ^23.1.0
   http: ^1.2.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

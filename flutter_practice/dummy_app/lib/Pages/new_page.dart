@@ -21,8 +21,8 @@ class _NewPageState extends State<NewPage> {
     controller = VideoPlayerController.asset('assets/background.mp4')
       ..initialize().then((_) {
         setState(() {});
-        controller.setLooping(true); // 🔁 loop
-        controller.setVolume(0);     // 🔇 mute
+        controller.setLooping(true); 
+        controller.setVolume(0);     
         controller.play();
       });
   }
@@ -62,7 +62,7 @@ class _NewPageState extends State<NewPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      const SelectableText(
                         "This is a new page",
                         style: TextStyle(
                           color: Colors.white,

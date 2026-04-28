@@ -1,62 +1,64 @@
 import 'dart:async';
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart' as models;
 import 'package:namma_kadai/core/services/auth_service.dart';
 import '../config/environment.dart';
 
 class AppwriteAuthServiceImpl implements AuthService {
   final Account _account;
-  final Databases _db;
-  final _ctrl = StreamController<AuthUser?>.broadcast();
+  final StreamController<AuthUser?> _authStateController =
+      StreamController<AuthUser?>.broadcast();
 
-  static const _dbId = Environment.appwriteDatabaseId;
-  static const _users = Environment.appwriteUsersCollectionId;
-
-  AppwriteAuthServiceImpl({required Client client})
-    : _account = Account(client),
-      _db = Databases(client) {
-    _update();
+  AppwriteAuthServiceImpl({Account? account})
+    : _account =
+          account ??
+          Account(
+            Client()
+                .setEndpoint(Environment.appwritePublicEndpoint)
+                .setProject(Environment.appwriteProjectId)
+                .setSelfSigned(status: true),
+          ) {
+    _updateAuthState();
   }
 
-  String _getId(String email) {
-    final id = email.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_').toLowerCase();
-    return id.substring(0, id.length > 36 ? 36 : id.length);
-  }
-
-  Future<void> _update() async {
+  Future<void> _updateAuthState() async {
     try {
       final user = await _account.get();
-      _ctrl.add(AuthUser(id: user.$id, email: user.email));
-    } catch (e) {
-      _ctrl.add(null);
+      _authStateController.add(_mapUser(user));
+    } catch (_) {
+      _authStateController.add(null);
     }
   }
 
+  AuthUser? _mapUser(models.User? user) {
+    if (user == null) return null;
+    return AuthUser(id: user.$id, email: user.email);
+  }
+
   @override
-  Stream<AuthUser?> authStateChanges() => _ctrl.stream;
+  Stream<AuthUser?> authStateChanges() => _authStateController.stream;
 
   @override
   Future<AuthUser?> signIn(String email, String password) async {
     try {
-      print('DEBUG: AppwriteAuth: Attempting signIn for $email');
       try {
+        await _account.getSession(sessionId: 'current');
         await _account.deleteSession(sessionId: 'current');
-        print('DEBUG: AppwriteAuth: Previous session deleted');
-      } catch (_) {}
+      } catch (_) {
+        // No active session, ignore
+      }
 
-      final session = await _account.createEmailPasswordSession(
+      await _account.createEmailPasswordSession(
         email: email,
         password: password,
       );
-      print('DEBUG: AppwriteAuth: Session created: ${session.$id}');
 
       final user = await _account.get();
-      print('DEBUG: AppwriteAuth: User fetched: ${user.$id}');
-
-      final authUser = AuthUser(id: user.$id, email: user.email);
-      _ctrl.add(authUser);
+      final authUser = _mapUser(user);
+      _authStateController.add(authUser);
       return authUser;
-    } catch (e) {
-      print('DEBUG: AppwriteAuth: signIn error: $e');
+    } on AppwriteException catch (e) {
+      print("Appwrite Sign In Error: ${e.code} - ${e.message}");
       return null;
     }
   }
@@ -66,77 +68,98 @@ class AppwriteAuthServiceImpl implements AuthService {
     try {
       await _account.deleteSession(sessionId: 'current');
     } catch (_) {}
-    _ctrl.add(null);
+    _authStateController.add(null);
   }
 
   @override
-  Future<AuthUser?> signUp(
-    String email,
-    String password, {
-    String? name,
-  }) async {
-    if (password.length < 8)
-      throw Exception('Password must be at least 8 chars.');
+  Future<AuthUser?> signUp(String email, String password) async {
+    if (password.length < 8) {
+      throw Exception('Password must be at least 8 characters long.');
+    }
+
     try {
-      final id = _getId(email);
-      print(
-        'DEBUG: AppwriteAuth: Attempting to create account for $email with ID: $id',
-      );
+      // Use sanitized email as userId for consistency
+      final userId = email
+          .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')
+          .toLowerCase();
+
       await _account.create(
-        userId: id,
+        userId: userId.substring(0, userId.length > 36 ? 36 : userId.length),
         email: email,
         password: password,
-        name: name,
       );
-      print('DEBUG: AppwriteAuth: Account created successfully for $email');
+
+      // auto login after signup
       return await signIn(email, password);
     } on AppwriteException catch (e) {
-      print('DEBUG: AppwriteAuth: signUp error: ${e.code} - ${e.message}');
+      print("Appwrite Sign Up Error: ${e.code} - ${e.message}");
       if (e.code == 409) {
-        print(
-          'DEBUG: AppwriteAuth: Account already exists, attempting sign in.',
-        );
+        // If user exists, try to log in
         return await signIn(email, password);
       }
-      rethrow;
-    } catch (e) {
-      print('DEBUG: AppwriteAuth: signUp unexpected error: $e');
       rethrow;
     }
   }
 
   @override
   Future<void> sendOtp(String email) async {
-    final id = _getId(email);
-    if (!(await isAccountRegistered(email))) throw Exception("USER_NOT_FOUND");
-    await _account.createEmailToken(userId: id, email: email);
+    try {
+      // Standardize userId: sanitized, lowercase, max 36 chars
+      final userId = email
+          .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')
+          .toLowerCase();
+      final finalUserId = userId.substring(
+        0,
+        userId.length > 36 ? 36 : userId.length,
+      );
+
+      try {
+        await _account.create(
+          userId: finalUserId,
+          email: email,
+          password: ID.unique(), // Placeholder
+        );
+        print("DEBUG: Created new placeholder account for OTP: $finalUserId");
+      } catch (e) {
+        // User likely exists, ignore
+        print("DEBUG: User exists or error during placeholder creation: $e");
+      }
+
+      await _account.createEmailToken(userId: finalUserId, email: email);
+      print("Appwrite OTP Sent to: $email (ID: $finalUserId)");
+    } on AppwriteException catch (e) {
+      print("Appwrite Send OTP Error: ${e.code} - ${e.message}");
+      rethrow;
+    }
   }
 
   @override
   Future<AuthUser?> verifyOtp(String email, String otp) async {
     try {
-      final id = _getId(email);
-      await _account.createSession(userId: id, secret: otp);
+      final userId = email
+          .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')
+          .toLowerCase();
+      final finalUserId = userId.substring(
+        0,
+        userId.length > 36 ? 36 : userId.length,
+      );
+
+      print("DEBUG: Verifying OTP for $email (ID: $finalUserId)");
+
+      await _account.createSession(userId: finalUserId, secret: otp);
+
       final user = await _account.get();
-      final authUser = AuthUser(id: user.$id, email: user.email);
-      _ctrl.add(authUser);
+      final authUser = _mapUser(user);
+      _authStateController.add(authUser);
       return authUser;
-    } catch (e) {
+    } on AppwriteException catch (e) {
+      print("Appwrite Verify OTP Error: ${e.code} - ${e.message}");
       return null;
     }
   }
-
+  
   @override
-  Future<bool> isAccountRegistered(String email) async {
-    try {
-      await _db.getDocument(
-        databaseId: _dbId,
-        collectionId: _users,
-        documentId: _getId(email),
-      );
-      return true;
-    } catch (_) {
-      return false;
-    }
+  Future<bool> isAccountRegistered(String email) {
+    throw UnimplementedError();
   }
 }

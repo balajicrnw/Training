@@ -26,10 +26,10 @@ class AppwriteStorageServiceImpl implements StorageService {
   static const _profileBucket = Environment.appwriteProfileBucketId;
 
   AppwriteStorageServiceImpl({required Client client})
-    : _client = client,
-      _db = Databases(client),
-      _account = Account(client),
-      _storage = Storage(client);
+      : _client = client,
+        _db = Databases(client),
+        _account = Account(client),
+        _storage = Storage(client);
 
   Future<String> get _uid async => (await _account.get()).$id;
 
@@ -70,70 +70,55 @@ class AppwriteStorageServiceImpl implements StorageService {
   Future<void> _setupBackend() async {
     final apiKey = Environment.appwriteApiKey;
     if (apiKey.isEmpty) return;
+
+    final serverClient = server.Client()
+        .setEndpoint(Environment.appwritePublicEndpoint)
+        .setProject(Environment.appwriteProjectId)
+        .setKey(apiKey);
+
+    final serverDb = server.Databases(serverClient);
+    final serverStorage = server.Storage(serverClient);
+
     try {
-      print('DEBUG: AppwriteSetup: Initializing server client...');
-      final serverClient = server.Client()
-          .setEndpoint(Environment.appwritePublicEndpoint)
-          .setProject(Environment.appwriteProjectId)
-          .setKey(apiKey);
-
-      final serverDb = server.Databases(serverClient);
-      final serverStorage = server.Storage(serverClient);
-
-      print('DEBUG: AppwriteSetup: Ensuring storage bucket...');
-      // 1. Create/Update Profile Bucket
       await _ensureBucket(serverStorage);
-
-      print('DEBUG: AppwriteSetup: Ensuring collections...');
-      // 2. Create/Update Collections and Attributes
       await _ensureCollections(serverDb);
 
-      print('DEBUG: AppwriteSetup: Setup completed successfully');
       await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
-      print('DEBUG: AppwriteSetup: Fatal error: $e');
+      print('Appwrite setup error: $e');
     }
   }
 
   Future<void> _ensureBucket(server.Storage storage) async {
     final bucketId = _profileBucket;
     try {
-      print('DEBUG: AppwriteSetup: Checking bucket: $bucketId');
       await storage.getBucket(bucketId: bucketId);
-      print('DEBUG: AppwriteSetup: Bucket exists, updating...');
       await storage.updateBucket(
         bucketId: bucketId,
         name: 'Profiles',
-        permissions: List<String>.from([
+        permissions: [
           'read("any")',
           'create("any")',
           'update("any")',
           'delete("any")',
-        ]),
+        ],
         fileSecurity: false,
         enabled: true,
       );
     } catch (e) {
-      final isAppwriteException =
-          e is AppwriteException || e is server.AppwriteException;
-      final dynamic err = e;
-      if (isAppwriteException && (err.code == 404 || err.code == 401)) {
-        print('DEBUG: AppwriteSetup: Creating new bucket: $bucketId');
+      if (e is AppwriteException && (e.code == 404 || e.code == 401)) {
         await storage.createBucket(
           bucketId: bucketId,
           name: 'Profiles',
-          permissions: List<String>.from([
+          permissions: [
             'read("any")',
             'create("any")',
             'update("any")',
             'delete("any")',
-          ]),
+          ],
           fileSecurity: false,
           enabled: true,
         );
-      } else {
-        print('DEBUG: AppwriteSetup: _ensureBucket error: $e');
-        rethrow;
       }
     }
   }
@@ -182,66 +167,49 @@ class AppwriteStorageServiceImpl implements StorageService {
       },
     };
 
-    final schemaTyped = Map<String, Map<String, dynamic>>.from(
-      schema.map((k, v) => MapEntry(k, Map<String, dynamic>.from(v))),
-    );
-
-    for (final entry in schemaTyped.entries) {
+    for (final entry in schema.entries) {
       final colId = entry.key;
       final config = entry.value;
 
       try {
-        print('DEBUG: AppwriteSetup: Checking collection: $colId');
         await db.getCollection(databaseId: _dbId, collectionId: colId);
-        print('DEBUG: AppwriteSetup: Collection exists, updating: $colId');
         await db.updateCollection(
           databaseId: _dbId,
           collectionId: colId,
           name: config['name'] as String,
-          permissions: List<String>.from([
+          permissions: [
             'read("any")',
             'create("any")',
             'update("any")',
             'delete("any")',
-          ]),
+          ],
           documentSecurity: false,
           enabled: true,
         );
       } catch (e) {
-        final isAppwriteException =
-            e is AppwriteException || e is server.AppwriteException;
-        final dynamic err = e;
-        if (isAppwriteException && err.code == 404) {
-          print('DEBUG: AppwriteSetup: Creating new collection: $colId');
+        if (e is AppwriteException && e.code == 404) {
           await db.createCollection(
             databaseId: _dbId,
             collectionId: colId,
             name: config['name'] as String,
-            permissions: List<String>.from([
+            permissions: [
               'read("any")',
               'create("any")',
               'update("any")',
               'delete("any")',
-            ]),
+            ],
             documentSecurity: false,
             enabled: true,
           );
-        } else {
-          print(
-            'DEBUG: AppwriteSetup: _ensureCollections error for $colId: $e',
-          );
-          rethrow;
         }
       }
 
       // Add attributes
-      final List<dynamic> attrsRaw = config['attr'] as List<dynamic>;
-      final attrs = attrsRaw.map((a) => Map<String, dynamic>.from(a)).toList();
+      final attrs = config['attr'] as List<Map<String, dynamic>>;
       for (final a in attrs) {
         try {
           final key = a['key'] as String;
           final type = a['type'] as String;
-          print('DEBUG: AppwriteSetup: Ensuring attribute $key in $colId');
 
           if (type == 'string') {
             await db.createStringAttribute(

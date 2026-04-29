@@ -13,6 +13,7 @@ dependencies:
   built_collection: ^5.1.1
   package_practice:
     path: ../../flutter_practice/package_practice
+  rxdart: ^0.28.0
   # path: ^1.8.0
 
 dev_dependencies:

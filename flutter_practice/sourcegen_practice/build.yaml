@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      sourcegen_practice:
+        generate_for:
+          - lib/**.dart
+
+builders:
+  sourcegen_practice:
+    import: "package:sourcegen_practice/builder.dart"
+    builder_factories: ["helloBuilder"]
+    build_extensions: {".dart": [".g.dart"]}
+    auto_apply: root_package
+    build_to: source

@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      sourcegen_calculator:
+        generate_for:
+          - lib/**.dart
+
+builders:
+  sourcegen_calculator:
+    import: "package:sourcegen_calculator/builder.dart"
+    builder_factories: ["operationBuilder"]
+    build_extensions: {".dart": [".g.dart"]}
+    auto_apply: root_package
+    build_to: source

@@ -8,7 +8,17 @@ targets:
 builders:
   sourcegen_practice:
     import: "package:sourcegen_practice/builder.dart"
-    builder_factories: ["helloBuilder"]
-    build_extensions: {".dart": [".g.dart"]}
+
+    builder_factories:
+      - "sharedBuilder"
+
+    build_extensions:
+      ".dart":
+        - ".sourcegen_practice.g.part"
+
     auto_apply: root_package
-    build_to: source
+    build_to: cache
+
+    applies_builders:
+      - source_gen|combining_builder
+  

@@ -1,23 +1,23 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'math_operation.dart';
+part of 'math_operation2.dart';
 
 // **************************************************************************
-// OperationGenerator
+// Generator: OperationGenerator1
 // **************************************************************************
 
-String addExpression(int a, int b) {
+String addExpression1(int a, int b) {
   return '$a + $b = ${a + b}';
 }
 
-String subtractExpression(int a, int b) {
+String subtractExpression1(int a, int b) {
   return '$a - $b = ${a - b}';
 }
 
-String multiplyExpression(int a, int b) {
+String multiplyExpression1(int a, int b) {
   return '$a * $b = ${a * b}';
 }
 
-String divideExpression(int a, int b) {
+String divideExpression1(int a, int b) {
   return '$a / $b = ${a / b}';
 }

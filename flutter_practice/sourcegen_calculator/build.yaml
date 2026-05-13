@@ -8,7 +8,11 @@ targets:
 builders:
   sourcegen_calculator:
     import: "package:sourcegen_calculator/builder.dart"
-    builder_factories: ["operationBuilder"]
-    build_extensions: {".dart": [".g.dart"]}
+    builder_factories: ["sharedBuilder"]
+    build_extensions:
+           ".dart": [".sourcegen_calculator.g.part"]
     auto_apply: root_package
-    build_to: source
+    build_to: cache
+
+    applies_builders:
+      - source_gen|combining_builder

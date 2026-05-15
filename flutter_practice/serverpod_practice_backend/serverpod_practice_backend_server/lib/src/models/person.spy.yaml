@@ -1,0 +1,9 @@
+class: Person
+table: persons
+
+fields:
+  name: String
+  age: int
+  city: String
+  favoriteColor: String
+  profession: String

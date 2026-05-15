@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "serverpod_practice_backend_flutter",
+            "cwd": "${workspaceFolder}/serverpod_practice_backend_flutter",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "serverpod_practice_backend_server",
+            "cwd": "${workspaceFolder}/serverpod_practice_backend_server",
+            "request": "launch",
+            "type": "dart",
+            "preLaunchTask": "docker_compose_up",
+            "program": "bin/main.dart",
+            "env": {
+                "SERVERPOD_PASSWORD_database": "s6fIKQE2qumZdBXn4zIPppimjPhRH80E"
+            },
+            "args": [
+                "--apply-migrations"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "serverpod_practice_backend (full stack)",
+            "configurations": [
+                "serverpod_practice_backend_server",
+                "serverpod_practice_backend_flutter"
+            ],
+            "presentation": {
+                "order": 1
+            }
+        }
+    ]
+}

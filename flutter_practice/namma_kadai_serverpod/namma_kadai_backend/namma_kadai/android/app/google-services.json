@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "588478581327",
+    "project_id": "namma-kadai-d7220",
+    "storage_bucket": "namma-kadai-d7220.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:588478581327:android:5c9901012a00ece9c9783a",
+        "android_client_info": {
+          "package_name": "com.nammakadai.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1X7GmIF2vMiowPGCtZYlWbIAoNh-HtSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

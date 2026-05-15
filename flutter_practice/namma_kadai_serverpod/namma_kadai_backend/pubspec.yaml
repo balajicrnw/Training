@@ -1,0 +1,11 @@
+name: _
+publish_to: none
+
+environment:
+  sdk: '^3.8.0'
+
+workspace:
+  - namma_kadai_backend_client
+  - namma_kadai_backend_server
+  - namma_kadai_backend_flutter
+

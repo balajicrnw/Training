@@ -1,0 +1,37 @@
+default_platform(:android)
+
+platform :android do
+
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Build and upload to Firebase"
+  lane :firebase do
+    build_android_app(
+      task: "assemble",
+      build_type: "Release",
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => "D:/Training/flutter_practice/namma_kadai/android/app/keystore.jks",
+       
+      }
+      
+    )
+
+    firebase_app_distribution(
+      app: "1:588478581327:android:5c9901012a00ece9c9783a",
+      testers: "shravani.s@nativewit.in",
+      apk_path: "../build/app/outputs/apk/release/app-release.apk"
+      
+    )
+  end
+
+  desc "Deploy to Google Play"
+  lane :deploy do
+    gradle(task: "clean assembleRelease")
+    upload_to_play_store
+  end
+
+end

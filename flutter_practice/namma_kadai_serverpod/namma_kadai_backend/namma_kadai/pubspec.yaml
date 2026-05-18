@@ -49,6 +49,11 @@ dependencies:
   dart_appwrite: ^12.1.0
   http: ^1.2.1
   image_picker: ^1.1.2
+  serverpod_flutter: 3.4.8
+  namma_kadai_shared:
+    path: ../namma_kadai_shared
+  namma_kadai_backend_client:
+    path: ../namma_kadai_backend_client
 
 dev_dependencies:
   flutter_test:

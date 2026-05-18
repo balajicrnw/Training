@@ -1,36 +1,34 @@
-import 'package:namma_kadai/services/firebase_firestore_service_impl.dart';
 import 'package:serverpod/serverpod.dart';
+import '../namma_kadai_services/api_impl.dart';
 
 class FirestoreEndpoint extends Endpoint {
-  final firebase = FirebaseFirestoreServiceImpl();
+  final api = ApiImpl();
 
   Future<void> seedProducts(Session session) async {
-    await firebase.seedProducts();
+    await api.seedProducts();
   }
 
-  // Product operations
   Future<void> createProduct(Session session, Map<String, dynamic> data) async {
-    await firebase.saveProduct(data);
+    await api.saveProduct(data);
   }
 
   Future<void> updateProduct(Session session, Map<String, dynamic> data) async {
-    await firebase.saveProduct(data);
+    await api.saveProduct(data);
   }
 
   Future<void> deleteProduct(Session session, String id) async {
-    await firebase.deleteProduct(id);
+    await api.deleteProduct(id);
   }
 
-  // Cart operations
   Future<void> updateCartQuantity(Session session, String productId, int quantity) async {
-    await firebase.updateCartQuantity(productId, quantity);
+    await api.updateCartQuantity(productId, quantity);
   }
 
   Future<void> removeFromCart(Session session, String productId) async {
-    await firebase.removeFromCart(productId);
+    await api.removeFromCart(productId);
   }
 
   Future<void> clearCart(Session session) async {
-    await firebase.clearCart();
+    await api.clearCart();
   }
 }

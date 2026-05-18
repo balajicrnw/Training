@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
-import 'package:namma_kadai/core/services/auth_service.dart';
+import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 
 class AuthServiceImpl implements AuthService {
   final FirebaseAuth _firebaseAuth;
@@ -67,11 +67,5 @@ class AuthServiceImpl implements AuthService {
   @override
   Future<AuthUser?> verifyOtp(String email, String otp) async {
     throw UnimplementedError('OTP not supported for Firebase in this project');
-  }
-
-  @override
-  Future<bool> isAccountRegistered(String email) async {
-    // For now, return false or throw error since Firebase OTP is not used
-    return false;
   }
 }

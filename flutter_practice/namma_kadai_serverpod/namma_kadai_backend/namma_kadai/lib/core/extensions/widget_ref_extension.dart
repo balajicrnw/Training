@@ -1,11 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../model/app_state.dart';
-import '../../model/order.dart';
-import '../../model/product.dart';
-import '../../model/cart_item.dart';
-import '../../model/user_model.dart';
+import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 import '../../viewmodel/view_model.dart';
-import '../../model/auth_user.dart';
 
 extension AppProviderShortcuts on WidgetRef {
 

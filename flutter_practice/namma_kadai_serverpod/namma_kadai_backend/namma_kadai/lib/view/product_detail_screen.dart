@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../model/product.dart';
+import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 import '../viewmodel/view_model.dart';
 
 class ProductDetailScreen extends ConsumerWidget {

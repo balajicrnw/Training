@@ -351,6 +351,11 @@ class Endpoints extends _i1.EndpointDispatch {
         'updateCartQuantity': _i1.MethodConnector(
           name: 'updateCartQuantity',
           params: {
+            'userId': _i1.ParameterDescription(
+              name: 'userId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'productId': _i1.ParameterDescription(
               name: 'productId',
               type: _i1.getType<String>(),
@@ -369,6 +374,7 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
                   .updateCartQuantity(
                     session,
+                    params['userId'],
                     params['productId'],
                     params['quantity'],
                   ),
@@ -376,6 +382,11 @@ class Endpoints extends _i1.EndpointDispatch {
         'removeFromCart': _i1.MethodConnector(
           name: 'removeFromCart',
           params: {
+            'userId': _i1.ParameterDescription(
+              name: 'userId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'productId': _i1.ParameterDescription(
               name: 'productId',
               type: _i1.getType<String>(),
@@ -389,18 +400,28 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
                   .removeFromCart(
                     session,
+                    params['userId'],
                     params['productId'],
                   ),
         ),
         'clearCart': _i1.MethodConnector(
           name: 'clearCart',
-          params: {},
+          params: {
+            'userId': _i1.ParameterDescription(
+              name: 'userId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .clearCart(session),
+              ) async =>
+                  (endpoints['firestore'] as _i5.FirestoreEndpoint).clearCart(
+                    session,
+                    params['userId'],
+                  ),
         ),
       },
     );

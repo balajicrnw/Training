@@ -5,13 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:namma_kadai/core/mixins/exception_handler_mixin.dart';
-import 'package:namma_kadai/core/services/auth_service.dart';
-import 'package:namma_kadai/core/services/storage_service.dart';
 
-import '../model/app_state.dart';
-import '../model/cart_item.dart';
-import '../model/order.dart';
-import '../model/product.dart';
+import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 import '../repository/app_repository.dart';
 
 final appViewModelProvider =
@@ -31,7 +26,6 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
   StorageService get storageService => repository.storageService;
 
   AuthService get authService => repository.authService;
-
 
   AppNotifier({
     required this.repository,

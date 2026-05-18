@@ -8,6 +8,7 @@ import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
 import 'src/web/routes/app_config_route.dart';
 import 'src/web/routes/root.dart';
+import 'src/web/routes/firestore_api_route.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
@@ -15,15 +16,11 @@ void run(List<String> args) async {
   final pod = Serverpod(args, Protocol(), Endpoints());
 
   // Initialize authentication services for the server.
-  // Token managers will be used to validate and issue authentication keys,
-  // and the identity providers will be the authentication options available for users.
   pod.initializeAuthServices(
     tokenManagerBuilders: [
-      // Use JWT for authentication keys towards the server.
       JwtConfigFromPasswords(),
     ],
     identityProviderBuilders: [
-      // Configure the email identity provider for email/password authentication.
       EmailIdpConfigFromPasswords(
         sendRegistrationVerificationCode: _sendRegistrationCode,
         sendPasswordResetVerificationCode: _sendPasswordResetCode,
@@ -32,9 +29,25 @@ void run(List<String> args) async {
   );
 
   // Setup a default page at the web root.
-  // These are used by the default page.
   pod.webServer.addRoute(RootRoute(), '/');
   pod.webServer.addRoute(RootRoute(), '/index.html');
+
+  // Register Firestore API Routes
+  final firestoreRoute = FirestoreApiRoute();
+  pod.webServer.addRoute(firestoreRoute, '/seedProducts');
+  pod.webServer.addRoute(firestoreRoute, '/createProduct');
+  pod.webServer.addRoute(firestoreRoute, '/updateProduct');
+  pod.webServer.addRoute(firestoreRoute, '/deleteProduct');
+  pod.webServer.addRoute(firestoreRoute, '/updateCartQuantity');
+  pod.webServer.addRoute(firestoreRoute, '/removeFromCart');
+  pod.webServer.addRoute(firestoreRoute, '/clearCart');
+  pod.webServer.addRoute(firestoreRoute, '/getProducts');
+  pod.webServer.addRoute(firestoreRoute, '/getUserData');
+  pod.webServer.addRoute(firestoreRoute, '/getCartItems');
+  pod.webServer.addRoute(firestoreRoute, '/getOrders');
+  pod.webServer.addRoute(firestoreRoute, '/saveUserData');
+  pod.webServer.addRoute(firestoreRoute, '/saveOrder');
+  pod.webServer.addRoute(firestoreRoute, '/addToCart');
 
   // Serve all files in the web/static relative directory under /.
   // These are used by the default web page.

@@ -1,19 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
-import '../core/services/storage_service.dart';
-import '../core/services/auth_service.dart';
-import '../model/order.dart';
-import '../model/user_model.dart';
-import '../model/serializers.dart';
-import '../model/product.dart';
-import '../model/cart_item.dart';
-import '../data/product_seed_data.dart';
+import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 
-class FirebaseFirestoreServiceImpl implements StorageService {
-  final FirebaseFirestore _firestore;
+class ApiImpl implements StorageService {
+  final dynamic _firestore;
+  String? currentUserId; // Set this before calling cart methods
 
-  FirebaseFirestoreServiceImpl({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+  ApiImpl({dynamic firestore}) : _firestore = firestore;
 
   static const String _usersCollection = 'users';
   static const String _ordersCollectionName = 'orders';
@@ -22,10 +13,11 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   @override
   Future<void> init() async {
-    await _seedProducts();
+    await seedProducts();
   }
 
-  Future<void> _seedProducts() async {
+  @override
+  Future<void> seedProducts() async {
     try {
       final snapshot = await _firestore
           .collection(_productsCollection)
@@ -58,7 +50,7 @@ class FirebaseFirestoreServiceImpl implements StorageService {
         'name': name,
         'username': username,
         'gender': gender,
-        'createdAt': FieldValue.serverTimestamp(),
+        'createdAt': DateTime.now(),
       };
 
       userData.removeWhere((key, value) => value == null);
@@ -66,7 +58,7 @@ class FirebaseFirestoreServiceImpl implements StorageService {
       await _firestore
           .collection(_usersCollection)
           .doc(user.id)
-          .set(userData, SetOptions(merge: true));
+          .set(userData, {'merge': true});
     } catch (e) {
       print('Error saving user data: $e');
       rethrow;
@@ -75,22 +67,10 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   @override
   Stream<UserModel?> getUserData(String userId) {
-    return _firestore.collection(_usersCollection).doc(userId).snapshots().map((
-      doc,
-    ) {
+    return _firestore.collection(_usersCollection).doc(userId).snapshots().map((doc) {
       if (!doc.exists || doc.data() == null) return null;
-
-      final data = Map<String, dynamic>.from(
-        doc.data() as Map<String, dynamic>,
-      );
+      final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
       data['id'] = doc.id;
-
-      if (data['createdAt'] is Timestamp) {
-        data['createdAt'] = (data['createdAt'] as Timestamp)
-            .toDate()
-            .microsecondsSinceEpoch;
-      }
-
       return serializers.deserializeWith(UserModel.serializer, data);
     });
   }
@@ -100,9 +80,7 @@ class FirebaseFirestoreServiceImpl implements StorageService {
     try {
       final snapshot = await _firestore.collection(_productsCollection).get();
       return snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(
-          doc.data() as Map<String, dynamic>,
-        );
+        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
         data['id'] = doc.id;
         return serializers.deserializeWith(Product.serializer, data) as Product;
       }).toList();
@@ -123,18 +101,9 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   }
 
   @override
-  Future<void> seedProducts() async {
-    for (final p in kProductSeedData) {
-      await saveProduct(Map<String, dynamic>.from(p));
-    }
-  }
-
-  @override
   Future<void> insertProduct(Product product) async {
     try {
-      final data =
-          serializers.serializeWith(Product.serializer, product)
-              as Map<String, dynamic>;
+      final data = serializers.serializeWith(Product.serializer, product) as Map<String, dynamic>;
       if (product.id != null) {
         await _firestore
             .collection(_productsCollection)
@@ -159,28 +128,23 @@ class FirebaseFirestoreServiceImpl implements StorageService {
     }
   }
 
-  CollectionReference _cartCollection(String userId) =>
+  dynamic _cartCollection(String userId) =>
       _firestore.collection(_usersCollection).doc(userId).collection('cart');
 
-  CollectionReference _ordersCollection(String userId) => _firestore
+  dynamic _ordersCollection(String userId) => _firestore
       .collection(_usersCollection)
       .doc(userId)
       .collection(_ordersCollectionName);
 
   @override
   Future<List<CartItem>> getCartItems() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return [];
-
+    if (currentUserId == null) return [];
     try {
-      final snapshot = await _cartCollection(user.uid).get();
+      final snapshot = await _cartCollection(currentUserId!).get();
       return snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(
-          doc.data() as Map<String, dynamic>,
-        );
+        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
         data['id'] = doc.id;
-        return serializers.deserializeWith(CartItem.serializer, data)
-            as CartItem;
+        return serializers.deserializeWith(CartItem.serializer, data) as CartItem;
       }).toList();
     } catch (e) {
       print('Error fetching cart items: $e');
@@ -190,14 +154,10 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   @override
   Future<void> addToCart(CartItem item) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (currentUserId == null) return;
     try {
-      final data =
-          serializers.serializeWith(CartItem.serializer, item)
-              as Map<String, dynamic>;
-      await _cartCollection(user.uid).doc(item.productId).set(data);
+      final data = serializers.serializeWith(CartItem.serializer, item) as Map<String, dynamic>;
+      await _cartCollection(currentUserId!).doc(item.productId).set(data);
     } catch (e) {
       print('Error adding to cart: $e');
       rethrow;
@@ -206,13 +166,9 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   @override
   Future<void> updateCartQuantity(String productId, int quantity) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (currentUserId == null) return;
     try {
-      await _cartCollection(
-        user.uid,
-      ).doc(productId).update({'quantity': quantity});
+      await _cartCollection(currentUserId!).doc(productId).update({'quantity': quantity});
     } catch (e) {
       print('Error updating cart quantity: $e');
       rethrow;
@@ -221,11 +177,9 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   @override
   Future<void> removeFromCart(String productId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (currentUserId == null) return;
     try {
-      await _cartCollection(user.uid).doc(productId).delete();
+      await _cartCollection(currentUserId!).doc(productId).delete();
     } catch (e) {
       print('Error removing from cart: $e');
       rethrow;
@@ -234,11 +188,9 @@ class FirebaseFirestoreServiceImpl implements StorageService {
 
   @override
   Future<void> clearCart() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (currentUserId == null) return;
     try {
-      final snapshot = await _cartCollection(user.uid).get();
+      final snapshot = await _cartCollection(currentUserId!).get();
       final batch = _firestore.batch();
       for (var doc in snapshot.docs) {
         batch.delete(doc.reference);
@@ -253,10 +205,11 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   @override
   Future<void> saveOrder(Order order) async {
     try {
-      final orderData = serializeOrder(order);
-      await _ordersCollection(
-        order.uid!,
-      ).add({...orderData, _orderDateField: FieldValue.serverTimestamp()});
+      final orderData = serializers.serializeWith(Order.serializer, order) as Map<String, dynamic>;
+      await _ordersCollection(order.uid!).add({
+        ...orderData,
+        _orderDateField: DateTime.now(),
+      });
     } catch (e) {
       print('Error saving order: $e');
       rethrow;
@@ -267,39 +220,16 @@ class FirebaseFirestoreServiceImpl implements StorageService {
   Stream<List<Order>> getOrders(String userId) {
     return _ordersCollection(userId).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(
-          doc.data() as Map<String, dynamic>,
-        );
+        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
         data['id'] = doc.id;
-
-        if (data['orderDate'] is Timestamp) {
-          data['dateTime'] = (data['orderDate'] as Timestamp)
-              .toDate()
-              .microsecondsSinceEpoch;
-        }
-
         return serializers.deserializeWith(Order.serializer, data)!;
       }).toList();
     });
   }
 
   @override
-  Map<String, dynamic> serializeOrder(Order order) {
-    return serializers.serializeWith(Order.serializer, order)
-        as Map<String, dynamic>;
-  }
-
-  @override
-  Order deserializeOrder(Map<String, dynamic> map) {
-    return serializers.deserializeWith(Order.serializer, map) as Order;
-  }
-
-  @override
-  Future<String?> uploadProfilePhotoBytes(
-    String userId,
-    List<int> bytes,
-    String fileName,
-  ) async {
+  Future<String?> uploadProfilePhotoBytes(String userId, List<int> bytes, String fileName) async {
+    // Implement cloud storage logic if needed
     return null;
   }
 }

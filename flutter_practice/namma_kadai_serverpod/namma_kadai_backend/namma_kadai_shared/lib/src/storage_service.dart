@@ -1,8 +1,9 @@
 import 'auth_service.dart';
-import '../../model/user_model.dart';
-import '../../model/product.dart';
-import '../../model/cart_item.dart';
-import '../../model/order.dart';
+import 'models/user_model.dart';
+import 'models/product.dart';
+import 'models/cart_item.dart';
+import 'models/order.dart';
+import 'models/auth_user.dart';
 
 abstract class StorageService {
   Future<void> init();

@@ -293,28 +293,35 @@ class EndpointFirestore extends _i2.EndpointRef {
   );
 
   _i3.Future<void> updateCartQuantity(
+    String userId,
     String productId,
     int quantity,
   ) => caller.callServerEndpoint<void>(
     'firestore',
     'updateCartQuantity',
     {
+      'userId': userId,
       'productId': productId,
       'quantity': quantity,
     },
   );
 
-  _i3.Future<void> removeFromCart(String productId) =>
-      caller.callServerEndpoint<void>(
-        'firestore',
-        'removeFromCart',
-        {'productId': productId},
-      );
+  _i3.Future<void> removeFromCart(
+    String userId,
+    String productId,
+  ) => caller.callServerEndpoint<void>(
+    'firestore',
+    'removeFromCart',
+    {
+      'userId': userId,
+      'productId': productId,
+    },
+  );
 
-  _i3.Future<void> clearCart() => caller.callServerEndpoint<void>(
+  _i3.Future<void> clearCart(String userId) => caller.callServerEndpoint<void>(
     'firestore',
     'clearCart',
-    {},
+    {'userId': userId},
   );
 }
 

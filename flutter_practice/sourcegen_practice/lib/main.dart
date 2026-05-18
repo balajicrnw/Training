@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sourcegen_practice/user.dart';
+import 'package:sourcegen_practice/models/user.dart';
 
 void main() {
   runApp(const MyApp());

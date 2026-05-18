@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:namma_kadai/model/product.dart';
+import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 import 'package:namma_kadai/view/cart_screen.dart';
 import 'package:namma_kadai/view/checkout_screen.dart';
 import 'package:namma_kadai/view/login_screen.dart';
@@ -11,7 +11,7 @@ import 'package:namma_kadai/view/product_detail_screen.dart';
 import 'package:namma_kadai/view/product_list_screen.dart';
 import 'package:namma_kadai/view/register_screen.dart';
 import 'package:namma_kadai/viewmodel/view_model.dart';
-import 'package:namma_kadai/model/auth_user.dart';
+
 
 import '../core/routing/route_names.dart';
 

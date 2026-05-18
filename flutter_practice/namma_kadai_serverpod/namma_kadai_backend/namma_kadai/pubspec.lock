@@ -185,6 +185,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  connectivity_plus:
+    dependency: transitive
+    description:
+      name: connectivity_plus
+      sha256: "62ffa266d9a23b79fb3fcbc206afc00bb979417ba57b1324c546b5aab95ba057"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.1"
+  connectivity_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_plus_platform_interface
+      sha256: "3c09627c536d22fd24691a905cdd8b14520de69da52c7a97499c8be5284a32ed"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   convert:
     dependency: transitive
     description:
@@ -241,6 +257,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.6"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: d0c98dcd4f5169878b6cf8f6e0a52403a9dff371a3e2f019697accbf6f44a270
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.12"
   desktop_webview_window:
     dependency: transitive
     description:
@@ -703,6 +727,20 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  namma_kadai_backend_client:
+    dependency: "direct main"
+    description:
+      path: "../namma_kadai_backend_client"
+      relative: true
+    source: path
+    version: "0.0.0"
+  namma_kadai_shared:
+    dependency: "direct main"
+    description:
+      path: "../namma_kadai_shared"
+      relative: true
+    source: path
+    version: "1.0.0"
   native_toolchain_c:
     dependency: transitive
     description:
@@ -711,6 +749,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.4"
+  nm:
+    dependency: transitive
+    description:
+      name: nm
+      sha256: "2c9aae4127bdc8993206464fcc063611e0e36e72018696cd9631023a31b24254"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   objective_c:
     dependency: transitive
     description:
@@ -823,6 +869,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.1"
+  petitparser:
+    dependency: transitive
+    description:
+      name: petitparser
+      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.2"
   platform:
     dependency: transitive
     description:
@@ -887,6 +941,46 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.1"
+  serverpod_auth_core_client:
+    dependency: transitive
+    description:
+      name: serverpod_auth_core_client
+      sha256: "5a8c6894581950dae28aab871d477bd8ee910fae2e2a9b5097bf8c28dd43655a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.8"
+  serverpod_auth_idp_client:
+    dependency: transitive
+    description:
+      name: serverpod_auth_idp_client
+      sha256: e81233960610c1a02341b8d7192efd2e8992251e16f030d2c54d621e0daaff86
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.8"
+  serverpod_client:
+    dependency: transitive
+    description:
+      name: serverpod_client
+      sha256: e3bd9dc071e81eca5c7d2647bd9220d2e1af5a3b8b551c1f701dd9b4bc6d6845
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.8"
+  serverpod_flutter:
+    dependency: "direct main"
+    description:
+      name: serverpod_flutter
+      sha256: bb15581449c81e1aa52a2fba5a21100eabe8747307ffa98ba3ea75b5e6df45b3
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.8"
+  serverpod_serialization:
+    dependency: transitive
+    description:
+      name: serverpod_serialization
+      sha256: ccccb6f1b1103322a079848dafd32fec4455bc9923047c76cca6d2dbdcf7ded9
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.8"
   shelf:
     dependency: transitive
     description:
@@ -1148,6 +1242,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.5"
+  uuid:
+    dependency: transitive
+    description:
+      name: uuid
+      sha256: "1fef9e8e11e2991bb773070d4656b7bd5d850967a2456cfc83cf47925ba79489"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.3"
   vector_math:
     dependency: transitive
     description:
@@ -1236,6 +1338,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  xml:
+    dependency: transitive
+    description:
+      name: xml
+      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.6.1"
   yaml:
     dependency: transitive
     description:

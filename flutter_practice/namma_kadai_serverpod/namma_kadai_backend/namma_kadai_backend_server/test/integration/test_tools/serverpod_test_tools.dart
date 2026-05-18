@@ -660,6 +660,7 @@ class _FirestoreEndpoint {
 
   _i3.Future<void> updateCartQuantity(
     _i1.TestSessionBuilder sessionBuilder,
+    String userId,
     String productId,
     int quantity,
   ) async {
@@ -675,6 +676,7 @@ class _FirestoreEndpoint {
           endpointPath: 'firestore',
           methodName: 'updateCartQuantity',
           parameters: _i1.testObjectToJson({
+            'userId': userId,
             'productId': productId,
             'quantity': quantity,
           }),
@@ -695,6 +697,7 @@ class _FirestoreEndpoint {
 
   _i3.Future<void> removeFromCart(
     _i1.TestSessionBuilder sessionBuilder,
+    String userId,
     String productId,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -708,7 +711,10 @@ class _FirestoreEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'firestore',
           methodName: 'removeFromCart',
-          parameters: _i1.testObjectToJson({'productId': productId}),
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'productId': productId,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -724,7 +730,10 @@ class _FirestoreEndpoint {
     });
   }
 
-  _i3.Future<void> clearCart(_i1.TestSessionBuilder sessionBuilder) async {
+  _i3.Future<void> clearCart(
+    _i1.TestSessionBuilder sessionBuilder,
+    String userId,
+  ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -736,7 +745,7 @@ class _FirestoreEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'firestore',
           methodName: 'clearCart',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _i1.testObjectToJson({'userId': userId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

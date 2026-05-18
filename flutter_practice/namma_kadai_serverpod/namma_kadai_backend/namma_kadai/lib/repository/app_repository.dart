@@ -1,8 +1,7 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:namma_kadai_shared/namma_kadai_shared.dart';
 import 'package:namma_kadai/services/serverpod_service.dart';
-import 'package:namma_kadai/services/firebase_auth_service_impl.dart';
+import 'package:namma_kadai/services/serverpod_auth_service.dart';
 import '../config/environment.dart';
 
 class AppRepository {
@@ -11,8 +10,13 @@ class AppRepository {
   //   ..setProject(Environment.appwriteProjectId)
   //   ..setSelfSigned(status: true);
 
-  final StorageService storageService = ServerpodService();
-  final AuthService authService = AuthServiceImpl(FirebaseAuth.instance);
+  final _serverpodService = ServerpodService();
+  StorageService get storageService => _serverpodService;
+  final AuthService authService = ServerpodAuthService();
+
+  void setCurrentUser(String? userId) {
+    _serverpodService.currentUserId = userId;
+  }
 
   Future<void> init() => storageService.init();
 }

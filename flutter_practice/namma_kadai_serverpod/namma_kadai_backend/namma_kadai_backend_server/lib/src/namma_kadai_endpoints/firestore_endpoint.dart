@@ -20,15 +20,18 @@ class FirestoreEndpoint extends Endpoint {
     await api.deleteProduct(id);
   }
 
-  Future<void> updateCartQuantity(Session session, String productId, int quantity) async {
+  Future<void> updateCartQuantity(Session session, String userId, String productId, int quantity) async {
+    api.currentUserId = userId;
     await api.updateCartQuantity(productId, quantity);
   }
 
-  Future<void> removeFromCart(Session session, String productId) async {
+  Future<void> removeFromCart(Session session, String userId, String productId) async {
+    api.currentUserId = userId;
     await api.removeFromCart(productId);
   }
 
-  Future<void> clearCart(Session session) async {
+  Future<void> clearCart(Session session, String userId) async {
+    api.currentUserId = userId;
     await api.clearCart();
   }
 }

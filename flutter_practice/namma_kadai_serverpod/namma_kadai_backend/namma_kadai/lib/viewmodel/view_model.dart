@@ -39,6 +39,7 @@ class AppNotifier extends StateNotifier<AppState> with ExceptionHandlerMixin {
 
       _authSubscription = authService.authStateChanges().listen((user) async {
         debugPrint('DEBUG: AuthNotifier: User changed to ${user?.email}');
+        repository.setCurrentUser(user?.id);
         state = state.rebuild((b) => b
           ..authUser = user?.toBuilder()
           ..isAuthInitialChecked = true);

@@ -1,38 +1,91 @@
+import 'dart:async';
 import 'package:namma_kadai_shared/namma_kadai_shared.dart';
+import 'package:firedart/firedart.dart';
 
 class ApiImpl implements StorageService {
-  final dynamic _firestore;
-  String? currentUserId; // Set this before calling cart methods
-
-  ApiImpl({dynamic firestore}) : _firestore = firestore;
-
-  static const String _usersCollection = 'users';
-  static const String _ordersCollectionName = 'orders';
-  static const String _orderDateField = 'orderDate';
-  static const String _productsCollection = 'products';
+  String? currentUserId;
 
   @override
   Future<void> init() async {
+    Firestore.initialize('namma-kadai-d7220');
+    FirebaseAuth.initialize(
+      'AIzaSyD-037x_qckmCuO4UFee6L9inf3MyjzYjA',
+      VolatileStore(),
+    );
     await seedProducts();
+  }
+
+  Future<AuthUser?> signIn(String email, String password) async {
+    try {
+      final user = await FirebaseAuth.instance.signIn(email, password);
+      return AuthUser(
+        (b) => b
+          ..id = user.id
+          ..email = email,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<AuthUser?> signUp(
+    String email,
+    String password, {
+    String? name,
+  }) async {
+    try {
+      final user = await FirebaseAuth.instance.signUp(email, password);
+      final authUser = AuthUser(
+        (b) => b
+          ..id = user.id
+          ..email = email,
+      );
+
+      final userModel = UserModel(
+        (b) => b
+          ..id = user.id
+          ..email = email
+          ..name = name
+          ..createdAt = DateTime.now(),
+      );
+
+      await Firestore.instance
+          .collection('users')
+          .document(user.id)
+          .set(
+            serializers.serializeWith(UserModel.serializer, userModel)
+                as Map<String, dynamic>,
+          );
+
+      return authUser;
+    } catch (e) {
+      throw Exception('email-already-in-use');
+    }
   }
 
   @override
   Future<void> seedProducts() async {
-    try {
-      final snapshot = await _firestore
-          .collection(_productsCollection)
-          .limit(1)
-          .get();
-      if (snapshot.docs.isNotEmpty) return;
+    final products = await Firestore.instance.collection('products').get();
+    if (products.isNotEmpty) return;
 
-      final batch = _firestore.batch();
-      for (final data in kProductSeedData) {
-        final docRef = _firestore.collection(_productsCollection).doc();
-        batch.set(docRef, Map<String, dynamic>.from(data));
+    int idCounter = 1;
+    for (final data in kProductSeedData) {
+      final mutableData = Map<String, dynamic>.from(data);
+      mutableData['id'] = 'seeded_prod_${idCounter++}';
+
+      final product = serializers.deserializeWith(
+        Product.serializer,
+        mutableData,
+      );
+      if (product != null) {
+        await Firestore.instance
+            .collection('products')
+            .document(product.id!)
+            .set(
+              serializers.serializeWith(Product.serializer, product)
+                  as Map<String, dynamic>,
+            );
       }
-      await batch.commit();
-    } catch (e) {
-      print('Error seeding Firestore products: $e');
     }
   }
 
@@ -40,114 +93,119 @@ class ApiImpl implements StorageService {
   Future<void> saveUserData(
     AuthUser user, {
     String? name,
-    String? username,
     String? gender,
     String? profileImageUrl,
   }) async {
-    try {
-      final userData = <String, dynamic>{
-        'email': user.email,
-        'name': name,
-        'username': username,
-        'gender': gender,
-        'createdAt': DateTime.now(),
-      };
+    final doc = await Firestore.instance
+        .collection('users')
+        .document(user.id)
+        .get()
+        .catchError((_) => throw Exception("Doc not found"));
 
-      userData.removeWhere((key, value) => value == null);
-
-      await _firestore
-          .collection(_usersCollection)
-          .doc(user.id)
-          .set(userData, {'merge': true});
-    } catch (e) {
-      print('Error saving user data: $e');
-      rethrow;
+    Map<String, dynamic> existing = {};
+    if (doc != null) {
+      existing = doc.map;
     }
+
+    final newUser = UserModel(
+      (b) => b
+        ..id = user.id
+        ..email = user.email
+        ..name = name ?? existing['name']
+        ..gender = gender ?? existing['gender']
+        ..profileImageUrl = profileImageUrl ?? existing['profileImageUrl']
+        ..createdAt = existing['createdAt'] != null
+            ? DateTime.parse(existing['createdAt'].toString())
+            : DateTime.now(),
+    );
+
+    await Firestore.instance
+        .collection('users')
+        .document(user.id)
+        .set(
+          serializers.serializeWith(UserModel.serializer, newUser)
+              as Map<String, dynamic>,
+        );
   }
 
   @override
-  Stream<UserModel?> getUserData(String userId) {
-    return _firestore.collection(_usersCollection).doc(userId).snapshots().map((doc) {
-      if (!doc.exists || doc.data() == null) return null;
-      final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
-      data['id'] = doc.id;
-      return serializers.deserializeWith(UserModel.serializer, data);
-    });
+  Stream<UserModel?> getUserData(String userId) async* {
+    try {
+      final stream = Firestore.instance
+          .collection('users')
+          .document(userId)
+          .stream;
+      await for (final doc in stream) {
+        if (doc != null) {
+          final data = doc.map;
+          data['id'] = doc.id;
+          yield serializers.deserializeWith(UserModel.serializer, data);
+        } else {
+          yield null;
+        }
+      }
+    } catch (_) {
+      yield null;
+    }
   }
 
   @override
   Future<List<Product>> getProducts() async {
-    try {
-      final snapshot = await _firestore.collection(_productsCollection).get();
-      return snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
-        data['id'] = doc.id;
-        return serializers.deserializeWith(Product.serializer, data) as Product;
-      }).toList();
-    } catch (e) {
-      print('Error fetching products: $e');
-      return [];
-    }
+    final docs = await Firestore.instance.collection('products').get();
+    return docs.map((d) {
+      final data = d.map;
+      data['id'] = d.id;
+      return serializers.deserializeWith(Product.serializer, data)!;
+    }).toList();
   }
 
   @override
   Future<void> saveProduct(Map<String, dynamic> data) async {
-    try {
-      await _firestore.collection(_productsCollection).add(data);
-    } catch (e) {
-      print('Error saving product to Firestore: $e');
-      rethrow;
+    final product = serializers.deserializeWith(Product.serializer, data);
+    if (product != null) {
+      final id = product.id ?? 'prod_${DateTime.now().millisecondsSinceEpoch}';
+      final serialized =
+          serializers.serializeWith(Product.serializer, product)
+              as Map<String, dynamic>;
+      serialized['id'] = id;
+      await Firestore.instance
+          .collection('products')
+          .document(id)
+          .set(serialized);
     }
   }
 
-  @override
   Future<void> insertProduct(Product product) async {
-    try {
-      final data = serializers.serializeWith(Product.serializer, product) as Map<String, dynamic>;
-      if (product.id != null) {
-        await _firestore
-            .collection(_productsCollection)
-            .doc(product.id!)
-            .set(data);
-      } else {
-        await _firestore.collection(_productsCollection).add(data);
-      }
-    } catch (e) {
-      print('Error inserting product: $e');
-      rethrow;
-    }
+    final id = product.id ?? 'prod_${DateTime.now().millisecondsSinceEpoch}';
+    final serialized =
+        serializers.serializeWith(Product.serializer, product)
+            as Map<String, dynamic>;
+    serialized['id'] = id;
+    await Firestore.instance
+        .collection('products')
+        .document(id)
+        .set(serialized);
   }
 
-  @override
   Future<void> deleteProduct(String id) async {
-    try {
-      await _firestore.collection(_productsCollection).doc(id).delete();
-    } catch (e) {
-      print('Error deleting product: $e');
-      rethrow;
-    }
+    await Firestore.instance.collection('products').document(id).delete();
   }
-
-  dynamic _cartCollection(String userId) =>
-      _firestore.collection(_usersCollection).doc(userId).collection('cart');
-
-  dynamic _ordersCollection(String userId) => _firestore
-      .collection(_usersCollection)
-      .doc(userId)
-      .collection(_ordersCollectionName);
 
   @override
   Future<List<CartItem>> getCartItems() async {
     if (currentUserId == null) return [];
     try {
-      final snapshot = await _cartCollection(currentUserId!).get();
-      return snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
-        data['id'] = doc.id;
-        return serializers.deserializeWith(CartItem.serializer, data) as CartItem;
+      final docs = await Firestore.instance
+          .collection('users')
+          .document(currentUserId!)
+          .collection('cart')
+          .get();
+      return docs.map((d) {
+        final data = d.map;
+        data['id'] = d.id;
+        return serializers.deserializeWith(CartItem.serializer, data)!;
       }).toList();
-    } catch (e) {
-      print('Error fetching cart items: $e');
+    } catch (_) {
       return [];
     }
   }
@@ -155,81 +213,134 @@ class ApiImpl implements StorageService {
   @override
   Future<void> addToCart(CartItem item) async {
     if (currentUserId == null) return;
+
+    final collection = Firestore.instance
+        .collection('users')
+        .document(currentUserId!)
+        .collection('cart');
+
     try {
-      final data = serializers.serializeWith(CartItem.serializer, item) as Map<String, dynamic>;
-      await _cartCollection(currentUserId!).doc(item.productId).set(data);
-    } catch (e) {
-      print('Error adding to cart: $e');
-      rethrow;
+      final doc = await collection.document(item.productId).get();
+      final existingData = doc.map;
+      final existing = serializers.deserializeWith(
+        CartItem.serializer,
+        existingData,
+      )!;
+
+      final updated = existing.rebuild(
+        (b) => b..quantity = existing.quantity + item.quantity,
+      );
+      await collection
+          .document(item.productId)
+          .update(
+            serializers.serializeWith(CartItem.serializer, updated)
+                as Map<String, dynamic>,
+          );
+    } catch (_) {
+      await collection
+          .document(item.productId)
+          .set(
+            serializers.serializeWith(CartItem.serializer, item)
+                as Map<String, dynamic>,
+          );
     }
   }
 
   @override
   Future<void> updateCartQuantity(String productId, int quantity) async {
     if (currentUserId == null) return;
-    try {
-      await _cartCollection(currentUserId!).doc(productId).update({'quantity': quantity});
-    } catch (e) {
-      print('Error updating cart quantity: $e');
-      rethrow;
+    final collection = Firestore.instance
+        .collection('users')
+        .document(currentUserId!)
+        .collection('cart');
+
+    if (quantity <= 0) {
+      await collection.document(productId).delete().catchError((_) {});
+    } else {
+      try {
+        final doc = await collection.document(productId).get();
+        final existingData = doc.map;
+        final existing = serializers.deserializeWith(
+          CartItem.serializer,
+          existingData,
+        )!;
+
+        final updated = existing.rebuild((b) => b..quantity = quantity);
+        await collection
+            .document(productId)
+            .update(
+              serializers.serializeWith(CartItem.serializer, updated)
+                  as Map<String, dynamic>,
+            );
+      } catch (_) {}
     }
   }
 
   @override
   Future<void> removeFromCart(String productId) async {
     if (currentUserId == null) return;
-    try {
-      await _cartCollection(currentUserId!).doc(productId).delete();
-    } catch (e) {
-      print('Error removing from cart: $e');
-      rethrow;
-    }
+    await Firestore.instance
+        .collection('users')
+        .document(currentUserId!)
+        .collection('cart')
+        .document(productId)
+        .delete()
+        .catchError((_) {});
   }
 
   @override
   Future<void> clearCart() async {
     if (currentUserId == null) return;
     try {
-      final snapshot = await _cartCollection(currentUserId!).get();
-      final batch = _firestore.batch();
-      for (var doc in snapshot.docs) {
-        batch.delete(doc.reference);
+      final collection = Firestore.instance
+          .collection('users')
+          .document(currentUserId!)
+          .collection('cart');
+      final docs = await collection.get();
+      for (final doc in docs) {
+        await collection.document(doc.id).delete();
       }
-      await batch.commit();
-    } catch (e) {
-      print('Error clearing cart: $e');
-      rethrow;
-    }
+    } catch (_) {}
   }
 
   @override
   Future<void> saveOrder(Order order) async {
+    if (order.uid == null) return;
+    final collection = Firestore.instance
+        .collection('users')
+        .document(order.uid!)
+        .collection('orders');
+    final orderWithDate = order.rebuild((b) => b..dateTime = DateTime.now());
+    await collection.add(
+      serializers.serializeWith(Order.serializer, orderWithDate)
+          as Map<String, dynamic>,
+    );
+  }
+
+  @override
+  Stream<List<Order>> getOrders(String userId) async* {
     try {
-      final orderData = serializers.serializeWith(Order.serializer, order) as Map<String, dynamic>;
-      await _ordersCollection(order.uid!).add({
-        ...orderData,
-        _orderDateField: DateTime.now(),
-      });
-    } catch (e) {
-      print('Error saving order: $e');
-      rethrow;
+      final docs = await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .collection('orders')
+          .get();
+      yield docs.map((d) {
+        final data = Map<String, dynamic>.from(d.map);
+        data['id'] = d.id;
+        return serializers.deserializeWith(Order.serializer, data)!;
+      }).toList();
+    } catch (_) {
+      yield [];
     }
   }
 
   @override
-  Stream<List<Order>> getOrders(String userId) {
-    return _ordersCollection(userId).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
-        data['id'] = doc.id;
-        return serializers.deserializeWith(Order.serializer, data)!;
-      }).toList();
-    });
-  }
-
-  @override
-  Future<String?> uploadProfilePhotoBytes(String userId, List<int> bytes, String fileName) async {
-    // Implement cloud storage logic if needed
-    return null;
+  Future<String?> uploadProfilePhotoBytes(
+    String userId,
+    List<int> bytes,
+    String fileName,
+  ) async {
+    return 'http://localhost:8082/mock-profile.png';
   }
 }

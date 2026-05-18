@@ -8,6 +8,8 @@ final serverpodServiceProvider = Provider((ref) => ServerpodService());
 class ServerpodService implements StorageService {
   final String baseUrl = 'http://localhost:8082';
 
+  String? currentUserId;
+
   @override
   Future<void> init() async {
     await seedProducts();
@@ -99,14 +101,12 @@ class ServerpodService implements StorageService {
     }
   }
 
-  @override
   Future<void> insertProduct(Product product) async {
     final data = serializers.serializeWith(Product.serializer, product)
         as Map<String, dynamic>;
     await saveProduct(data);
   }
 
-  @override
   Future<void> deleteProduct(String id) async {
     try {
       final response = await http.post(
@@ -125,7 +125,7 @@ class ServerpodService implements StorageService {
   @override
   Future<List<CartItem>> getCartItems() async {
     try {
-      final userId = 'mock_user'; // In real app, get from auth
+      final userId = currentUserId ?? 'mock_user';
       final response =
           await http.get(Uri.parse('$baseUrl/getCartItems?userId=$userId'));
       if (response.statusCode != 200)
@@ -144,7 +144,7 @@ class ServerpodService implements StorageService {
   @override
   Future<void> addToCart(CartItem item) async {
     try {
-      final userId = 'mock_user';
+      final userId = currentUserId ?? 'mock_user';
       final data = serializers.serializeWith(CartItem.serializer, item)
           as Map<String, dynamic>;
       final response = await http.post(
@@ -162,7 +162,7 @@ class ServerpodService implements StorageService {
   @override
   Future<void> updateCartQuantity(String productId, int quantity) async {
     try {
-      final userId = 'mock_user';
+      final userId = currentUserId ?? 'mock_user';
       final response = await http.post(
         Uri.parse('$baseUrl/updateCartQuantity'),
         headers: {'Content-Type': 'application/json'},
@@ -180,7 +180,7 @@ class ServerpodService implements StorageService {
   @override
   Future<void> removeFromCart(String productId) async {
     try {
-      final userId = 'mock_user';
+      final userId = currentUserId ?? 'mock_user';
       final response = await http.post(
         Uri.parse('$baseUrl/removeFromCart'),
         headers: {'Content-Type': 'application/json'},
@@ -197,7 +197,7 @@ class ServerpodService implements StorageService {
   @override
   Future<void> clearCart() async {
     try {
-      final userId = 'mock_user';
+      final userId = currentUserId ?? 'mock_user';
       final response = await http.post(
         Uri.parse('$baseUrl/clearCart'),
         headers: {'Content-Type': 'application/json'},

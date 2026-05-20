@@ -1,9 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namma_kadai_shared/namma_kadai_shared.dart';
-
-final serverpodServiceProvider = Provider((ref) => ServerpodService());
 
 class ServerpodService implements StorageService {
   final String baseUrl = 'http://localhost:8082';

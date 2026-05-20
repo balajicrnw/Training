@@ -11,11 +11,3 @@ jwtRefresh:
   - refreshAccessToken:
 greeting:
   - hello:
-firestore:
-  - seedProducts:
-  - createProduct:
-  - updateProduct:
-  - deleteProduct:
-  - updateCartQuantity:
-  - removeFromCart:
-  - clearCart:

@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class GamePage extends StatefulWidget {
+  const GamePage({super.key});
   @override
-  _GamePageState createState() => _GamePageState();
+  State<GamePage> createState() => _GamePageState();
 }
 
 class _GamePageState extends State<GamePage> {
@@ -87,18 +88,12 @@ class _GamePageState extends State<GamePage> {
           Positioned(
             top: 50,
             left: width * 0.4,
-            child: Text(
-              "$time",
-              style: const TextStyle(fontSize: 50),
-            ),
+            child: Text("$time", style: const TextStyle(fontSize: 50)),
           ),
           Positioned(
             top: 150,
             left: width * 0.3,
-            child: Text(
-              "Score: $score",
-              style: const TextStyle(fontSize: 50),
-            ),
+            child: Text("Score: $score", style: const TextStyle(fontSize: 50)),
           ),
           Positioned(
             top: 220,
@@ -109,21 +104,18 @@ class _GamePageState extends State<GamePage> {
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
               crossAxisCount: 3,
-              children: List.generate(
-                isvisible.length,
-                (index) {
-                  return Hole(
-                    key: ValueKey(index), // ✅ ensures widget rebuild per hole
-                    isvisible: isvisible[index],
-                    onTap: () {
-                      incrementScore(isvisible[index]);
-                      setState(() {
-                        isvisible[index] = false;
-                      });
-                    },
-                  );
-                },
-              ),
+              children: List.generate(isvisible.length, (index) {
+                return Hole(
+                  key: ValueKey(index), // ✅ ensures widget rebuild per hole
+                  isvisible: isvisible[index],
+                  onTap: () {
+                    incrementScore(isvisible[index]);
+                    setState(() {
+                      isvisible[index] = false;
+                    });
+                  },
+                );
+              }),
             ),
           ),
           Positioned(
@@ -146,7 +138,8 @@ class Hole extends StatefulWidget {
   final bool isvisible;
   final VoidCallback? onTap;
 
-  const Hole({required Key key, this.isvisible = false, this.onTap}) : super(key: key);
+  const Hole({required Key key, this.isvisible = false, this.onTap})
+    : super(key: key);
 
   @override
   _HoleState createState() => _HoleState();
@@ -165,9 +158,10 @@ class _HoleState extends State<Hole> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
   @override

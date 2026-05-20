@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:namma_kadai_backend_server/src/web/routes/cors_route.dart';
+import 'package:serverpod/protocol.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
 
 import 'src/generated/endpoints.dart';
-import 'src/generated/protocol.dart';
+import 'src/generated/protocol.dart' hide Protocol;
 import 'src/web/routes/app_config_route.dart';
 import 'src/web/routes/firestore_api_route.dart';
 import 'src/web/routes/root.dart';
@@ -39,10 +40,6 @@ void run(List<String> args) async {
   // =========================
 
   // CORS preflight handler
-  pod.webServer.addRoute(
-    CorsRoute(),
-    '/(.*)',
-  );
 
   // =========================
   // FIRESTORE ROUTES

@@ -259,72 +259,6 @@ class EndpointGreeting extends _i2.EndpointRef {
       );
 }
 
-/// {@category Endpoint}
-class EndpointFirestore extends _i2.EndpointRef {
-  EndpointFirestore(_i2.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'firestore';
-
-  _i3.Future<void> seedProducts() => caller.callServerEndpoint<void>(
-    'firestore',
-    'seedProducts',
-    {},
-  );
-
-  _i3.Future<void> createProduct(Map<String, dynamic> data) =>
-      caller.callServerEndpoint<void>(
-        'firestore',
-        'createProduct',
-        {'data': data},
-      );
-
-  _i3.Future<void> updateProduct(Map<String, dynamic> data) =>
-      caller.callServerEndpoint<void>(
-        'firestore',
-        'updateProduct',
-        {'data': data},
-      );
-
-  _i3.Future<void> deleteProduct(String id) => caller.callServerEndpoint<void>(
-    'firestore',
-    'deleteProduct',
-    {'id': id},
-  );
-
-  _i3.Future<void> updateCartQuantity(
-    String userId,
-    String productId,
-    int quantity,
-  ) => caller.callServerEndpoint<void>(
-    'firestore',
-    'updateCartQuantity',
-    {
-      'userId': userId,
-      'productId': productId,
-      'quantity': quantity,
-    },
-  );
-
-  _i3.Future<void> removeFromCart(
-    String userId,
-    String productId,
-  ) => caller.callServerEndpoint<void>(
-    'firestore',
-    'removeFromCart',
-    {
-      'userId': userId,
-      'productId': productId,
-    },
-  );
-
-  _i3.Future<void> clearCart(String userId) => caller.callServerEndpoint<void>(
-    'firestore',
-    'clearCart',
-    {'userId': userId},
-  );
-}
-
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _i1.Caller(client);
@@ -368,7 +302,6 @@ class Client extends _i2.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     greeting = EndpointGreeting(this);
-    firestore = EndpointFirestore(this);
     modules = Modules(this);
   }
 
@@ -378,8 +311,6 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointGreeting greeting;
 
-  late final EndpointFirestore firestore;
-
   late final Modules modules;
 
   @override
@@ -387,7 +318,6 @@ class Client extends _i2.ServerpodClientShared {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
     'greeting': greeting,
-    'firestore': firestore,
   };
 
   @override

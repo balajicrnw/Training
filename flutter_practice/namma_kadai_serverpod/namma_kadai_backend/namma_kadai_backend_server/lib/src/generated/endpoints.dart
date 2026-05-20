@@ -14,11 +14,10 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
 import '../greetings/greeting_endpoint.dart' as _i4;
-import '../namma_kadai_endpoints/firestore_endpoint.dart' as _i5;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i6;
+    as _i5;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i7;
+    as _i6;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -40,12 +39,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
-          null,
-        ),
-      'firestore': _i5.FirestoreEndpoint()
-        ..initialize(
-          server,
-          'firestore',
           null,
         ),
     };
@@ -277,157 +270,9 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    connectors['firestore'] = _i1.EndpointConnector(
-      name: 'firestore',
-      endpoint: endpoints['firestore']!,
-      methodConnectors: {
-        'seedProducts': _i1.MethodConnector(
-          name: 'seedProducts',
-          params: {},
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .seedProducts(session),
-        ),
-        'createProduct': _i1.MethodConnector(
-          name: 'createProduct',
-          params: {
-            'data': _i1.ParameterDescription(
-              name: 'data',
-              type: _i1.getType<Map<String, dynamic>>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .createProduct(
-                    session,
-                    params['data'],
-                  ),
-        ),
-        'updateProduct': _i1.MethodConnector(
-          name: 'updateProduct',
-          params: {
-            'data': _i1.ParameterDescription(
-              name: 'data',
-              type: _i1.getType<Map<String, dynamic>>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .updateProduct(
-                    session,
-                    params['data'],
-                  ),
-        ),
-        'deleteProduct': _i1.MethodConnector(
-          name: 'deleteProduct',
-          params: {
-            'id': _i1.ParameterDescription(
-              name: 'id',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .deleteProduct(
-                    session,
-                    params['id'],
-                  ),
-        ),
-        'updateCartQuantity': _i1.MethodConnector(
-          name: 'updateCartQuantity',
-          params: {
-            'userId': _i1.ParameterDescription(
-              name: 'userId',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'productId': _i1.ParameterDescription(
-              name: 'productId',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'quantity': _i1.ParameterDescription(
-              name: 'quantity',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .updateCartQuantity(
-                    session,
-                    params['userId'],
-                    params['productId'],
-                    params['quantity'],
-                  ),
-        ),
-        'removeFromCart': _i1.MethodConnector(
-          name: 'removeFromCart',
-          params: {
-            'userId': _i1.ParameterDescription(
-              name: 'userId',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'productId': _i1.ParameterDescription(
-              name: 'productId',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['firestore'] as _i5.FirestoreEndpoint)
-                  .removeFromCart(
-                    session,
-                    params['userId'],
-                    params['productId'],
-                  ),
-        ),
-        'clearCart': _i1.MethodConnector(
-          name: 'clearCart',
-          params: {
-            'userId': _i1.ParameterDescription(
-              name: 'userId',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['firestore'] as _i5.FirestoreEndpoint).clearCart(
-                    session,
-                    params['userId'],
-                  ),
-        ),
-      },
-    );
-    modules['serverpod_auth_idp'] = _i6.Endpoints()
+    modules['serverpod_auth_idp'] = _i5.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i7.Endpoints()
+    modules['serverpod_auth_core'] = _i6.Endpoints()
       ..initializeEndpoints(server);
   }
 }

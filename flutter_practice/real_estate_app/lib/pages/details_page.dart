@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/widgets/app_details_card.dart';
+import 'package:real_estate_app/widgets/app_dropdown.dart';
+import 'package:real_estate_app/widgets/app_icon_button.dart';
 
 class DetailsPage extends StatefulWidget {
   const DetailsPage({super.key});
@@ -23,8 +26,20 @@ class _DetailsPageState extends State<DetailsPage> {
             ),
           ],
         ),
-        Row(),
-        Stack(),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SizedBox(height: 50, width: 250, child: AppDropdown()),
+            ),
+            AppIconButton(icon: Icons.add_location),
+            SizedBox(width: 5),
+            AppIconButton(icon: Icons.arrow_outward),
+          ],
+        ),
+        SizedBox(height: 5),
+        AppDetailsCard(),
       ],
     );
   }

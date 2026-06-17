@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
 import 'ui.dart';
 
 class TestPage extends StatefulWidget {
@@ -19,11 +20,7 @@ class _TestPageState extends State<TestPage> {
             width: double.infinity,
             color: Colors.black,
           ),
-          AppChip(
-            title: "Best Deal",
-            appChipVariant: AppChipVariant.medium,
-            iconData: Icons.bed_outlined,
-          ),
+          AppBottomNavigator(),
         ],
       ),
     );

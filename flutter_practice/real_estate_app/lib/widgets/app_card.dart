@@ -20,8 +20,8 @@ class AppCard extends StatelessWidget {
           Stack(
             children: [
               SizedBox(
-                width: 350,
-                height: 180,
+                width: 320,
+                height: 150,
                 child: Padding(
                   padding: const EdgeInsets.all(2),
                   child: Stack(
@@ -65,7 +65,7 @@ class AppCard extends StatelessWidget {
                   text: "Aaradhya Homes",
                   appTextVariant: AppTextVariant.medium,
                 ),
-                const SizedBox(width: 80),
+                const SizedBox(width: 50),
                 AppChip(
                   title: r'$440,000',
                   appChipVariant: AppChipVariant.priceChip,

@@ -21,7 +21,7 @@ class AppChip extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 1),
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -34,6 +34,7 @@ class AppChip extends StatelessWidget {
       case AppChipVariant.medium:
         return Chip(
           padding: EdgeInsets.all(14),
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -49,6 +50,7 @@ class AppChip extends StatelessWidget {
         );
       case AppChipVariant.large:
         return Chip(
+          backgroundColor: const Color.fromARGB(255, 253, 255, 229),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -75,6 +77,17 @@ class AppChip extends StatelessWidget {
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
             ],
+          ),
+        );
+      case AppChipVariant.selectedChip:
+        return Chip(
+          backgroundColor: const Color(0xfff7fd8e),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [Text(title, style: TextStyle(fontSize: 15))],
           ),
         );
     }

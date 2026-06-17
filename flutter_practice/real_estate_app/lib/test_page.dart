@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/pages/explore_page.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
 import 'ui.dart';
 
@@ -13,15 +14,19 @@ class _TestPageState extends State<TestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            color: Colors.black,
+      backgroundColor: Colors.transparent,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [Color(0xFFfdffe5), Colors.white], // Light Blue
           ),
-          AppCard(image: AssetImage('lib/assets/villa1.jpeg')),
-        ],
+        ),
+
+        child: ExplorePage(),
       ),
     );
   }

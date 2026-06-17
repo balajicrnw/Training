@@ -31,7 +31,7 @@ class AppText extends StatelessWidget {
         return Text(
           text,
           style: TextStyle(
-            fontSize: 50,
+            fontSize: 30,
             color: const Color.fromARGB(255, 34, 34, 34),
           ),
         );

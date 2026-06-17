@@ -17,6 +17,14 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
+  int index = 0;
+  final List<Widget> pages = [
+    HomePage(),
+    DetailsPage(),
+    SearchPage(),
+    BookingPage(),
+    SettingsPage(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +39,28 @@ class _TestPageState extends State<TestPage> {
           ),
         ),
 
-        child: SafeArea(child: BookingPage()),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              IndexedStack(index: index - 1, children: pages),
+              Positioned(
+                bottom: 24,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: AppBottomNavigator(
+                    selected: index,
+                    onTap: (int indexReturned) {
+                      setState(() {
+                        index = indexReturned;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

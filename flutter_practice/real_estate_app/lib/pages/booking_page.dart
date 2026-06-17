@@ -24,7 +24,7 @@ class _BookingPageState extends State<BookingPage> {
                 text: "Book Summary",
                 appTextVariant: AppTextVariant.medium,
               ),
-              SizedBox(width: 50),
+              SizedBox(width: 48),
               AppIconButton(icon: Icons.share),
             ],
           ),

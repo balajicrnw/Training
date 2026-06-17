@@ -90,12 +90,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-
-        Positioned(
-          bottom: 10,
-          right: 100,
-          child: AppBottomNavigator(selected: 1),
-        ),
       ],
     );
   }

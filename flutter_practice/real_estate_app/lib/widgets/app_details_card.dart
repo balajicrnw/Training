@@ -33,7 +33,7 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
                       text: "Apartment 65",
                       appTextVariant: AppTextVariant.medium,
                     ),
-                    SizedBox(width: 146),
+                    SizedBox(width: 144),
 
                     AppIconButton(icon: Icons.arrow_outward),
                   ],
@@ -60,7 +60,7 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
                 title: "Furnished",
                 appChipVariant: AppChipVariant.medium,
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 12),
             ],
           ),
         ],

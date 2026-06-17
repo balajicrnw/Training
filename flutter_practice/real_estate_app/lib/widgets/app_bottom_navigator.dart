@@ -3,7 +3,8 @@ import 'package:real_estate_app/ui.dart';
 
 class AppBottomNavigator extends StatelessWidget {
   final selected;
-  const AppBottomNavigator({super.key, this.selected});
+  final Function onTap;
+  const AppBottomNavigator({super.key, this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +21,31 @@ class AppBottomNavigator extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          AppIconButton(icon: Icons.home, selected: selected == 1),
-          AppIconButton(icon: Icons.favorite, selected: selected == 2),
-          AppIconButton(icon: Icons.price_change, selected: selected == 3),
-          AppIconButton(icon: Icons.calendar_month, selected: selected == 4),
-          AppIconButton(icon: Icons.settings, selected: selected == 5),
+          AppIconButton(
+            icon: Icons.home,
+            selected: selected == 1,
+            onTap: () => onTap(1),
+          ),
+          AppIconButton(
+            icon: Icons.favorite,
+            selected: selected == 2,
+            onTap: () => onTap(2),
+          ),
+          AppIconButton(
+            icon: Icons.price_change,
+            selected: selected == 3,
+            onTap: () => onTap(3),
+          ),
+          AppIconButton(
+            icon: Icons.calendar_month,
+            selected: selected == 4,
+            onTap: () => onTap(4),
+          ),
+          AppIconButton(
+            icon: Icons.settings,
+            selected: selected == 5,
+            onTap: () => onTap(5),
+          ),
         ],
       ),
     );

@@ -72,7 +72,6 @@ class SearchPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Positioned(bottom: 10, left: 70, child: AppBottomNavigator()),
               ],
             );
           },

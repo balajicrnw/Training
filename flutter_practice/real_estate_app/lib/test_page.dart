@@ -19,7 +19,11 @@ class _TestPageState extends State<TestPage> {
             width: double.infinity,
             color: Colors.black,
           ),
-          AppText(text: 'Hello', appTextVariant: AppTextVariant.large),
+          AppChip(
+            title: "Best Deal",
+            appChipVariant: AppChipVariant.medium,
+            iconData: Icons.bed_outlined,
+          ),
         ],
       ),
     );

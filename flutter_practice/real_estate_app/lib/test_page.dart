@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/widgets/app_icon_button.dart';
+import 'ui.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({super.key});
@@ -19,7 +19,7 @@ class _TestPageState extends State<TestPage> {
             width: double.infinity,
             color: Colors.black,
           ),
-          AppIconButton(icon: Icons.favorite_outline_rounded),
+          AppText(text: 'Hello', appTextVariant: AppTextVariant.large),
         ],
       ),
     );

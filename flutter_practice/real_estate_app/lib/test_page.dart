@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:real_estate_app/pages/details_page.dart';
 import 'package:real_estate_app/pages/home_page.dart';
 import 'package:real_estate_app/pages/search_page.dart';
+import 'package:real_estate_app/pages/settings_page.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
 import 'package:real_estate_app/widgets/app_search_bar.dart';
 import 'ui.dart';
@@ -28,7 +29,7 @@ class _TestPageState extends State<TestPage> {
           ),
         ),
 
-        child: SafeArea(child: DetailsPage()),
+        child: SafeArea(child: SettingsPage()),
       ),
     );
   }

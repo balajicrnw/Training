@@ -39,7 +39,7 @@ class _DetailsPageState extends State<DetailsPage> {
           ],
         ),
         SizedBox(height: 5),
-        AppDetailsCard(),
+        SizedBox(width: 330, child: AppDetailsCard()),
       ],
     );
   }

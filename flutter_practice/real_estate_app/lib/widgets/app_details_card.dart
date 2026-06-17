@@ -33,7 +33,7 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
                       text: "Apartment 65",
                       appTextVariant: AppTextVariant.medium,
                     ),
-                    SizedBox(width: 178),
+                    SizedBox(width: 146),
 
                     AppIconButton(icon: Icons.arrow_outward),
                   ],

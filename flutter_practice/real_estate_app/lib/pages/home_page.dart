@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/ui.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
+import 'package:real_estate_app/widgets/recommendation.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -84,27 +85,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 15),
-                      AppText(
-                        text: "Recommended For You",
-                        appTextVariant: AppTextVariant.medium,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
-                AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
-                AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
-                AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
+                Recommendation(),
               ],
             ),
           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/pages/home_page.dart';
+import 'package:real_estate_app/pages/search_page.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
 import 'package:real_estate_app/widgets/app_search_bar.dart';
 import 'ui.dart';
@@ -15,7 +16,6 @@ class _TestPageState extends State<TestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -27,7 +27,7 @@ class _TestPageState extends State<TestPage> {
           ),
         ),
 
-        child: AppSearchBar(),
+        child: SafeArea(child: SearchPage()),
       ),
     );
   }

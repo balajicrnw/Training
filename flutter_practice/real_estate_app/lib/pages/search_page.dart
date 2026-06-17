@@ -41,6 +41,10 @@ class SearchPage extends StatelessWidget {
                   width: double.infinity,
                   height: double.infinity,
                   decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
                     gradient: LinearGradient(
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,

@@ -20,7 +20,7 @@ class _TestPageState extends State<TestPage> {
             width: double.infinity,
             color: Colors.black,
           ),
-          AppBottomNavigator(),
+          AppCard(image: AssetImage('lib/assets/villa1.jpeg')),
         ],
       ),
     );

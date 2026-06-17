@@ -11,11 +11,30 @@ class AppText extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (appTextVariant) {
       case AppTextVariant.small:
-        return Text(text, style: TextStyle(fontSize: 10, color: Colors.white));
+        return Text(
+          text,
+          style: TextStyle(
+            fontSize: 8,
+            color: const Color.fromARGB(255, 56, 55, 55),
+          ),
+        );
       case AppTextVariant.medium:
-        return Text(text, style: TextStyle(fontSize: 25, color: Colors.white));
+        return Text(
+          text,
+          style: TextStyle(
+            fontSize: 20,
+            color: const Color.fromARGB(255, 40, 39, 39),
+            fontWeight: FontWeight.bold,
+          ),
+        );
       case AppTextVariant.large:
-        return Text(text, style: TextStyle(fontSize: 50, color: Colors.white));
+        return Text(
+          text,
+          style: TextStyle(
+            fontSize: 50,
+            color: const Color.fromARGB(255, 34, 34, 34),
+          ),
+        );
     }
   }
 }

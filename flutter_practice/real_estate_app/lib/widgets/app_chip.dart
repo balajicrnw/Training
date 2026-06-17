@@ -33,13 +33,18 @@ class AppChip extends StatelessWidget {
         );
       case AppChipVariant.medium:
         return Chip(
-          padding: EdgeInsets.all(18),
+          padding: EdgeInsets.all(14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
           label: Row(
             mainAxisSize: MainAxisSize.min,
-            children: [Text(title, style: TextStyle(fontSize: 12))],
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         );
       case AppChipVariant.large:
@@ -52,6 +57,23 @@ class AppChip extends StatelessWidget {
             children: [
               Icon(iconData, size: 20),
               Text(title, style: TextStyle(fontSize: 15)),
+            ],
+          ),
+        );
+      case AppChipVariant.priceChip:
+        return Chip(
+          backgroundColor: Color(0xFFfdffe5),
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         );

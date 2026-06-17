@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/pages/explore_page.dart';
+import 'package:real_estate_app/pages/home_page.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
+import 'package:real_estate_app/widgets/app_search_bar.dart';
 import 'ui.dart';
 
 class TestPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _TestPageState extends State<TestPage> {
           ),
         ),
 
-        child: ExplorePage(),
+        child: AppSearchBar(),
       ),
     );
   }

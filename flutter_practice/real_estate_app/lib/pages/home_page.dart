@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:real_estate_app/ui.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
 
-class ExplorePage extends StatefulWidget {
-  ExplorePage({super.key});
+class HomePage extends StatefulWidget {
+  HomePage({super.key});
 
   @override
-  State<ExplorePage> createState() => _ExplorePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _ExplorePageState extends State<ExplorePage> {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Stack(

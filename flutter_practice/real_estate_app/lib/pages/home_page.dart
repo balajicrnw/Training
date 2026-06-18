@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/ui.dart';
-import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
 import 'package:real_estate_app/widgets/recommendation.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,12 +20,16 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(right: 20, left: 20, top: 20),
                   child: Row(
                     children: [
                       AppIconButton(icon: Icons.menu),
                       Spacer(),
-                      Align(child: AppIconButton(icon: Icons.notifications)),
+                      Align(
+                        child: AppIconButton(
+                          icon: Icons.notifications_outlined,
+                        ),
+                      ),
                       SizedBox(width: 10),
                       AppIconButton(icon: Icons.person),
                     ],
@@ -37,15 +40,18 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 15),
-                      AppText(
-                        text: "Made for You",
-                        appTextVariant: AppTextVariant.large,
-                      ),
-
-                      AppText(
-                        text: "Explore Properties",
-                        appTextVariant: AppTextVariant.large,
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppText(
+                              text: "Made for You Explore Properties",
+                              appTextVariant: AppTextVariant.large,
+                            ),
+                            flex: 3,
+                          ),
+                          Expanded(child: AppIconButton(icon: Icons.search)),
+                        ],
                       ),
                     ],
                   ),
@@ -66,19 +72,19 @@ class _HomePageState extends State<HomePage> {
                         AppChip(
                           title: "House",
                           appChipVariant: AppChipVariant.large,
-                          iconData: Icons.star,
+                          image: AssetImage("lib/assets/villa1.jpeg"),
                         ),
                         SizedBox(width: 10),
                         AppChip(
                           title: "Apartment",
                           appChipVariant: AppChipVariant.large,
-                          iconData: Icons.bed,
+                          image: AssetImage("lib/assets/villa1.jpeg"),
                         ),
                         SizedBox(width: 10),
                         AppChip(
                           title: "2 Baths",
                           appChipVariant: AppChipVariant.large,
-                          iconData: Icons.bathroom,
+                          image: AssetImage("lib/assets/villa1.jpeg"),
                         ),
                         SizedBox(width: 20),
                       ],

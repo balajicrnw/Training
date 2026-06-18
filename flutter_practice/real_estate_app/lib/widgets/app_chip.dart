@@ -5,12 +5,14 @@ class AppChip extends StatelessWidget {
   final String title;
   final AppChipVariant appChipVariant;
   IconData? iconData;
+  ImageProvider? image;
 
   AppChip({
     super.key,
     required this.title,
     required this.appChipVariant,
     this.iconData,
+    this.image,
   });
 
   @override
@@ -38,6 +40,7 @@ class AppChip extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
+
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -50,15 +53,26 @@ class AppChip extends StatelessWidget {
         );
       case AppChipVariant.large:
         return Chip(
-          backgroundColor: const Color.fromARGB(255, 253, 255, 229),
+          side: BorderSide(color: const Color.fromARGB(55, 188, 188, 188)),
+          backgroundColor: Color(0xfff1f7ee),
+
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 1.5),
+          labelPadding: EdgeInsets.only(right: 10),
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(iconData, size: 20),
-              Text(title, style: TextStyle(fontSize: 15)),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image(image: image!, height: 30, width: 30),
+              ),
+              SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         );
@@ -82,6 +96,12 @@ class AppChip extends StatelessWidget {
       case AppChipVariant.selectedChip:
         return Chip(
           backgroundColor: const Color(0xfff7fd8e),
+          side: BorderSide(
+            style: BorderStyle.none,
+            color: Colors.transparent,
+
+            width: 0,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

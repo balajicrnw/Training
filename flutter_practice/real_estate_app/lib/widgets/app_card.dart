@@ -37,15 +37,16 @@ class AppCard extends StatelessWidget {
                           ),
                         ),
                         Positioned(
-                          top: 2,
-                          left: 5,
+                          top: 3,
+                          left: 3,
                           child: AppChip(
                             title: "Best Deal",
                             appChipVariant: AppChipVariant.medium,
                           ),
                         ),
                         Positioned(
-                          right: 5,
+                          right: 3,
+                          top: 3,
                           child: AppIconButton(
                             icon: Icons.favorite_border_outlined,
                           ),
@@ -56,17 +57,22 @@ class AppCard extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: 10),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
 
                 children: [
-                  AppText(
-                    text: "Aaradhya Homes",
-                    appTextVariant: AppTextVariant.medium,
+                  Column(
+                    children: [
+                      AppText(
+                        text: "Aaradhya Homes",
+                        appTextVariant: AppTextVariant.medium,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 50),
+                  const SizedBox(width: 50, height: 10),
                   AppChip(
                     title: r'$440,000',
                     appChipVariant: AppChipVariant.priceChip,
@@ -83,22 +89,22 @@ class AppCard extends StatelessWidget {
                   AppChip(
                     title: "Ananda",
                     appChipVariant: AppChipVariant.small,
-                    iconData: Icons.location_on,
+                    iconData: Icons.location_on_outlined,
                   ),
                   AppChip(
                     title: "4.5",
                     appChipVariant: AppChipVariant.small,
-                    iconData: Icons.star,
+                    iconData: Icons.star_outline,
                   ),
                   AppChip(
                     title: "4 Beds",
                     appChipVariant: AppChipVariant.small,
-                    iconData: Icons.bed,
+                    iconData: Icons.bed_outlined,
                   ),
                   AppChip(
                     title: "2 Baths",
                     appChipVariant: AppChipVariant.small,
-                    iconData: Icons.bathroom,
+                    iconData: Icons.bathtub_outlined,
                   ),
                 ],
               ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
-import 'package:real_estate_app/widgets/app_icon_button.dart';
-import 'package:real_estate_app/widgets/app_search_bar.dart';
+import 'package:real_estate_app/ui.dart';
 import 'package:real_estate_app/widgets/recommendation.dart';
 
 class SearchPage extends StatelessWidget {
@@ -30,6 +28,20 @@ class SearchPage extends StatelessWidget {
             ],
           ),
         ),
+        Positioned(
+          top: 200,
+          left: 50,
+          right: 50,
+          child: Row(
+            children: [
+              AppChip(
+                title: "House Name",
+                appChipVariant: AppChipVariant.pinChip,
+                image: AssetImage("lib/assets/villa3.jpg"),
+              ),
+            ],
+          ),
+        ),
         DraggableScrollableSheet(
           initialChildSize: 0.5,
           minChildSize: 0.15,
@@ -48,12 +60,13 @@ class SearchPage extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,
-                      colors: [Color(0xFFfdffe5), Colors.white], // Light Blue
+                      colors: [Color(0xFFfdffe5), Colors.white],
                     ),
                   ),
                 ),
                 Column(
                   children: [
+                    SizedBox(height: 8),
                     Container(
                       width: 40,
                       height: 5,

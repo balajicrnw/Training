@@ -23,15 +23,22 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.only(right: 20, left: 20, top: 20),
                   child: Row(
                     children: [
-                      AppIconButton(icon: Icons.menu),
+                      AppIconButton(
+                        icon: Icons.menu,
+                        variant: AppIconButtonVariant.background,
+                      ),
                       Spacer(),
                       Align(
                         child: AppIconButton(
                           icon: Icons.notifications_outlined,
+                          variant: AppIconButtonVariant.background,
                         ),
                       ),
                       SizedBox(width: 10),
-                      AppIconButton(icon: Icons.person),
+                      AppIconButton(
+                        icon: Icons.person,
+                        variant: AppIconButtonVariant.background,
+                      ),
                     ],
                   ),
                 ),
@@ -50,13 +57,18 @@ class _HomePageState extends State<HomePage> {
                             ),
                             flex: 3,
                           ),
-                          Expanded(child: AppIconButton(icon: Icons.search)),
+                          Expanded(
+                            child: AppIconButton(
+                              icon: Icons.search,
+                              variant: AppIconButtonVariant.background,
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
-
+                SizedBox(height: 10),
                 SizedBox(
                   height: 50,
                   child: SingleChildScrollView(

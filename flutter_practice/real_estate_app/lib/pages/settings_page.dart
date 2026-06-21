@@ -32,7 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     appTextVariant: AppTextVariant.medium,
                   ),
                   SizedBox(height: 5),
-                  AppSearchBar(),
+                  AppSearchBar(text: "Settings"),
                   SizedBox(height: 24),
                   Container(
                     padding: EdgeInsets.all(2),
@@ -56,7 +56,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           ListTile(
                             leading: CircleAvatar(
                               radius: 24,
-                              child: Icon(Icons.person),
+                              backgroundImage: AssetImage(
+                                "lib/assets/batman.jpg",
+                              ),
                             ),
                             title: Text("Batman"),
                             subtitle: Text("batman123@gmail.com"),
@@ -155,7 +157,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             title: Text("UseFaceID"),
                             trailing: Switch(
                               value: true,
-                              activeTrackColor: Color(0xfff7fd8e),
+                              activeTrackColor: AppColors.darkYellow,
                               onChanged: (value) {},
                             ),
                             onTap: () {},

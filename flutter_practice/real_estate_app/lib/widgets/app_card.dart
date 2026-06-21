@@ -11,8 +11,12 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        color: AppColors.white,
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: AppColors.grey),
+        ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -21,18 +25,26 @@ class AppCard extends StatelessWidget {
             Stack(
               children: [
                 SizedBox(
-                  width: 320,
-                  height: 150,
+                  width: 312,
+                  height: 154,
                   child: Padding(
                     padding: const EdgeInsets.all(2),
                     child: Stack(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            image: DecorationImage(
-                              image: image,
-                              fit: BoxFit.cover,
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 1,
+                            top: 1,
+                            bottom: 1,
+                            right: 1,
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              image: DecorationImage(
+                                image: image,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
@@ -49,6 +61,7 @@ class AppCard extends StatelessWidget {
                           top: 3,
                           child: AppIconButton(
                             icon: Icons.favorite_border_outlined,
+                            variant: AppIconButtonVariant.background,
                           ),
                         ),
                       ],
@@ -59,7 +72,7 @@ class AppCard extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
 
@@ -72,7 +85,7 @@ class AppCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 50, height: 10),
+                  const SizedBox(width: 40, height: 10),
                   AppChip(
                     title: r'$440,000',
                     appChipVariant: AppChipVariant.priceChip,

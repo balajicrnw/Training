@@ -15,15 +15,15 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color.fromARGB(255, 209, 209, 209)),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppColors.grey),
         color: const Color.fromARGB(255, 255, 255, 255),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 8, bottom: 2, left: 14),
 
             child: Row(
               children: [
@@ -35,7 +35,10 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
                     ),
                     SizedBox(width: 144),
 
-                    AppIconButton(icon: Icons.arrow_outward),
+                    AppIconButton(
+                      icon: Icons.arrow_outward,
+                      variant: AppIconButtonVariant.transparent,
+                    ),
                   ],
                 ),
               ],
@@ -43,19 +46,36 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
           ),
 
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: AppText(
-              text: r"$ 36,000",
-              appTextVariant: AppTextVariant.large,
+            padding: const EdgeInsets.only(
+              left: 14,
+              right: 8,
+              top: 1,
+              bottom: 10,
+            ),
+            child: Row(
+              children: [
+                AppText(
+                  text: r"$ 36,000",
+                  appTextVariant: AppTextVariant.large,
+                ),
+                SizedBox(width: 5),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: AppText(
+                    text: "Sq ft",
+                    appTextVariant: AppTextVariant.greytxt,
+                  ),
+                ),
+              ],
             ),
           ),
           Row(
             children: [
-              SizedBox(width: 10),
+              SizedBox(width: 16),
               AppChip(title: "4 Rooms", appChipVariant: AppChipVariant.medium),
-              SizedBox(width: 10),
+              SizedBox(width: 5),
               AppChip(title: "110 sqm", appChipVariant: AppChipVariant.medium),
-              SizedBox(width: 10),
+              SizedBox(width: 5),
               AppChip(
                 title: "Furnished",
                 appChipVariant: AppChipVariant.medium,
@@ -63,6 +83,7 @@ class _AppDetailsCardState extends State<AppDetailsCard> {
               SizedBox(width: 12),
             ],
           ),
+          SizedBox(height: 10),
         ],
       ),
     );

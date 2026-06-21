@@ -23,17 +23,22 @@ class _RecommendationState extends State<Recommendation> {
             children: [
               SizedBox(height: 15),
               AppText(
-                text: "Recommended For You",
+                text: "Recomment For You",
                 appTextVariant: AppTextVariant.medium,
               ),
+              SizedBox(height: 8),
             ],
           ),
         ),
 
         AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
+        SizedBox(height: 2),
         AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
+        SizedBox(height: 2),
         AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
+        SizedBox(height: 2),
         AppCard(image: AssetImage("lib/assets/villa1.jpeg")),
+        SizedBox(height: 2),
       ],
     );
   }

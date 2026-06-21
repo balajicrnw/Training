@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppSearchBar extends StatefulWidget {
-  const AppSearchBar({super.key});
+  final String text;
+  const AppSearchBar({super.key, required this.text});
 
   @override
   State<AppSearchBar> createState() => _AppSearchBarState();
@@ -14,7 +15,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
       decoration: InputDecoration(
         fillColor: Color.fromARGB(255, 255, 255, 255),
         filled: true,
-        hintText: "Search by locations",
+        hintText: widget.text,
         prefixIcon: Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),

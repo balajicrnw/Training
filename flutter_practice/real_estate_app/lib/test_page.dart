@@ -5,8 +5,6 @@ import 'package:real_estate_app/pages/home_page.dart';
 import 'package:real_estate_app/pages/search_page.dart';
 import 'package:real_estate_app/pages/settings_page.dart';
 import 'package:real_estate_app/widgets/app_bottom_navigator.dart';
-import 'package:real_estate_app/widgets/app_calander.dart';
-import 'package:real_estate_app/widgets/app_search_bar.dart';
 import 'ui.dart';
 
 class TestPage extends StatefulWidget {
@@ -17,7 +15,7 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
-  int index = 0;
+  int index = 1;
   final List<Widget> pages = [
     HomePage(),
     DetailsPage(),
@@ -33,9 +31,9 @@ class _TestPageState extends State<TestPage> {
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Color(0xFFfdffe5), Colors.white], // Light Blue
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft,
+            colors: [Color(0xFFfdffe5), Colors.white],
           ),
         ),
 
@@ -48,13 +46,16 @@ class _TestPageState extends State<TestPage> {
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: AppBottomNavigator(
-                    selected: index,
-                    onTap: (int indexReturned) {
-                      setState(() {
-                        index = indexReturned;
-                      });
-                    },
+                  child: Transform.scale(
+                    scale: 1.4,
+                    child: AppBottomNavigator(
+                      selected: index,
+                      onTap: (int indexReturned) {
+                        setState(() {
+                          index = indexReturned;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),

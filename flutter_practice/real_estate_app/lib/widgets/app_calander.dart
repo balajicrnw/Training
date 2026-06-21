@@ -31,13 +31,28 @@ class _AppCalanderState extends State<AppCalander> {
         ),
         child: Column(
           children: [
-            AppText(text: "Month 2000", appTextVariant: AppTextVariant.medium),
+            SizedBox(height: 5),
+            Row(
+              children: [
+                SizedBox(width: 10),
+                Icon(Icons.arrow_back_ios, size: 16),
+                Spacer(),
+                AppText(
+                  text: "Month 2000",
+                  appTextVariant: AppTextVariant.medium,
+                ),
+                Spacer(),
+                Icon(Icons.arrow_forward_ios, size: 16),
+                SizedBox(width: 10),
+              ],
+            ),
+            SizedBox(height: 10),
             Expanded(
               child: CrCalendar(
                 initialDate: DateTime.now(),
                 controller: _controller,
                 touchMode: TouchMode.rangeSelection,
-
+                firstDayOfWeek: WeekDay.monday,
                 weekDaysBuilder: (WeekDay day) {
                   String label = '';
                   switch (day) {
@@ -69,7 +84,7 @@ class _AppCalanderState extends State<AppCalander> {
                       label,
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                         color: Colors.black54,
                       ),
                     ),

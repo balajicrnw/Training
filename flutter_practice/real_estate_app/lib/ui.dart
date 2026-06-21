@@ -3,4 +3,11 @@ export 'package:real_estate_app/widgets/app_text.dart';
 export 'package:real_estate_app/widgets/enums.dart';
 export 'package:real_estate_app/widgets/app_chip.dart';
 export 'package:real_estate_app/widgets/app_card.dart';
-
+export 'package:real_estate_app/widgets/app_bottom_navigator.dart';
+export 'package:real_estate_app/widgets/app_search_bar.dart';
+export 'package:real_estate_app/widgets/app_dropdown.dart';
+export 'package:real_estate_app/widgets/app_calander.dart';
+export 'package:real_estate_app/widgets/app_details_card.dart';
+export 'package:real_estate_app/widgets/app_button.dart';
+export 'package:real_estate_app/colors.dart';
+export 'package:real_estate_app/widgets/app_trailing.dart';

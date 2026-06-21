@@ -23,8 +23,11 @@ class SearchPage extends StatelessWidget {
           right: 16,
           child: Row(
             children: [
-              Expanded(child: AppSearchBar()),
-              AppIconButton(icon: Icons.tune),
+              Expanded(child: AppSearchBar(text: "Search by locations")),
+              AppIconButton(
+                icon: Icons.tune,
+                variant: AppIconButtonVariant.background,
+              ),
             ],
           ),
         ),

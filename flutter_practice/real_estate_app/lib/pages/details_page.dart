@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/widgets/app_details_card.dart';
-import 'package:real_estate_app/widgets/app_dropdown.dart';
-import 'package:real_estate_app/widgets/app_icon_button.dart';
+import 'package:real_estate_app/ui.dart';
+import 'package:real_estate_app/widgets/app_carousel.dart';
 
 class DetailsPage extends StatefulWidget {
   const DetailsPage({super.key});
@@ -13,33 +12,42 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: [
-        Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(4.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                child: Image.asset("lib/assets/villa1.jpeg"),
-              ),
-            ),
-          ],
-        ),
+        AppCarousel(),
         const SizedBox(height: 12),
         Row(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SizedBox(height: 50, width: 250, child: AppDropdown()),
+              padding: const EdgeInsets.only(left: 26, right: 18, bottom: 12),
+              child: Row(
+                children: [
+                  SizedBox(height: 46, width: 230, child: AppDropdown()),
+                  SizedBox(width: 8),
+                  AppIconButton(
+                    icon: Icons.add_location,
+                    variant: AppIconButtonVariant.transparent,
+                  ),
+                  SizedBox(width: 8),
+                  AppIconButton(
+                    icon: Icons.arrow_outward,
+                    variant: AppIconButtonVariant.transparent,
+                  ),
+                ],
+              ),
             ),
-            AppIconButton(icon: Icons.add_location),
-            SizedBox(width: 5),
-            AppIconButton(icon: Icons.arrow_outward),
           ],
         ),
-        SizedBox(height: 5),
-        SizedBox(width: 330, child: AppDetailsCard()),
+        Column(
+          children: [
+            SizedBox(height: 5),
+            SizedBox(width: 330, child: AppDetailsCard()),
+            SizedBox(height: 5),
+            SizedBox(width: 330, child: AppDetailsCard()),
+            SizedBox(height: 5),
+            SizedBox(width: 330, child: AppDetailsCard()),
+          ],
+        ),
       ],
     );
   }

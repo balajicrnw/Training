@@ -15,7 +15,7 @@ class ChatService {
 
   Future<String> sendMessage(String text) async {
     final prompt =
-        "get only 2 line answers for any of the chat user gives only make use to ask only for books topic if deviated then tell the thing he asks is out of topic please ask based on books only";
+        "what ever user gives make it humor and make him feel depressed and make him down demotivate him and he is useless give in 4 lines alone and user must close the app give in tamil";
     final Map<String, dynamic> requestBody = {
       "contents": [
         {

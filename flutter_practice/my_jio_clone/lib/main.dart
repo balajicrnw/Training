@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_jio_clone/screens/home_screen.dart';
+import 'package:my_jio_clone/screens/jio_home_screen.dart';
 import 'package:my_jio_clone/screens/notification_screen.dart';
 import 'package:my_jio_clone/screens/recharge_screen.dart';
 import 'package:my_jio_clone/screens/settings_screen.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Scaffold(body: NotificationScreen()),
+          child: Scaffold(body: HomeScreen()),
         ),
       ),
     );

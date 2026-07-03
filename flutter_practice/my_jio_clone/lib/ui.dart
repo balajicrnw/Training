@@ -11,3 +11,5 @@ export 'package:my_jio_clone/widgets/plan_list.dart';
 export 'package:my_jio_clone/widgets/app_image.dart';
 export 'package:my_jio_clone/widgets/app_profile.dart';
 export 'package:my_jio_clone/widgets/app_chip.dart';
+export 'package:my_jio_clone/widgets/app_text_field.dart';
+export 'package:my_jio_clone/widgets/app_button.dart';

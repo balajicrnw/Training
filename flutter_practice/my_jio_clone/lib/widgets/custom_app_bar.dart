@@ -33,6 +33,23 @@ class CustomAppBar extends StatefulWidget {
     );
   }
 
+  factory CustomAppBar.jioHome() {
+    return CustomAppBar(
+      widget: Row(
+        children: [
+          Icon(Icons.arrow_back_ios_rounded, color: AppColors.darkBlue),
+          SizedBox(width: 10),
+          Column(
+            children: [
+              AppText.medium(text: "Get JioHome", isBold: true),
+              AppText.medium(text: "9876543210", isBold: true),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   factory CustomAppBar.recharge() {
     return CustomAppBar(
       widget: Row(
